@@ -11,6 +11,6 @@
 |
 */
 
-Route::get('/', function () {
-    return view("index");
-});
+@include("website.php");
+@include("control_panel.php");
+
