@@ -12,5 +12,5 @@
 */
 
 Route::get('/', function () {
-    return view("ControlPanel.main");
+    return view("index");
 });
