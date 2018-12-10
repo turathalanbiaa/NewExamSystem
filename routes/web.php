@@ -11,6 +11,5 @@
 |
 */
 
-Route::get('/', function () {
-    return view("ControlPanel.main");
-});
+@include("website.php");
+@include("control_panel.php");

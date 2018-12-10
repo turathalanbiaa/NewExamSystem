@@ -10,11 +10,11 @@
             <h4 class="alert-heading font-weight-bold mb-4 text-center">لوحة التحكم النظام الإمتحاني</h4>
             <p class="font-weight-bold text-center">معهد تراث الأنبياء (عليهم السلام) للدراسات الحوزوية الإلكترونية</p>
             <hr>
-            
+
             <!-- Copyright -->
             <div class="footer-copyright text-center py-2" style="direction: ltr; text-align: right;">
                 <span>© 2018 Copyright:</span>
-                <a href="https://turathalanbiaa.com" class="text-default"> turathalanbiaa.com</a>
+                <a href="https://turathalanbiaa.com" class="text-black"> turathalanbiaa.com</a>
             </div>
             <!-- Copyright -->
         </div>
