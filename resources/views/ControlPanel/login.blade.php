@@ -8,49 +8,44 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 col-sm-12">
-                <div class="card shadow mt-5">
-                    <div class="card-body">
-                        <!--Header-->
-                        <div class="form-header turquoise p-3 shadow mb-3" style="margin-top: -30px;">
-                            <h3 class="text-white">
-                                <i class="fa fa-lock"></i>
-                                <span>تسجيل الدخول</span>
-                            </h3>
-                        </div>
+                <!-- Card -->
+                <div class="card mt-4">
 
-                        <!--Body-->
-                        <form method="post" action="/control-panel/login">
+                    <!-- Card body -->
+                    <div class="card-body">
+
+                        <!-- Material form register -->
+                        <form class="text-left" dir="ltr">
+                            <p class="h4 text-center py-4">Login</p>
+
+                            <!-- Material input username -->
                             <div class="md-form">
-                                <i class="fa fa-envelope prefix grey-text"></i>
-                                <input type="text" id="defaultForm-email" class="form-control">
-                                <label for="defaultForm-email">Your email</label>
+                                <i class="fa fa-user prefix grey-text"></i>
+                                <input type="text" id="username" class="form-control">
+                                <label for="username" class="font-weight-light">Username</label>
                             </div>
 
+                            <!-- Material input password -->
                             <div class="md-form">
                                 <i class="fa fa-lock prefix grey-text"></i>
-                                <input type="password" id="defaultForm-pass" class="form-control">
-                                <label for="defaultForm-pass">Your password</label>
+                                <input type="password" id="password" class="form-control">
+                                <label for="password" class="font-weight-light">Password</label>
                             </div>
 
-                            <div class="text-center">
-                                <button class="btn btn-default waves-effect waves-light">Login</button>
+                            <div class="text-center py-4 mt-3">
+                                <button class="btn btn-outline-purple" type="submit">
+                                    <span>Login</span>
+                                    <i class="fa fa-paper-plane ml-2"></i>
+                                </button>
                             </div>
                         </form>
+                        <!-- Material form register -->
 
                     </div>
+                    <!-- Card body -->
 
-                    <!--Footer-->
-                    <div class="modal-footer">
-                        <div class="options">
-                            <p>Not a member?
-                                <a href="#">Sign Up</a>
-                            </p>
-                            <p>Forgot
-                                <a href="#">Password?</a>
-                            </p>
-                        </div>
-                    </div>
                 </div>
+                <!-- Card -->
             </div>
         </div>
     </div>
