@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Admin;
 use Closure;
 use Illuminate\Support\Facades\Cookie;
 
@@ -16,9 +17,17 @@ class AutoLoginAdminMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (!Cookie::has("session"))
-            redirect("/control-panel");
+        if (Cookie::has("EXAM_SYSTEM_ADMIN_SESSION")) {
+            $admin = Admin::where("session", Cookie::get("EXAM_SYSTEM_ADMIN_SESSION"))->first();
 
-        return $next($request);
+            if ($admin) {
+                session()->put('EXAM_SYSTEM_ADMIN_SESSION' , $admin->session);
+                session()->save();
+
+                return $next($request);
+            }
+        }
+
+        return redirect("/control-panel/login");
     }
 }

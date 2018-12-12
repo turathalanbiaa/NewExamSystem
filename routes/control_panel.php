@@ -6,10 +6,10 @@
  * Time: 1:44 PM
  */
 
-Route::get('/control-panel', 'ControlPanel\MainController@index');
-Route::get('/control-panel/login', 'ControlPanel\MainController@login');
-Route::post('/control-panel/login', 'ControlPanel\MainController@loginValidate');
-Route::get('/control-panel/logout', 'ControlPanel\MainController@logout');
+Route::get('/control-panel', 'ControlPanel\MainController@index')->middleware("login");
+Route::get('/control-panel/login', 'ControlPanel\LoginController@login');
+Route::post('/control-panel/login', 'ControlPanel\LoginController@loginValidate');
+Route::get('/control-panel/logout', 'ControlPanel\LogoutController@logout');
 
 Route::resource('control-panel/admins', 'ControlPanel\AdminController');
 Route::resource('control-panel/courses', 'ControlPanel\CourseController');

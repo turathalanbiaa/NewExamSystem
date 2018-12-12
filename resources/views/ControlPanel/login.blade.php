@@ -8,27 +8,40 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 col-sm-12">
-                <!-- Card -->
+                <!-- Card login-->
                 <div class="card mt-4">
-
-                    <!-- Card body -->
                     <div class="card-body">
+                        <form method="post" action="/control-panel/login" class="text-left" dir="ltr">
+                            <p class="h4 text-center text-secondary py-4">Login</p>
+                            <!-- Errors -->
+                            @if ($errors->any())
+                                <div class="alert alert-primary mb-5" style="direction: rtl; text-align: right;">
+                                    <ul class="mb-0 pr-3">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
 
-                        <!-- Material form register -->
-                        <form class="text-left" dir="ltr">
-                            <p class="h4 text-center py-4">Login</p>
+                            <!-- Session Error Login Message -->
+                            @if (session('ErrorLoginMessage'))
+                                <div class="alert alert-primary text-center">
+                                    {{ session('ErrorLoginMessage') }}
+                                </div>
+                            @endif
 
-                            <!-- Material input username -->
+                            {{ csrf_field() }}
+
                             <div class="md-form">
                                 <i class="fa fa-user prefix grey-text"></i>
-                                <input type="text" id="username" class="form-control">
+                                <input type="text" name="username" value="{{old("username")}}" id="username" class="form-control">
                                 <label for="username" class="font-weight-light">Username</label>
                             </div>
 
-                            <!-- Material input password -->
                             <div class="md-form">
                                 <i class="fa fa-lock prefix grey-text"></i>
-                                <input type="password" id="password" class="form-control">
+                                <input type="password" name="password" id="password" class="form-control">
                                 <label for="password" class="font-weight-light">Password</label>
                             </div>
 
@@ -39,13 +52,8 @@
                                 </button>
                             </div>
                         </form>
-                        <!-- Material form register -->
-
                     </div>
-                    <!-- Card body -->
-
                 </div>
-                <!-- Card -->
             </div>
         </div>
     </div>

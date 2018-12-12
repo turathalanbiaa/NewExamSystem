@@ -35,7 +35,7 @@
         <!-- Copyright -->
         <div class="footer-copyright text-center py-3" style="direction: ltr; text-align: right;">
             <span>© 2018 Copyright:</span>
-            <a href="https://turathalanbiaa.com">turathalanbiaa.com</a>
+            <a href="https://turathalanbiaa.com" target="_blank">turathalanbiaa.com</a>
         </div>
         <!-- Copyright -->
     </footer>
