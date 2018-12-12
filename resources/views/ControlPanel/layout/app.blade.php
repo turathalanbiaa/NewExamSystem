@@ -13,6 +13,8 @@
     <link href="{{asset("mdb/css/bootstrap.min.css")}}" rel="stylesheet">
     <!-- Material Design Bootstrap -->
     <link href="{{asset("mdb/css/mdb.min.css")}}" rel="stylesheet">
+    <!-- MDBootstrap Datatables  -->
+    <link href="{{asset("mdb/css/addons/datatables.min.css")}}" rel="stylesheet">
     <!-- My Custom Styles -->
     <link href="{{asset("mdb/css/style.css")}}" rel="stylesheet">
 
@@ -42,8 +44,6 @@
     <!--Footer-->
 
     <!-- SCRIPTS -->
-    <!-- My Custom Script -->
-    @yield("script")
     <!-- JQuery -->
     <script type="text/javascript" src="{{asset("mdb/js/jquery-3.3.1.min.js")}}"></script>
     <!-- Bootstrap tooltips -->
@@ -52,5 +52,9 @@
     <script type="text/javascript" src="{{asset("mdb/js/bootstrap.min.js")}}"></script>
     <!-- MDB core JavaScript -->
     <script type="text/javascript" src="{{asset("mdb/js/mdb.min.js")}}"></script>
+    <!-- MDBootstrap Datatables  -->
+    <script type="text/javascript" src="{{asset("mdb/js/addons/datatables.min.js")}}"></script>
+    <!-- My Custom Script -->
+    @yield("script")
 </body>
 </html>

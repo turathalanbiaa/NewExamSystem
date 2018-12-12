@@ -8,6 +8,6 @@ use App\Http\Controllers\Controller;
 class MainController extends Controller
 {
     public function index() {
-        dd("home");
+        return view("ControlPanel.index");
     }
 }

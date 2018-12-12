@@ -46,7 +46,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="/control-panel/admins">
                                 <span>الحسابات</span>
                             </a>
                         </li>

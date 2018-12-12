@@ -15,7 +15,10 @@ class AdminController extends Controller
      */
     public function index()
     {
-        //
+        $admins = Admin::all();
+        return view("ControlPanel.admin.index")->with([
+            "admins" => $admins
+        ]);
     }
 
     /**
