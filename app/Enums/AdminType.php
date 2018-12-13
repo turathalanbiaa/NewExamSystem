@@ -11,13 +11,14 @@ namespace App\Enums;
 
 class AdminType
 {
-    const LECTURER = 1;
-    const MANAGER = 2;
+
+    const MANAGER = 1;
+    const LECTURER = 2;
 
     public static function getType($key) {
         switch ($key) {
-            case 1: return "استاذ"; break;
-            case 2: return "مدير"; break;
+            case 1: return "مدير"; break;
+            case 2: return "استاذ"; break;
         }
         return "";
     }

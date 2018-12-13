@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\AutoLoginAdminMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -61,6 +62,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'StudentAuth' => \App\Http\Middleware\StudentAuthMiddleware::class,
+        'login' => \App\Http\Middleware\AutoLoginAdminMiddleware::class,
     ];
 
     /**

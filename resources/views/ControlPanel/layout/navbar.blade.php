@@ -1,24 +1,22 @@
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-default">
+<nav class="navbar navbar-expand-lg navbar-dark secondary-color">
     <div class="container">
         <!-- Navbar Brand -->
-        <a class="navbar-brand pull-right mr-0 ml-4 py-3" href="#">
-            <img src="https://mdbootstrap.com/img/logo/mdb-transparent.png" height="20" alt="Route 66 in navbar">
+        <a class="navbar-brand pull-right mr-0 ml-4" href="#">
+            <img src="{{asset("mdb/img/escp.png")}}" height="20" alt="Route 66 in navbar">
             <span class="d-inline-block align-top mr-2">لوحة التحكم</span>
         </a>
 
-        @php
-            $currentPath = \Illuminate\Support\Facades\Route::getFacadeRoot()->current()->uri();
-        @endphp
+        @php $currentPath = \Illuminate\Support\Facades\Route::getFacadeRoot()->current()->uri(); @endphp
 
-        @if($currentPath !== "login")
+        @if($currentPath !== "control-panel/login")
             <!-- Navbar Collapse -->
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarExampleDef" aria-controls="navbarExampleDef"
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse" aria-controls="navbarExampleDef"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="collapse navbar-collapse pull-right" id="navbarExampleDef">
+                <div class="collapse navbar-collapse pull-right" id="navbar-collapse">
                     <ul class="navbar-nav ml-auto pr-0">
                         <li class="nav-item active">
                             <a class="nav-link" href="#">
@@ -48,16 +46,16 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="/control-panel/admins">
                                 <span>الحسابات</span>
                             </a>
                         </li>
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <li class="nav-item dropdown" style="width: 100px;">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span>الاعدادات</span>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="navbarDropdown">
+                            <div class="dropdown-menu dropdown-menu-right text-center dropdown-primary border-top-0 border-right-0 border-left-0 rounded-0 border-bottom border-secondary" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="#">
                                     <span>عرض المعلومات الشخصية</span>
                                 </a>
