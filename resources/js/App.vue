@@ -17,28 +17,28 @@
                     </v-list-tile-content>
                 </v-list-tile>
 
-                <v-list-tile to="/">
+                <v-list-tile :to="{ name: 'Page2'}">
                     <v-list-tile-action>
-                        <v-icon color="light-blue lighten-1">settings</v-icon>
+                        <v-icon color="light-blue lighten-1">navigate_before</v-icon>
                     </v-list-tile-action>
                     <v-list-tile-content>
-                        <v-list-tile-title >الاعدادت</v-list-tile-title>
+                        <v-list-tile-title >الامتحانات الحاليه</v-list-tile-title>
                     </v-list-tile-content>
                 </v-list-tile>
 
-                <v-list-tile to="/">
+                <v-list-tile >
                     <v-list-tile-action>
-                        <v-icon color="teal lighten-1">help</v-icon>
+                        <v-icon color="teal lighten-1">navigate_next</v-icon>
                     </v-list-tile-action>
                     <v-list-tile-content>
-                        <v-list-tile-title>المساعده</v-list-tile-title>
+                        <v-list-tile-title>الامتحانات القادمه</v-list-tile-title>
                     </v-list-tile-content>
                 </v-list-tile>
             </v-list>
         </v-navigation-drawer>
         <v-toolbar
                 clipped-right
-                color="teal"
+                color="#6f42c1"
                 dark
                 app
                 fixed
@@ -72,11 +72,7 @@
             </v-btn>
         </v-toolbar>
         <v-content>
-            <v-container fluid fill-height>
-                <v-layout justify-center align-center>
-
-                </v-layout>
-            </v-container>
+            <router-view></router-view>
         </v-content>
     </v-app>
 </template>

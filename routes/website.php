@@ -8,5 +8,9 @@
 
 
 Route::get('/', function () {
-    return view("index");
+    return view("Website/index");
+})->middleware('StudentAuth');
+
+Route::get('/info', function () {
+        return view("Website/info");
 });

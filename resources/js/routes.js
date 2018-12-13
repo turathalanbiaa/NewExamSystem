@@ -18,4 +18,5 @@ export const routes= [
         name: 'Page2',
         component: Page2
     },
+
 ];
