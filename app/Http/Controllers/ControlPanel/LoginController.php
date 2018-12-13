@@ -15,7 +15,7 @@ class LoginController extends Controller
             $admin = Admin::where("session", "=", Cookie::get("EXAM_SYSTEM_ADMIN_SESSION"))->first();
 
             if (!$admin)
-                return view("/control-panel/login");
+                return view("ControlPanel.login");
 
             session()->put('EXAM_SYSTEM_ADMIN_SESSION', $admin->session);
             session()->save();
@@ -23,7 +23,7 @@ class LoginController extends Controller
             return redirect("/control-panel");
         }
 
-        return view("ControlPanel/login");
+        return view("ControlPanel.login");
     }
 
     public function loginValidate(Request $request) {
@@ -52,6 +52,7 @@ class LoginController extends Controller
         $admin->save();
 
         session()->put('EXAM_SYSTEM_ADMIN_SESSION' , $admin->session);
+        session()->save();
 
         return redirect("/control-panel")->withCookie(cookie('EXAM_SYSTEM_ADMIN_SESSION' , $admin->session , 1000000000));
     }

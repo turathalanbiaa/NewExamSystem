@@ -1,5 +1,5 @@
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark secondary-color">
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark secondary-color">
     <div class="container">
         <!-- Navbar Brand -->
         <a class="navbar-brand pull-right mr-0 ml-4" href="#">

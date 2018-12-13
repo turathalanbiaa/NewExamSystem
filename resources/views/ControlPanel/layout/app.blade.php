@@ -27,7 +27,7 @@
     <!--Main Navigation-->
 
     <!--Main layout-->
-    <main>
+    <main style="margin: 60px 0;">
         @yield("content")
     </main>
     <!--Main layout-->

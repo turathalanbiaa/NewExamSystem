@@ -42,10 +42,10 @@ table.dataTable thead .sorting_asc:before,
 table.dataTable thead .sorting_asc_disabled:before,
 table.dataTable thead .sorting_desc:before,
 table.dataTable thead .sorting_desc_disabled:before {
-    right: 1em;
+    left: 1em;
     content: "\f0de";
-    font-family: FontAwesome;
-    font-size: 1rem
+    font-family: "Font Awesome 5 Free";
+    font-size: 1rem;
 }
 
 table.dataTable thead .sorting:after,
@@ -54,9 +54,9 @@ table.dataTable thead .sorting_asc_disabled:after,
 table.dataTable thead .sorting_desc:after,
 table.dataTable thead .sorting_desc_disabled:after {
     content: "\f0dd";
-    font-family: FontAwesome;
-    right: 16px;
-    font-size: 1rem
+    font-family: "Font Awesome 5 Free";
+    left: 16px;
+    font-size: 1rem;
 }
 
 table.dataTable thead .sorting_asc:before,
