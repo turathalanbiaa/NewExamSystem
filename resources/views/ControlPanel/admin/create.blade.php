@@ -9,20 +9,29 @@
         <div class="row justify-content-center">
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
-                    <div class="card-body px-lg-5 pt-0">
-                        <!-- Errors -->
-                        @if ($errors->any())
-                            <div class="alert alert-primary mb-5" style="direction: rtl; text-align: right;">
-                                <ul class="mb-0 pr-3">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
+                    <!-- Errors -->
+                    @if ($errors->any())
+                        <div class="alert alert-info m-lg-4 m-3">
+                            <ul class="mb-0 pr-3">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
+                <!-- Session Create Admin Message -->
+                    @if (session('CreateAdminMessage'))
+                        <div class="alert alert-info text-center m-lg-4 m-3">
+                            {{session('CreateAdminMessage')}}
+                        </div>
+                    @endif
+
+
+                    <div class="card-body px-lg-5 pt-0">
                         <form class="md-form" method="post" action="/control-panel/admins">
-                            {{csrf_field()}}
+                            {{ csrf_field() }}
+
                             <div class="md-form">
                                 <label class="w-100" for="name">الاسم الحقيقي</label>
                                 <input type="text" name="name" id="name" class="form-control" value="{{old("name")}}">
@@ -90,7 +99,4 @@
             </div>
         </div>
     </div>
-@endsection
-
-@section("script")
 @endsection

@@ -39,8 +39,9 @@ class AdminController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
     {
@@ -69,10 +70,25 @@ class AdminController extends Controller
 
         $this->validate($request, $rule, $ruleMessages);
 
+        $admin = new Admin();
+        $admin->name = Input::get("name");
+        $admin->username = Input::get("username");
+        $admin->password = md5(Input::get("password"));
+        $admin->type = Input::get("type");
+        $admin->lecturer_id = Input::get("lecturer_id",null);
+        $admin->state = Input::get("state");
+        $admin->session = Input::get("session");
+        $admin->date = date("Y-m-d");
+        $success = $admin->save();
 
+        if(!$success)
+            return redirect("control-panel/admins/create")->with([
+                "CreateAdminMessage" => "لم تتم عملية الاضافة بنجاح."
+            ]);
 
-
-        return "";
+        return redirect("control-panel/admins/create")->with([
+            "CreateAdminMessage" => "تمت عملية الاضافة بنجاح."
+        ]);
     }
 
     /**

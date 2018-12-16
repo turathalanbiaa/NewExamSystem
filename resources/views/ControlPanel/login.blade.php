@@ -15,7 +15,7 @@
                             <p class="h4 text-center text-secondary py-4">Login</p>
                             <!-- Errors -->
                             @if ($errors->any())
-                                <div class="alert alert-primary mb-5" style="direction: rtl; text-align: right;">
+                                <div class="alert alert-info mb-5" style="direction: rtl; text-align: right;">
                                     <ul class="mb-0 pr-3">
                                         @foreach ($errors->all() as $error)
                                             <li>{{ $error }}</li>
@@ -26,7 +26,7 @@
 
                             <!-- Session Error Login Message -->
                             @if (session('ErrorLoginMessage'))
-                                <div class="alert alert-primary text-center">
+                                <div class="alert alert-info text-center">
                                     {{ session('ErrorLoginMessage') }}
                                 </div>
                             @endif

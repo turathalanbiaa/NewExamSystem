@@ -17,10 +17,14 @@ class AutoLoginAdminMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (Cookie::has("EXAM_SYSTEM_ADMIN_SESSION")) {
+        $request->session()->reflash();
+
+        if (Cookie::has("EXAM_SYSTEM_ADMIN_SESSION"))
+        {
             $admin = Admin::where("session", Cookie::get("EXAM_SYSTEM_ADMIN_SESSION"))->first();
 
-            if ($admin) {
+            if ($admin)
+            {
                 session()->put('EXAM_SYSTEM_ADMIN_SESSION' , $admin->session);
                 session()->save();
 
