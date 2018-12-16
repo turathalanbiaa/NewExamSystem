@@ -5,7 +5,15 @@
 @endsection
 
 @section("content")
-    <div class="container pt-3">
+    <div class="container pt-4">
+        <div class="row">
+            <div class="col-12">
+                <a href="/control-panel/admins/create" class="btn btn-default">
+                    <i class="fa fa-plus ml-1"></i>
+                    <span>اضافة</span>
+                </a>
+            </div>
+        </div>
         <div class="row">
             <div class="col-12">
                 <table id="dtAdmins" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
