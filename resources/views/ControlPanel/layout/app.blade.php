@@ -13,7 +13,6 @@
     <link href="{{asset("mdb/css/bootstrap.min.css")}}" rel="stylesheet">
     <!-- Material Design Bootstrap -->
     <link href="{{asset("mdb/css/mdb.min.css")}}" rel="stylesheet">
-    <link href="{{asset("mdb/css/mdb.lite.css")}}" rel="stylesheet">
     <!-- MDBootstrap Datatables  -->
     <link href="{{asset("mdb/css/addons/datatables.min.css")}}" rel="stylesheet">
     <!-- My Custom Styles -->

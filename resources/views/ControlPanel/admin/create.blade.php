@@ -1,7 +1,7 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>اضافة حساب</title>
+    <title>اضافة</title>
 @endsection
 
 @section("content")
@@ -55,10 +55,10 @@
                             <div class="md-form pt-3">
                                 <select class="browser-default custom-select" name="type">
                                     <option value="" disabled="" selected="">اختر نوع الحساب</option>
-                                    <option value="{{\App\Enums\AdminType::MANAGER}}">
+                                    <option value="{{\App\Enums\AdminType::MANAGER}}" {{(old("type") == \App\Enums\AdminType::MANAGER ? "selected":"")}}>
                                         {{\App\Enums\AdminType::getType(\App\Enums\AdminType::MANAGER)}}
                                     </option>
-                                    <option value="{{\App\Enums\AdminType::LECTURER}}">
+                                    <option value="{{\App\Enums\AdminType::LECTURER}}" {{(old("type") == \App\Enums\AdminType::LECTURER ? "selected":"")}}>
                                         {{\App\Enums\AdminType::getType(\App\Enums\AdminType::LECTURER)}}
                                     </option>
                                 </select>
@@ -68,7 +68,7 @@
                                 <select class="browser-default custom-select" name="lecturer_id">
                                     <option value="" disabled="" selected="">اختر الاستاذ</option>
                                     @forelse($lecturers as $lecturer)
-                                        <option value="{{$lecturer->id}}">
+                                        <option value="{{$lecturer->id}}" {{(old("lecturer_id") == $lecturer->id ? "selected":"")}}>
                                             {{$lecturer->name}}
                                         </option>
                                     @empty
@@ -80,10 +80,10 @@
                             <div class="md-form pt-3">
                                 <select class="browser-default custom-select" name="state">
                                     <option value="" disabled="" selected="">اختر حالة الحساب</option>
-                                    <option value="{{\App\Enums\AdminState::OPEN}}">
+                                    <option value="{{\App\Enums\AdminState::OPEN}}" {{(old("state") == \App\Enums\AdminState::OPEN ? "selected":"")}}>
                                         {{\App\Enums\AdminState::getState(\App\Enums\AdminState::OPEN)}}
                                     </option>
-                                    <option value="{{\App\Enums\AdminState::CLOSE}}">
+                                    <option value="{{\App\Enums\AdminState::CLOSE}}" {{(old("state") == \App\Enums\AdminState::CLOSE ? "selected":"")}}>
                                         {{\App\Enums\AdminState::getState(\App\Enums\AdminState::CLOSE)}}
                                     </option>
                                 </select>

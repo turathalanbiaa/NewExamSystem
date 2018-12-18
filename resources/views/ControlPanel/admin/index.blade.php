@@ -20,7 +20,7 @@
                     <thead>
                     <tr>
                         <th class="th-sm fa d-table-cell">
-                            <span>رقم الحساب</span>
+                            <span>رقم</span>
                         </th>
                         <th class="th-sm fa d-table-cell">
                             <span>الاسم الحقيقي</span>
@@ -38,7 +38,7 @@
                             <span>حالة الحساب</span>
                         </th>
                         <th class="th-sm fa d-table-cell">
-                            <span>تاريخ</span>
+                            <span>خيارات</span>
                         </th>
                     </tr>
                     </thead>
@@ -51,19 +51,33 @@
                             <td>{{\App\Enums\AdminType::getType($admin->type)}}</td>
                             <td>{{$admin->getLecturerName()}}</td>
                             <td>{{\App\Enums\AdminState::getState($admin->state)}}</td>
-                            <td>{{$admin->date}}</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                                    <a href="/control-panel/admins/{{$admin->id}}" class="btn btn-dark-green mx-0" data-toggle="tooltip" title="عرض جميع المعلومات">
+                                        <i class="fa fa-info-circle"></i>
+                                    </a>
+
+                                    <a href="/control-panel/admins/{{$admin->id}}/edit?type=change-info" class="btn btn-indigo mx-2" data-toggle="tooltip" title="تحرير معلومات الحساب">
+                                        <i class="fa fa-pencil-alt"></i>
+                                    </a>
+
+                                    <a href="/control-panel/admins/{{$admin->id}}/edit?type=change-password" class="btn btn-amber mx-0" data-toggle="tooltip" title="تغيير كلمة المرور">
+                                        <i class="fa fa-unlock-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>
                     <tfoot>
                     <tr>
-                        <th>رقم الحساب</th>
+                        <th>رقم</th>
                         <th>الاسم الحقيقي</th>
                         <th>اسم المستخدم</th>
                         <th>نوع الحساب</th>
                         <th>اسم الاستاذ</th>
                         <th>حالة الحساب</th>
-                        <th>تاريخ</th>
+                        <th>خيارات</th>
                     </tr>
                     </tfoot>
                 </table>
@@ -75,10 +89,14 @@
 @section("script")
     <script>
         $(document).ready(function () {
+            // DataTable Initialization
             $('#dtAdmins').DataTable();
             $('.dataTables_length').addClass('bs-select');
             $("div#dtAdmins_wrapper>.row:first-child").css("direction","ltr");
             $("div#dtAdmins_wrapper>.row:first-child").css("text-align","left");
+
+            // Tooltips Initialization
+            $('[data-toggle="tooltip"]').tooltip()
         });
     </script>
 @endsection
