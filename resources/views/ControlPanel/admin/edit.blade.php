@@ -1,7 +1,11 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>تعديل</title>
+    @if($_GET["type"] == "change-password")
+        <title>تغيير كلمة المرور</title>
+    @else
+        <title>تعديل الحساب</title>
+    @endif
 @endsection
 
 @section("content")

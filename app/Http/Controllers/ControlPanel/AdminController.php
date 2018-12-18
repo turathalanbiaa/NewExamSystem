@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\ControlPanel;
 
 use App\Enums\AdminType;
+use App\Enums\EventLogType;
 use App\Models\Admin;
+use App\Models\EventLog;
 use App\Models\Lecturer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
-use phpDocumentor\Reflection\Types\Null_;
 
 class AdminController extends Controller
 {
@@ -84,10 +85,16 @@ class AdminController extends Controller
         $admin->date = date("Y-m-d");
         $success = $admin->save();
 
-        if(!$success)
+        if (!$success)
             return redirect("control-panel/admins/create")->with([
                 "CreateAdminMessage" => "لم تتم عملية الاضافة بنجاح"
             ]);
+
+        $source = session()->get("EXAM_SYSTEM_ADMIN_ID");
+        $destination = $admin->id;
+        $type = EventLogType::ADMIN;
+        $event = "اضافة حساب جديد";
+        EventLog::create($source, $destination, $type, $event);
 
         return redirect("control-panel/admins/create")->with([
             "CreateAdminMessage" => "تمت عملية الاضافة بنجاح"
@@ -97,25 +104,31 @@ class AdminController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Admin  $admin
+     * @param  \App\Models\Admin $admin
      * @return \Illuminate\Http\Response
      */
     public function show(Admin $admin)
     {
-        //
+        $events = EventLog::where("source", $admin->id)
+            ->orderBy("id","DESC")
+            ->get();
+        return view("ControlPanel.admin.show")->with([
+            "admin" => $admin,
+            "events" => $events
+        ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Admin  $admin
+     * @param  \App\Models\Admin $admin
      * @return \Illuminate\Http\Response
      */
     public function edit(Admin $admin)
     {
         $lecturers = Lecturer::all();
         return view("ControlPanel.admin.edit")->with([
-            "admin"     => $admin,
+            "admin" => $admin,
             "lecturers" => $lecturers
         ]);
     }
@@ -131,8 +144,7 @@ class AdminController extends Controller
     public function update(Request $request, Admin $admin)
     {
         //For Change Password
-        if (Input::get("type") == "change-password")
-        {
+        if (Input::get("type") == "change-password") {
             $rule = [
                 'password' => 'required|min:8',
                 'password_confirmation' => 'required_with:password|same:password'
@@ -151,10 +163,16 @@ class AdminController extends Controller
             $admin->session = null;
             $success = $admin->save();
 
-            if(!$success)
+            if (!$success)
                 return redirect("control-panel/admins/$admin->id/edit?type=change-password")->with([
                     "UpdateAdminMessage" => "لم يتم تغيير كلمة المرور"
                 ]);
+
+            $source = session()->get("EXAM_SYSTEM_ADMIN_ID");
+            $destination = $admin->id;
+            $type = EventLogType::ADMIN;
+            $event = "تغيير كلمة المرور";
+            EventLog::create($source, $destination, $type, $event);
 
             return redirect("control-panel/admins/$admin->id/edit?type=change-password")->with([
                 "UpdateAdminMessage" => "تم تغيير كلمة المرور"
@@ -164,7 +182,7 @@ class AdminController extends Controller
         else {
             $rule = [
                 'name' => 'required',
-                'username' => ["required",Rule::unique('admin')->ignore($admin->id)],
+                'username' => ["required", Rule::unique('admin')->ignore($admin->id)],
                 'type' => 'required',
                 'lecturer_id' => 'required_if:type,2',
                 'state' => 'required'
@@ -188,10 +206,16 @@ class AdminController extends Controller
             $admin->state = Input::get("state");
             $success = $admin->save();
 
-            if(!$success)
+            if (!$success)
                 return redirect("control-panel/admins/$admin->id/edit?type=change-info")->with([
                     "UpdateAdminMessage" => "لم يتم تحديث المعلومات"
                 ]);
+
+            $source = session()->get("EXAM_SYSTEM_ADMIN_ID");
+            $destination = $admin->id;
+            $type = EventLogType::ADMIN;
+            $event = "تعديل الحساب";
+            EventLog::create($source, $destination, $type, $event);
 
             return redirect("control-panel/admins/$admin->id/edit?type=change-info")->with([
                 "UpdateAdminMessage" => "تم تحديث المعلومات"
@@ -202,7 +226,7 @@ class AdminController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Admin  $admin
+     * @param  \App\Models\Admin $admin
      * @return \Illuminate\Http\Response
      */
     public function destroy(Admin $admin)

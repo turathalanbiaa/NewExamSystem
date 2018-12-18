@@ -25,6 +25,10 @@ class AutoLoginAdminMiddleware
 
             if ($admin)
             {
+                session()->put('EXAM_SYSTEM_ADMIN_ID' , $admin->id);
+                session()->put('EXAM_SYSTEM_ADMIN_NAME' , $admin->name);
+                session()->put('EXAM_SYSTEM_ADMIN_TYPE' , $admin->type);
+                session()->put('EXAM_SYSTEM_ADMIN_STATE' , $admin->state);
                 session()->put('EXAM_SYSTEM_ADMIN_SESSION' , $admin->session);
                 session()->save();
 

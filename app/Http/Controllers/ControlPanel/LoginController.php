@@ -17,6 +17,10 @@ class LoginController extends Controller
             if (!$admin)
                 return view("ControlPanel.login");
 
+            session()->put('EXAM_SYSTEM_ADMIN_ID' , $admin->id);
+            session()->put('EXAM_SYSTEM_ADMIN_NAME' , $admin->name);
+            session()->put('EXAM_SYSTEM_ADMIN_TYPE' , $admin->type);
+            session()->put('EXAM_SYSTEM_ADMIN_STATE' , $admin->state);
             session()->put('EXAM_SYSTEM_ADMIN_SESSION', $admin->session);
             session()->save();
 
@@ -47,14 +51,18 @@ class LoginController extends Controller
         if (!$admin)
             return redirect("/control-panel/login")->with('ErrorLoginMessage', "فشل تسجيل الدخول !!! أعد المحاولة مرة أخرى");
 
-        $session = md5(uniqid());
-        $admin->session = $session;
+        $admin->session = md5(uniqid());
         $admin->save();
 
+        session()->put('EXAM_SYSTEM_ADMIN_ID' , $admin->id);
+        session()->put('EXAM_SYSTEM_ADMIN_NAME' , $admin->name);
+        session()->put('EXAM_SYSTEM_ADMIN_TYPE' , $admin->type);
+        session()->put('EXAM_SYSTEM_ADMIN_STATE' , $admin->state);
         session()->put('EXAM_SYSTEM_ADMIN_SESSION' , $admin->session);
         session()->save();
 
-        return redirect("/control-panel")->withCookie(cookie('EXAM_SYSTEM_ADMIN_SESSION' , $admin->session , 1000000000));
+        //Session for one year (525600 minutes)
+        return redirect("/control-panel")->withCookie(cookie('EXAM_SYSTEM_ADMIN_SESSION' , $admin->session , 525600));
     }
 
 }
