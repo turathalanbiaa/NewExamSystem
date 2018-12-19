@@ -17,7 +17,7 @@
         <div class="row">
             <div class="col-12">
                 <table id="dtAdmins" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
-                    <thead>
+                    <thead class="default-color text-white">
                     <tr>
                         <th class="th-sm fa d-table-cell">
                             <span>رقم</span>
@@ -69,17 +69,6 @@
                         </tr>
                     @endforeach
                     </tbody>
-                    <tfoot>
-                    <tr>
-                        <th>رقم</th>
-                        <th>الاسم الحقيقي</th>
-                        <th>اسم المستخدم</th>
-                        <th>نوع الحساب</th>
-                        <th>اسم الاستاذ</th>
-                        <th>حالة الحساب</th>
-                        <th>خيارات</th>
-                    </tr>
-                    </tfoot>
                 </table>
             </div>
         </div>

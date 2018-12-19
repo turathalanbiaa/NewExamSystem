@@ -12,7 +12,7 @@
                 <div class="card mt-4">
                     <div class="card-body">
                         <form method="post" action="/control-panel/login" class="text-left" dir="ltr">
-                            <p class="h4 text-center text-secondary py-4">Login</p>
+                            <p class="h4 text-center text-default py-4">Login</p>
                             <!-- Errors -->
                             @if ($errors->any())
                                 <div class="alert alert-info mb-5" style="direction: rtl; text-align: right;">
@@ -46,7 +46,7 @@
                             </div>
 
                             <div class="text-center py-4 mt-3">
-                                <button class="btn btn-outline-purple" type="submit">
+                                <button class="btn btn-outline-default" type="submit">
                                     <span>Login</span>
                                     <i class="fa fa-paper-plane ml-2"></i>
                                 </button>

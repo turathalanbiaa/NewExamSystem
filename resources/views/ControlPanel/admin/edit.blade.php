@@ -97,7 +97,7 @@
                                 </div>
                             @endif
 
-                            <button class="btn btn-outline-secondary btn-block mt-5" type="submit">
+                            <button class="btn btn-outline-default btn-block mt-5" type="submit">
                                 <span>حفظ</span>
                             </button>
                         </form>
