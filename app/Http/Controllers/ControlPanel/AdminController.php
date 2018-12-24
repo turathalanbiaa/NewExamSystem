@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
-use App\Enums\AdminType;
+use App\Enums\AccountType;
 use App\Enums\EventLogType;
 use App\Models\Admin;
 use App\Models\EventLog;
@@ -79,7 +79,7 @@ class AdminController extends Controller
         $admin->username = Input::get("username");
         $admin->password = md5(Input::get("password"));
         $admin->type = Input::get("type");
-        $admin->lecturer_id = ($admin->type == AdminType::LECTURER) ? Input::get("lecturer_id") : null;
+        $admin->lecturer_id = ($admin->type == AccountType::LECTURER) ? Input::get("lecturer_id") : null;
         $admin->state = Input::get("state");
         $admin->session = null;
         $admin->date = date("Y-m-d");
@@ -202,7 +202,7 @@ class AdminController extends Controller
             $admin->name = Input::get("name");
             $admin->username = Input::get("username");
             $admin->type = Input::get("type");
-            $admin->lecturer_id = ($admin->type == AdminType::LECTURER) ? Input::get("lecturer_id") : null;
+            $admin->lecturer_id = ($admin->type == AccountType::LECTURER) ? Input::get("lecturer_id") : null;
             $admin->state = Input::get("state");
             $success = $admin->save();
 

@@ -21,6 +21,7 @@ class RootExamType
             case 2: return "يومي"; break;
             case 3: return "تقييم (نشاط)"; break;
         }
+
         return "";
     }
 }

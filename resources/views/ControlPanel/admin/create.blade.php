@@ -55,11 +55,11 @@
                             <div class="md-form pt-3">
                                 <select class="browser-default custom-select" name="type">
                                     <option value="" disabled="" selected="">اختر نوع الحساب</option>
-                                    <option value="{{\App\Enums\AdminType::MANAGER}}" {{(old("type") == \App\Enums\AdminType::MANAGER ? "selected":"")}}>
-                                        {{\App\Enums\AdminType::getType(\App\Enums\AdminType::MANAGER)}}
+                                    <option value="{{\App\Enums\AccountType::MANAGER}}" {{(old("type") == \App\Enums\AccountType::MANAGER ? "selected":"")}}>
+                                        {{\App\Enums\AccountType::getType(\App\Enums\AccountType::MANAGER)}}
                                     </option>
-                                    <option value="{{\App\Enums\AdminType::LECTURER}}" {{(old("type") == \App\Enums\AdminType::LECTURER ? "selected":"")}}>
-                                        {{\App\Enums\AdminType::getType(\App\Enums\AdminType::LECTURER)}}
+                                    <option value="{{\App\Enums\AccountType::LECTURER}}" {{(old("type") == \App\Enums\AccountType::LECTURER ? "selected":"")}}>
+                                        {{\App\Enums\AccountType::getType(\App\Enums\AccountType::LECTURER)}}
                                     </option>
                                 </select>
                             </div>

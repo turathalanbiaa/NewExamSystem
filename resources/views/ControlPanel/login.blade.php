@@ -45,6 +45,18 @@
                                 <label for="password" class="font-weight-light">Password</label>
                             </div>
 
+                            <div class="md-form">
+                                <select class="browser-default custom-select" name="accountType">
+                                    <option disabled selected value="">Type Account</option>
+                                    <option value="{{\App\Enums\AccountType::MANAGER}}">
+                                        {{\App\Enums\AccountType::getType(\App\Enums\AccountType::MANAGER)}}
+                                    </option>
+                                    <option value="{{\App\Enums\AccountType::LECTURER}}">
+                                        {{\App\Enums\AccountType::getType(\App\Enums\AccountType::LECTURER)}}
+                                    </option>
+                                </select>
+                            </div>
+
                             <div class="text-center py-4 mt-3">
                                 <button class="btn btn-outline-default" type="submit">
                                     <span>Login</span>

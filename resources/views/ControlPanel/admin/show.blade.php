@@ -42,7 +42,7 @@
                                </h5>
                                <h5>
                                    <span>نوع الحساب:</span>
-                                   {{\App\Enums\AdminType::getType($admin->type)}}
+                                   {{\App\Enums\AccountType::getType($admin->type)}}
                                </h5>
                                <h5>
                                    <span>حالة الحساب:</span>

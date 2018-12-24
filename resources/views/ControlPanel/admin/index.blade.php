@@ -48,7 +48,7 @@
                             <td>{{$admin->id}}</td>
                             <td>{{$admin->name}}</td>
                             <td>{{$admin->username}}</td>
-                            <td>{{\App\Enums\AdminType::getType($admin->type)}}</td>
+                            <td>{{\App\Enums\AccountType::getType($admin->type)}}</td>
                             <td>{{$admin->getLecturerName()}}</td>
                             <td>{{\App\Enums\AdminState::getState($admin->state)}}</td>
                             <td class="text-center">

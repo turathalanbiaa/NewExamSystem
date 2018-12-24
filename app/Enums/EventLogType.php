@@ -12,8 +12,8 @@ namespace App\Enums;
 class EventLogType
 {
     const ADMIN = 1;
-    const COURSE = 2;
-    const lECTURER = 3;
+    const lECTURER = 2;
+    const COURSE = 3;
     const ROOT_EXAM = 4;
     const EXAM = 5;
     const ROOT_QUESTION = 6;
@@ -29,6 +29,7 @@ class EventLogType
             case 6: return "6";  break;
             case 7: return "7";  break;
         }
+
         return "";
     }
 }
