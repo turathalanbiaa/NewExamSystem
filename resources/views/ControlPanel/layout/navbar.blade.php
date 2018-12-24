@@ -1,8 +1,8 @@
 <!-- Navbar -->
-<nav class="navbar fixed-top navbar-expand-lg navbar-dark secondary-color">
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark default-color">
     <div class="container">
         <!-- Navbar Brand -->
-        <a class="navbar-brand pull-right mr-0 ml-4" href="#">
+        <a class="navbar-brand pull-right mr-0 ml-4" href="javascript:void(0);">
             <img src="{{asset("mdb/img/escp.png")}}" height="20" alt="Route 66 in navbar">
             <span class="d-inline-block align-top mr-2">لوحة التحكم</span>
         </a>
@@ -23,16 +23,25 @@
                                 <span>الرئيسية</span>
                             </a>
                         </li>
+
+                        <li class="nav-item" style="width: 100px;">
+                            <a class="nav-link" href="/control-panel/admins">
+                                <span>ادارة الحسابات</span>
+                            </a>
+                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <span>الدورات</span>
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <span>الاساتذة</span>
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <span>الامتحانات</span>
@@ -45,17 +54,11 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="/control-panel/admins">
-                                <span>الحسابات</span>
-                            </a>
-                        </li>
-
                         <li class="nav-item dropdown" style="width: 100px;">
                             <a class="nav-link dropdown-toggle" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span>الاعدادات</span>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right text-center dropdown-primary border-top-0 border-right-0 border-left-0 rounded-0 border-bottom border-secondary" aria-labelledby="navbarDropdown">
+                            <div class="dropdown-menu dropdown-menu-right text-center border-top-0 border-right-0 border-left-0 rounded-0 border-bottom border-default" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="#">
                                     <span>عرض المعلومات الشخصية</span>
                                 </a>
@@ -73,7 +76,7 @@
                                     <span>تغيير كلمة المرور</span>
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="/control-panel/logout">
                                     <span>تسجيل خروج</span>
                                 </a>
                             </div>

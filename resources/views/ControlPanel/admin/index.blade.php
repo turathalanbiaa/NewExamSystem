@@ -8,7 +8,7 @@
     <div class="container pt-4">
         <div class="row">
             <div class="col-12">
-                <a href="/control-panel/admins/create" class="btn btn-default">
+                <a href="/control-panel/admins/create" class="btn btn-secondary">
                     <i class="fa fa-plus ml-1"></i>
                     <span>اضافة</span>
                 </a>

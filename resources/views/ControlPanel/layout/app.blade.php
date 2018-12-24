@@ -33,7 +33,7 @@
     <!--Main layout-->
 
     <!--Footer-->
-    <footer class="page-footer font-small secondary-color fixed-bottom">
+    <footer class="page-footer font-small default-color fixed-bottom">
         <!-- Copyright -->
         <div class="footer-copyright text-center py-3" style="direction: ltr; text-align: right;">
             <span>© 2018 Copyright:</span>
