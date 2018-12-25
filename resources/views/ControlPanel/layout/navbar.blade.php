@@ -16,15 +16,15 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="collapse navbar-collapse pull-right" id="navbar-collapse">
-                    <ul class="navbar-nav ml-auto pr-0">
-                        <li class="nav-item active">
-                            <a class="nav-link" href="#">
+                <div class="collapse navbar-collapse" id="navbar-collapse">
+                    <ul class="w-100 navbar-nav nav-fill pr-1">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/control-panel">
                                 <span>الرئيسية</span>
                             </a>
                         </li>
 
-                        <li class="nav-item" style="width: 100px;">
+                        <li class="nav-item">
                             <a class="nav-link" href="/control-panel/admins">
                                 <span>ادارة الحسابات</span>
                             </a>
@@ -32,13 +32,13 @@
 
                         <li class="nav-item">
                             <a class="nav-link" href="#">
-                                <span>الدورات</span>
+                                <span>الاساتذة</span>
                             </a>
                         </li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="#">
-                                <span>الاساتذة</span>
+                                <span>الدورات</span>
                             </a>
                         </li>
 
@@ -54,7 +54,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item dropdown" style="width: 100px;">
+                        <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span>الاعدادات</span>
                             </a>

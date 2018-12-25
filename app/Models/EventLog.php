@@ -10,11 +10,12 @@ class EventLog extends Model
     protected $primaryKey = "id";
     public $timestamps = false;
 
-    public static function create($source, $destination, $type, $event)
+    public static function create($target, $type, $event)
     {
         $eventLog = new EventLog();
-        $eventLog->source = $source;
-        $eventLog->destination = $destination;
+        $eventLog->account_id = session()->get("EXAM_SYSTEM_ACCOUNT_ID");
+        $eventLog->account_type = session()->get("EXAM_SYSTEM_ACCOUNT_TYPE");
+        $eventLog->target = $target;
         $eventLog->type = $type;
         $eventLog->event = $event;
         $eventLog->time = date("Y-m-d h:i:s", time());

@@ -9,17 +9,17 @@
         <div class="row">
             <div class="col-12">
                 <!-- Nav tabs -->
-                <ul class="nav nav-tabs nav-justified shadow default-color p-3" role="tablist">
+                <ul class="nav nav-tabs nav-justified shadow secondary-color p-3" role="tablist">
                     <!-- Nav item profile -->
                     <li class="nav-item">
-                        <a class="nav-link btn-default active" data-toggle="tab" href="#profile" role="tab">
+                        <a class="nav-link btn-secondary active" data-toggle="tab" href="#profile" role="tab">
                             <i class="fa fa-user pl-2"></i>
                             <span>معلومات الحساب</span>
                         </a>
                     </li>
                     <!-- Nav item events log -->
                     <li class="nav-item">
-                        <a class="nav-link btn-default" data-toggle="tab" href="#events-log" role="tab">
+                        <a class="nav-link btn-secondary" data-toggle="tab" href="#events-log" role="tab">
                             <i class="fa fa-heart pl-2"></i>
                             <span>سجل الاحداث</span>
                         </a>
@@ -39,10 +39,6 @@
                                <h5>
                                    <span>اسم المستخدم:</span>
                                    {{$admin->username}}
-                               </h5>
-                               <h5>
-                                   <span>نوع الحساب:</span>
-                                   {{\App\Enums\AccountType::getType($admin->type)}}
                                </h5>
                                <h5>
                                    <span>حالة الحساب:</span>
@@ -71,37 +67,37 @@
                             <div class="col-md-3">
                                 <ul class="nav flex-column" role="tablist" style="padding: 0 0 0 40px;">
                                     <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-default btn-block active" data-toggle="tab" href="#last-event" role="tab">
+                                        <a class="nav-link btn btn-secondary btn-block active" data-toggle="tab" href="#last-event" role="tab">
                                             <span>آخر الاحداث</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-default btn-block" data-toggle="tab" href="#admin-event" role="tab">
-                                            <span>الحسابات</span>
+                                        <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#admin-event" role="tab">
+                                            <span>ادارة الحسابات</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-default btn-block" data-toggle="tab" href="#course-event" role="tab">
-                                            <span>الدورات</span>
-                                        </a>
-                                    </li>
-
-                                    <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-default btn-block" data-toggle="tab" href="#lecturer-event" role="tab">
+                                        <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#lecturer-event" role="tab">
                                             <span>الاساتذة</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-default btn-block" data-toggle="tab" href="#exam-event" role="tab">
+                                        <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#course-event" role="tab">
+                                            <span>الدورات</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item mb-1">
+                                        <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#exam-event" role="tab">
                                             <span>الامتحانات</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
-                                        <a class="nav-link btn btn-default btn-block" data-toggle="tab" href="#exam-event" role="tab">
+                                        <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#exam-event" role="tab">
                                             <span>اسئلة الامتحانات</span>
                                         </a>
                                     </li>
@@ -113,7 +109,7 @@
                                 <div class="tab-content vertical">
                                     <div class="tab-pane fade in show active" id="last-event" role="tabpanel">
                                         <table data-table="dtEvents" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
-                                            <thead class="default-color text-white">
+                                            <thead class="secondary-color text-white">
                                             <tr>
                                                 <th class="th-sm fa d-table-cell">
                                                     <span>رقم</span>
@@ -141,7 +137,7 @@
 
                                     <div class="tab-pane fade" id="admin-event" role="tabpanel">
                                         <table data-table="dtEvents" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
-                                            <thead class="default-color text-white">
+                                            <thead class="secondary-color text-white">
                                             <tr>
                                                 <th class="th-sm fa d-table-cell">
                                                     <span>رقم</span>
@@ -171,7 +167,7 @@
 
                                     <div class="tab-pane fade" id="course-event" role="tabpanel">
                                         <table data-table="dtEvents" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
-                                            <thead class="default-color text-white">
+                                            <thead class="secondary-color text-white">
                                             <tr>
                                                 <th class="th-sm fa d-table-cell">
                                                     <span>رقم</span>
@@ -201,7 +197,7 @@
 
                                     <div class="tab-pane fade" id="lecturer-event" role="tabpanel">
                                         <table data-table="dtEvents" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
-                                            <thead class="default-color text-white">
+                                            <thead class="secondary-color text-white">
                                             <tr>
                                                 <th class="th-sm fa d-table-cell">
                                                     <span>رقم</span>
@@ -231,7 +227,7 @@
 
                                     <div class="tab-pane fade" id="exam-event" role="tabpanel">
                                         <table data-table="dtEvents" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
-                                            <thead class="default-color text-white">
+                                            <thead class="secondary-color text-white">
                                             <tr>
                                                 <th class="th-sm fa d-table-cell">
                                                     <span>رقم</span>
@@ -261,7 +257,7 @@
 
                                     <div class="tab-pane fade" id="question-event" role="tabpanel">
                                         <table data-table="dtEvents" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
-                                            <thead class="default-color text-white">
+                                            <thead class="secondary-color text-white">
                                             <tr>
                                                 <th class="th-sm fa d-table-cell">
                                                     <span>رقم</span>

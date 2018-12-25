@@ -17,7 +17,7 @@
         <div class="row">
             <div class="col-12">
                 <table id="dtAdmins" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
-                    <thead class="default-color text-white">
+                    <thead class="secondary-color text-white">
                     <tr>
                         <th class="th-sm fa d-table-cell">
                             <span>رقم</span>
@@ -27,12 +27,6 @@
                         </th>
                         <th class="th-sm fa d-table-cell">
                             <span>اسم المستخدم</span>
-                        </th>
-                        <th class="th-sm fa d-table-cell">
-                            <span>نوع الحساب</span>
-                        </th>
-                        <th class="th-sm fa d-table-cell">
-                            <span title="سوف يضهر اسم الاستاذ اذا كان نوع الحساب هو خاص للاستاذ">اسم الاستاذ</span>
                         </th>
                         <th class="th-sm fa d-table-cell">
                             <span>حالة الحساب</span>
@@ -48,23 +42,19 @@
                             <td>{{$admin->id}}</td>
                             <td>{{$admin->name}}</td>
                             <td>{{$admin->username}}</td>
-                            <td>{{\App\Enums\AccountType::getType($admin->type)}}</td>
-                            <td>{{$admin->getLecturerName()}}</td>
                             <td>{{\App\Enums\AdminState::getState($admin->state)}}</td>
                             <td class="text-center">
-                                <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                                    <a href="/control-panel/admins/{{$admin->id}}" class="btn btn-dark-green mx-0" data-toggle="tooltip" title="عرض جميع المعلومات">
-                                        <i class="fa fa-info-circle"></i>
-                                    </a>
+                                <a class="btn btn-sm btn-dark-green mx-0" href="/control-panel/admins/{{$admin->id}}" data-toggle="tooltip" title="عرض جميع المعلومات">
+                                    <i class="fa fa-info-circle"></i>
+                                </a>
 
-                                    <a href="/control-panel/admins/{{$admin->id}}/edit?type=change-info" class="btn btn-indigo mx-2" data-toggle="tooltip" title="تحرير معلومات الحساب">
-                                        <i class="fa fa-pencil-alt"></i>
-                                    </a>
+                                <a class="btn btn-sm btn-indigo mx-2" href="/control-panel/admins/{{$admin->id}}/edit?type=change-info" data-toggle="tooltip" title="تحرير معلومات الحساب">
+                                    <i class="fa fa-pencil-alt"></i>
+                                </a>
 
-                                    <a href="/control-panel/admins/{{$admin->id}}/edit?type=change-password" class="btn btn-amber mx-0" data-toggle="tooltip" title="تغيير كلمة المرور">
-                                        <i class="fa fa-unlock-alt"></i>
-                                    </a>
-                                </div>
+                                <a class="btn btn-sm btn-amber mx-0" href="/control-panel/admins/{{$admin->id}}/edit?type=change-password" data-toggle="tooltip" title="تغيير كلمة المرور">
+                                    <i class="fa fa-unlock-alt"></i>
+                                </a>
                             </td>
                         </tr>
                     @endforeach

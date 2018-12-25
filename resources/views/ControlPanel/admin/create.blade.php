@@ -28,7 +28,7 @@
                     @endif
 
 
-                    <div class="card-body px-lg-5 pt-0">
+                    <div class="card-body px-lg-5 pt-0 border-bottom border-default">
                         <form class="md-form" method="post" action="/control-panel/admins">
                             {{ csrf_field() }}
 
@@ -53,31 +53,6 @@
                             </div>
 
                             <div class="md-form pt-3">
-                                <select class="browser-default custom-select" name="type">
-                                    <option value="" disabled="" selected="">اختر نوع الحساب</option>
-                                    <option value="{{\App\Enums\AccountType::MANAGER}}" {{(old("type") == \App\Enums\AccountType::MANAGER ? "selected":"")}}>
-                                        {{\App\Enums\AccountType::getType(\App\Enums\AccountType::MANAGER)}}
-                                    </option>
-                                    <option value="{{\App\Enums\AccountType::LECTURER}}" {{(old("type") == \App\Enums\AccountType::LECTURER ? "selected":"")}}>
-                                        {{\App\Enums\AccountType::getType(\App\Enums\AccountType::LECTURER)}}
-                                    </option>
-                                </select>
-                            </div>
-
-                            <div class="md-form pt-3">
-                                <select class="browser-default custom-select" name="lecturer_id">
-                                    <option value="" disabled="" selected="">اختر الاستاذ</option>
-                                    @forelse($lecturers as $lecturer)
-                                        <option value="{{$lecturer->id}}" {{(old("lecturer_id") == $lecturer->id ? "selected":"")}}>
-                                            {{$lecturer->name}}
-                                        </option>
-                                    @empty
-                                        <option value="" disabled="">لايوجد استاذ، يرجى اضافة اساتذة اولا.</option>
-                                    @endforelse
-                                </select>
-                            </div>
-
-                            <div class="md-form pt-3">
                                 <select class="browser-default custom-select" name="state">
                                     <option value="" disabled="" selected="">اختر حالة الحساب</option>
                                     <option value="{{\App\Enums\AdminState::OPEN}}" {{(old("state") == \App\Enums\AdminState::OPEN ? "selected":"")}}>
@@ -90,7 +65,7 @@
                             </div>
 
 
-                            <button class="btn btn-outline-default btn-block mt-5" type="submit">
+                            <button class="btn btn-outline-secondary btn-block mt-5" type="submit">
                                 <span>حفظ</span>
                             </button>
                         </form>
