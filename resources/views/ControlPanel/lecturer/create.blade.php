@@ -1,7 +1,7 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>اضافة مدير</title>
+    <title>اضافة استاذ</title>
 @endsection
 
 @section("content")
@@ -20,16 +20,16 @@
                         </div>
                     @endif
 
-                <!-- Session Create Admin Message -->
-                    @if (session('CreateAdminMessage'))
+                <!-- Session Create Lecturer Message -->
+                    @if (session('CreateLecturerMessage'))
                         <div class="alert alert-info text-center m-lg-4 m-3">
-                            {{session('CreateAdminMessage')}}
+                            {{session('CreateLecturerMessage')}}
                         </div>
                     @endif
 
 
                     <div class="card-body px-lg-5 pt-0 border-bottom border-default">
-                        <form class="md-form" method="post" action="/control-panel/admins">
+                        <form class="md-form" method="post" action="/control-panel/lecturers">
                             {{ csrf_field() }}
 
                             <div class="md-form">
@@ -55,11 +55,11 @@
                             <div class="md-form pt-3">
                                 <select class="browser-default custom-select" name="state">
                                     <option value="" disabled="" selected="">اختر حالة الحساب</option>
-                                    <option value="{{\App\Enums\AdminState::OPEN}}" {{(old("state") == \App\Enums\AdminState::OPEN ? "selected":"")}}>
-                                        {{\App\Enums\AdminState::getState(\App\Enums\AdminState::OPEN)}}
+                                    <option value="{{\App\Enums\LecturerState::OPEN}}" {{(old("state") == \App\Enums\LecturerState::OPEN ? "selected":"")}}>
+                                        {{\App\Enums\LecturerState::getState(\App\Enums\LecturerState::OPEN)}}
                                     </option>
-                                    <option value="{{\App\Enums\AdminState::CLOSE}}" {{(old("state") == \App\Enums\AdminState::CLOSE ? "selected":"")}}>
-                                        {{\App\Enums\AdminState::getState(\App\Enums\AdminState::CLOSE)}}
+                                    <option value="{{\App\Enums\LecturerState::CLOSE}}" {{(old("state") == \App\Enums\LecturerState::CLOSE ? "selected":"")}}>
+                                        {{\App\Enums\LecturerState::getState(\App\Enums\LecturerState::CLOSE)}}
                                     </option>
                                 </select>
                             </div>

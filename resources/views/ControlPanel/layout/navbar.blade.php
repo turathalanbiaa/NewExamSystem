@@ -18,20 +18,20 @@
 
                 <div class="collapse navbar-collapse" id="navbar-collapse">
                     <ul class="w-100 navbar-nav nav-fill pr-1">
-                        <li class="nav-item">
+                        <li class="nav-item @if(request()->is("control-panel")) active @endif">
                             <a class="nav-link" href="/control-panel">
                                 <span>الرئيسية</span>
                             </a>
                         </li>
 
-                        <li class="nav-item">
+                        <li class="nav-item @if(request()->is("control-panel/admins*")) active @endif">
                             <a class="nav-link" href="/control-panel/admins">
                                 <span>ادارة الحسابات</span>
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
+                        <li class="nav-item @if(request()->is("control-panel/lecturers*")) active @endif">
+                            <a class="nav-link" href="/control-panel/lecturers">
                                 <span>الاساتذة</span>
                             </a>
                         </li>

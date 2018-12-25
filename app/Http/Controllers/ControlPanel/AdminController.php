@@ -6,7 +6,6 @@ use App\Enums\AccountType;
 use App\Enums\EventLogType;
 use App\Models\Admin;
 use App\Models\EventLog;
-use App\Models\Lecturer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;

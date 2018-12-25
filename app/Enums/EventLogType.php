@@ -12,7 +12,7 @@ namespace App\Enums;
 class EventLogType
 {
     const ADMIN = 1;
-    const lECTURER = 2;
+    const LECTURER = 2;
     const COURSE = 3;
     const ROOT_EXAM = 4;
     const EXAM = 5;
