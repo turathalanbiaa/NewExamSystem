@@ -44,7 +44,7 @@
                             <td>{{$admin->username}}</td>
                             <td>{{\App\Enums\AdminState::getState($admin->state)}}</td>
                             <td class="text-center">
-                                <a class="btn btn-sm btn-dark-green mx-0" href="/control-panel/admins/{{$admin->id}}" data-toggle="tooltip" title="عرض جميع المعلومات">
+                                <a class="btn btn-sm btn-dark-green mx-0" href="/control-panel/admins/{{$admin->id}}" data-toggle="tooltip" title="مزيد من المعلومات">
                                     <i class="fa fa-info-circle"></i>
                                 </a>
 

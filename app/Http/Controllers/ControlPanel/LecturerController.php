@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\AccountType;
 use App\Enums\EventLogType;
 use App\Models\EventLog;
 use App\Models\Lecturer;
@@ -95,7 +96,14 @@ class LecturerController extends Controller
      */
     public function show(Lecturer $lecturer)
     {
-        //
+        $events = EventLog::where("account_id", $lecturer->id)
+            ->where("account_type",AccountType::LECTURER)
+            ->orderBy("id","DESC")
+            ->get();
+        return view("ControlPanel.lecturer.show")->with([
+            "lecturer" => $lecturer,
+            "events" => $events
+        ]);
     }
 
     /**

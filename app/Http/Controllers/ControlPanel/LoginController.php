@@ -6,9 +6,11 @@ use App\Enums\AccountType;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Lecturer;
+use function Couchbase\defaultDecoder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Input;
+use phpDocumentor\Reflection\DocBlock;
 
 class LoginController extends Controller
 {
@@ -19,7 +21,7 @@ class LoginController extends Controller
     {
         if ((Cookie::has("EXAM_SYSTEM_ACCOUNT_SESSION")) && (Cookie::has("EXAM_SYSTEM_ACCOUNT_TYPE")))
         {
-            $accountType = Cookie::has("EXAM_SYSTEM_ACCOUNT_TYPE");
+            $accountType = Cookie::get("EXAM_SYSTEM_ACCOUNT_TYPE");
             switch ($accountType)
             {
                 case (AccountType::MANAGER):
@@ -45,7 +47,7 @@ class LoginController extends Controller
             session()->put('EXAM_SYSTEM_ACCOUNT_TYPE' , $accountType);
             session()->save();
 
-            return redirect("/control-panel");
+            return redirect("/control-panel/profile");
         }
 
         return view("ControlPanel.login");
@@ -104,7 +106,7 @@ class LoginController extends Controller
         session()->save();
 
         //Session for one year (525600 minutes)
-        return redirect("/control-panel")
+        return redirect("/control-panel/profile")
             ->withCookie(cookie('EXAM_SYSTEM_ACCOUNT_SESSION' , $account->session , 525600))
             ->withCookie(cookie('EXAM_SYSTEM_ACCOUNT_TYPE' , $accountType , 525600));
     }

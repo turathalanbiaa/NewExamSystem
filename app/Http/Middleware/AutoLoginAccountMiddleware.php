@@ -24,7 +24,7 @@ class AutoLoginAccountMiddleware
 
         if ((Cookie::has("EXAM_SYSTEM_ACCOUNT_SESSION")) && (Cookie::has("EXAM_SYSTEM_ACCOUNT_TYPE")))
         {
-            $accountType = Cookie::has("EXAM_SYSTEM_ACCOUNT_TYPE");
+            $accountType = Cookie::get("EXAM_SYSTEM_ACCOUNT_TYPE");
             switch ($accountType)
             {
                 case (AccountType::MANAGER):
@@ -48,6 +48,10 @@ class AutoLoginAccountMiddleware
                 session()->put('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session);
                 session()->put('EXAM_SYSTEM_ACCOUNT_TYPE' , $accountType);
                 session()->save();
+
+                $request->merge(["account" => $account]);
+
+                dd($request);
 
                 return $next($request);
             }

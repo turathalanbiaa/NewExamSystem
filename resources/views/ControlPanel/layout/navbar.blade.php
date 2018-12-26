@@ -59,20 +59,17 @@
                                 <span>الاعدادات</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right text-center border-top-0 border-right-0 border-left-0 rounded-0 border-bottom border-default" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="#">
-                                    <span>عرض المعلومات الشخصية</span>
+                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}?show=info">
+                                    <span>عرض الملف الشخصي</span>
                                 </a>
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}?show=event-log">
                                     <span>عرض سجل الاحدات</span>
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#">
-                                    <span>تغيير الاسم الحقيقي</span>
+                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/edit?type=change-info">
+                                    <span>تعديل الحساب</span>
                                 </a>
-                                <a class="dropdown-item" href="#">
-                                    <span>تغيير اسم المستخدم</span>
-                                </a>
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/edit?type=change-password">
                                     <span>تغيير كلمة المرور</span>
                                 </a>
                                 <div class="dropdown-divider"></div>

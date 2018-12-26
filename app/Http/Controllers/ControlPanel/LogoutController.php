@@ -29,7 +29,7 @@ class LogoutController extends Controller
         }
 
         if (!$account)
-            return redirect("/control-panel");
+            return redirect("/control-panel/profile");
 
         $account->session = null;
         $account->save();
@@ -44,6 +44,6 @@ class LogoutController extends Controller
         $cookie = Cookie::forget("EXAM_SYSTEM_ACCOUNT_SESSION");
         $cookie = Cookie::forget("EXAM_SYSTEM_ACCOUNT_TYPE");
 
-        return redirect("/control-panel")->withCookie($cookie);
+        return redirect("/control-panel/profile")->withCookie($cookie);
     }
 }

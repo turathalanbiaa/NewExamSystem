@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\AutoLoginAccountMiddleware;
+use App\Http\Middleware\PermissionMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -63,6 +64,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'StudentAuth' => \App\Http\Middleware\StudentAuthMiddleware::class,
         'Login' => \App\Http\Middleware\AutoLoginAccountMiddleware::class,
+        'Permission' => \App\Http\Middleware\PermissionMiddleware::class,
     ];
 
     /**
@@ -79,5 +81,7 @@ class Kernel extends HttpKernel
         \Illuminate\Session\Middleware\AuthenticateSession::class,
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
         \Illuminate\Auth\Middleware\Authorize::class,
+        AutoLoginAccountMiddleware::class,
+        PermissionMiddleware::class
     ];
 }
