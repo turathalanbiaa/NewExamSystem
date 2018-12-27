@@ -62,11 +62,11 @@
                                 <div class="md-form pt-3">
                                     <select class="browser-default custom-select" name="state">
                                         <option value="" disabled="" selected="">اختر حالة الحساب</option>
-                                        <option value="{{\App\Enums\LecturerState::OPEN}}" {{($lecturer->state == \App\Enums\LecturerState::OPEN ? "selected":"")}}>
-                                            {{\App\Enums\LecturerState::getState(\App\Enums\LecturerState::OPEN)}}
+                                        <option value="{{\App\Enums\AccountState::OPEN}}" {{($lecturer->state == \App\Enums\AccountState::OPEN ? "selected":"")}}>
+                                            {{\App\Enums\AccountState::getState(\App\Enums\AccountState::OPEN)}}
                                         </option>
-                                        <option value="{{\App\Enums\LecturerState::CLOSE}}" {{($lecturer->state == \App\Enums\LecturerState::CLOSE ? "selected":"")}}>
-                                            {{\App\Enums\LecturerState::getState(\App\Enums\LecturerState::CLOSE)}}
+                                        <option value="{{\App\Enums\AccountState::CLOSE}}" {{($lecturer->state == \App\Enums\AccountState::CLOSE ? "selected":"")}}>
+                                            {{\App\Enums\AccountState::getState(\App\Enums\AccountState::CLOSE)}}
                                         </option>
                                     </select>
                                 </div>

@@ -50,32 +50,12 @@ class ProfileController extends Controller
      */
     public function show($id)
     {
-        $accountType = session()->get("EXAM_SYSTEM_ACCOUNT_TYPE");
-        switch ($accountType)
-        {
-            case (AccountType::MANAGER):
-                $account = Admin::where("session", "=", session()->get("EXAM_SYSTEM_ACCOUNT_SESSION"))
-                    ->first();
-                break;
-
-            case (AccountType::LECTURER):
-                $account = Lecturer::where("session", "=", session()->get("EXAM_SYSTEM_ACCOUNT_SESSION"))
-                    ->first();
-                break;
-
-            default: $account = false;
-        }
-
-        if (!$account)
-            return redirect("/control-panel/login");
-
-        $events = EventLog::where("account_id",$account->id)
-            ->where("account_type",session()->get("EXAM_SYSTEM_ACCOUNT_TYPE"))
+        $events = EventLog::where("account_id", $id)
+            ->where("account_type", session()->get("EXAM_SYSTEM_ACCOUNT_TYPE"))
             ->orderBy("id","DESC")
             ->get();
 
         return view("ControlPanel.profile.show")->with([
-            "account" => $account,
             "events"  => $events
         ]);
     }
@@ -88,7 +68,24 @@ class ProfileController extends Controller
      */
     public function edit($id)
     {
-        //
+        switch (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE"))
+        {
+            case (AccountType::MANAGER):
+                $account = Admin::where("session", session()->get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                    ->first();
+                break;
+
+            case (AccountType::LECTURER):
+                $account = Admin::where("session", session()->get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                    ->first();
+                break;
+
+            default: $account = false;
+        }
+
+        return view("ControlPanel.profile.edit")->with([
+            "account" => $account
+        ]);
     }
 
     /**

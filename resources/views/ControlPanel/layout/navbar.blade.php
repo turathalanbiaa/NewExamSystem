@@ -38,7 +38,7 @@
 
                         <li class="nav-item">
                             <a class="nav-link" href="#">
-                                <span>الدورات</span>
+                                <span>المواد الدراسية</span>
                             </a>
                         </li>
 

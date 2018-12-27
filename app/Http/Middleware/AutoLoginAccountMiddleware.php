@@ -28,12 +28,12 @@ class AutoLoginAccountMiddleware
             switch ($accountType)
             {
                 case (AccountType::MANAGER):
-                    $account = Admin::where("session", "=", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                    $account = Admin::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
                         ->first();
                     break;
 
                 case (AccountType::LECTURER):
-                    $account = Lecturer::where("session", "=", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                    $account = Lecturer::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
                         ->first();
                     break;
 
@@ -42,16 +42,13 @@ class AutoLoginAccountMiddleware
 
             if ($account)
             {
-                session()->put('EXAM_SYSTEM_ACCOUNT_ID' , $account->id);
+                session()->put('EXAM_SYSTEM_ACCOUNT_ID', $account->id);
                 session()->put('EXAM_SYSTEM_ACCOUNT_NAME' , $account->name);
+                session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME' , $account->username);
                 session()->put('EXAM_SYSTEM_ACCOUNT_STATE' , $account->state);
                 session()->put('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session);
-                session()->put('EXAM_SYSTEM_ACCOUNT_TYPE' , $accountType);
+                session()->put('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType);
                 session()->save();
-
-                $request->merge(["account" => $account]);
-
-                dd($request);
 
                 return $next($request);
             }

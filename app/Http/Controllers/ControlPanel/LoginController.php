@@ -6,11 +6,9 @@ use App\Enums\AccountType;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Lecturer;
-use function Couchbase\defaultDecoder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Input;
-use phpDocumentor\Reflection\DocBlock;
 
 class LoginController extends Controller
 {
@@ -25,12 +23,12 @@ class LoginController extends Controller
             switch ($accountType)
             {
                 case (AccountType::MANAGER):
-                    $account = Admin::where("session", "=", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                    $account = Admin::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
                         ->first();
                     break;
 
                 case (AccountType::LECTURER):
-                    $account = Lecturer::where("session", "=", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                    $account = Lecturer::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
                         ->first();
                     break;
 
@@ -40,11 +38,12 @@ class LoginController extends Controller
             if (!$account)
                 return view("ControlPanel.login");
 
-            session()->put('EXAM_SYSTEM_ACCOUNT_ID' , $account->id);
-            session()->put('EXAM_SYSTEM_ACCOUNT_NAME' , $account->name);
-            session()->put('EXAM_SYSTEM_ACCOUNT_STATE' , $account->state);
+            session()->put('EXAM_SYSTEM_ACCOUNT_ID', $account->id);
+            session()->put('EXAM_SYSTEM_ACCOUNT_NAME', $account->name);
+            session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME', $account->username);
+            session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $account->state);
             session()->put('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session);
-            session()->put('EXAM_SYSTEM_ACCOUNT_TYPE' , $accountType);
+            session()->put('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType);
             session()->save();
 
             return redirect("/control-panel/profile");
@@ -77,14 +76,14 @@ class LoginController extends Controller
         switch ($accountType)
         {
             case (AccountType::MANAGER):
-                $account = Admin::where("username", "=", $username)
-                    ->where("password", "=", $password)
+                $account = Admin::where("username", $username)
+                    ->where("password", $password)
                     ->first();
                 break;
 
             case (AccountType::LECTURER):
-                $account = Lecturer::where("username", "=", $username)
-                    ->where("password", "=", $password)
+                $account = Lecturer::where("username", $username)
+                    ->where("password", $password)
                     ->first();
                 break;
 
@@ -98,16 +97,17 @@ class LoginController extends Controller
         $account->session = md5(uniqid());
         $account->save();
 
-        session()->put('EXAM_SYSTEM_ACCOUNT_ID' , $account->id);
-        session()->put('EXAM_SYSTEM_ACCOUNT_NAME' , $account->name);
-        session()->put('EXAM_SYSTEM_ACCOUNT_STATE' , $account->state);
-        session()->put('EXAM_SYSTEM_ACCOUNT_SESSION' , $account->session);
-        session()->put('EXAM_SYSTEM_ACCOUNT_TYPE' , $accountType);
+        session()->put('EXAM_SYSTEM_ACCOUNT_ID', $account->id);
+        session()->put('EXAM_SYSTEM_ACCOUNT_NAME', $account->name);
+        session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME', $account->username);
+        session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $account->state);
+        session()->put('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session);
+        session()->put('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType);
         session()->save();
 
         //Session for one year (525600 minutes)
         return redirect("/control-panel/profile")
-            ->withCookie(cookie('EXAM_SYSTEM_ACCOUNT_SESSION' , $account->session , 525600))
-            ->withCookie(cookie('EXAM_SYSTEM_ACCOUNT_TYPE' , $accountType , 525600));
+            ->withCookie(cookie('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session, 525600))
+            ->withCookie(cookie('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType, 525600));
     }
 }

@@ -16,12 +16,12 @@ class LogoutController extends Controller
         switch ($accountType)
         {
             case (AccountType::MANAGER):
-                $account = Admin::where("session", "=", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                $account = Admin::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
                     ->first();
                 break;
 
             case (AccountType::LECTURER):
-                $account = Lecturer::where("session", "=", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                $account = Lecturer::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
                     ->first();
                 break;
 
@@ -36,6 +36,7 @@ class LogoutController extends Controller
 
         session()->remove("EXAM_SYSTEM_ACCOUNT_ID");
         session()->remove("EXAM_SYSTEM_ACCOUNT_NAME");
+        session()->remove("EXAM_SYSTEM_ACCOUNT_USERNAME");
         session()->remove("EXAM_SYSTEM_ACCOUNT_TYPE");
         session()->remove("EXAM_SYSTEM_ACCOUNT_STATE");
         session()->remove("EXAM_SYSTEM_ACCOUNT_SESSION");

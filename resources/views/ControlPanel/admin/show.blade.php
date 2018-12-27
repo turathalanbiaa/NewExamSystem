@@ -275,7 +275,7 @@
                                </h5>
                                <h5>
                                    <span>حالة الحساب:</span>
-                                   {{\App\Enums\AdminState::getState($admin->state)}}
+                                   {{\App\Enums\AccountState::getState($admin->state)}}
                                </h5>
 
                                <div class="p-2"></div>

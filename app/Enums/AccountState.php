@@ -2,14 +2,14 @@
 /**
  * Created by PhpStorm.
  * User: Emad
- * Date: 12/24/2018
- * Time: 10:00 AM
+ * Date: 12/9/2018
+ * Time: 10:04 AM
  */
 
 namespace App\Enums;
 
 
-class LecturerState
+class AccountState
 {
     const OPEN = 1;
     const CLOSE = 2;

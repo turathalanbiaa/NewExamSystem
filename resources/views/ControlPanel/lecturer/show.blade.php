@@ -203,7 +203,7 @@
                                 </h5>
                                 <h5>
                                     <span>حالة الحساب:</span>
-                                    {{\App\Enums\LecturerState::getState($lecturer->state)}}
+                                    {{\App\Enums\AccountState::getState($lecturer->state)}}
                                 </h5>
 
                                 <div class="p-2"></div>

@@ -1,7 +1,11 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>{{$account->name}}</title>
+    @if($_GET["show"] == "event-log")
+        <title>{{"سجل الاحداث"}}</title>
+    @else
+        <title>{{session("EXAM_SYSTEM_ACCOUNT_NAME")}}</title>
+    @endif
 @endsection
 
 @section("content")
@@ -40,23 +44,25 @@
                                         </a>
                                     </li>
 
-                                    <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#admin-event" role="tab">
-                                            <span>ادارة الحسابات</span>
-                                        </a>
-                                    </li>
+                                    @if(session("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER)
+                                        <li class="nav-item mb-1">
+                                            <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#admin-event" role="tab">
+                                                <span>ادارة الحسابات</span>
+                                            </a>
+                                        </li>
 
-                                    <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#lecturer-event" role="tab">
-                                            <span>الاساتذة</span>
-                                        </a>
-                                    </li>
+                                        <li class="nav-item mb-1">
+                                            <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#lecturer-event" role="tab">
+                                                <span>الاساتذة</span>
+                                            </a>
+                                        </li>
 
-                                    <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#course-event" role="tab">
-                                            <span>الدورات</span>
-                                        </a>
-                                    </li>
+                                        <li class="nav-item mb-1">
+                                            <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#course-event" role="tab">
+                                                <span>المواد الدراسية</span>
+                                            </a>
+                                        </li>
+                                    @endif
 
                                     <li class="nav-item mb-1">
                                         <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#exam-event" role="tab">
@@ -267,29 +273,25 @@
                             <div class="card-body">
                                 <h5>
                                     <span>الاسم الحقيقي:</span>
-                                    {{$account->name}}
+                                    {{session("EXAM_SYSTEM_ACCOUNT_NAME")}}
                                 </h5>
                                 <h5>
                                     <span>اسم المستخدم:</span>
-                                    {{$account->username}}
+                                    {{session("EXAM_SYSTEM_ACCOUNT_USERNAME")}}
                                 </h5>
                                 <h5>
                                     <span>حالة الحساب:</span>
-                                    @if(session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER))
-                                        {{\App\Enums\AdminState::getState($account->state)}}
-                                    @else
-                                        {{\App\Enums\LecturerState::getState($account->state)}}
-                                    @endif
+                                    {{\App\Enums\AccountState::getState(session("EXAM_SYSTEM_ACCOUNT_STATE"))}}
                                 </h5>
 
                                 <div class="p-2"></div>
 
-                                <a href="/control-panel/profile/{{$account->id}}/edit?type=change-info" class="btn btn-indigo">
+                                <a href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/edit?type=change-info" class="btn btn-indigo">
                                     <i class="fa fa-pencil-alt ml-1"></i>
                                     <span>تعديل الحساب</span>
                                 </a>
 
-                                <a href="/control-panel/profile/{{$account->id}}/edit?type=change-password" class="btn btn-amber">
+                                <a href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/edit?type=change-password" class="btn btn-amber">
                                     <i class="fa fa-unlock-alt ml-1"></i>
                                     <span>تغيير كلمة المرور</span>
                                 </a>
