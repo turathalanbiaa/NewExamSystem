@@ -143,7 +143,14 @@ class AdminController extends Controller
             ]);
 
             $admin->password = md5(Input::get("password"));
-            $admin->session = null;
+
+            /**
+             * Store auto login for current admin.
+             * If current admin change your password from admins.
+             */
+            if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") != $admin->id)
+                $admin->session = null;
+
             $success = $admin->save();
 
             if (!$success)
@@ -185,6 +192,18 @@ class AdminController extends Controller
                     "UpdateAdminMessage" => "لم يتم تحديث المعلومات"
                 ]);
 
+            /**
+             * Update session for current admin.
+             * If current admin change your info from admins.
+             */
+            if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") == $admin->id)
+            {
+                session()->put('EXAM_SYSTEM_ACCOUNT_NAME', $admin->name);
+                session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME', $admin->username);
+                session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $admin->state);
+                session()->save();
+            }
+
             $target = $admin->id;
             $type = EventLogType::ADMIN;
             $event = "تعديل الحساب";
@@ -204,6 +223,12 @@ class AdminController extends Controller
      */
     public function destroy(Admin $admin)
     {
-        //
+        return "";
     }
+
+    public static function UpdateSession()
+    {
+
+    }
+
 }

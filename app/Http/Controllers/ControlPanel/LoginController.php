@@ -94,7 +94,11 @@ class LoginController extends Controller
             return redirect("/control-panel/login")
                 ->with('ErrorLoginMessage', "فشل تسجيل الدخول !!! أعد المحاولة مرة أخرى");
 
-        $account->session = md5(uniqid());
+        /**
+         * Store login from multi devises.
+         */
+        if (is_null($account->session))
+            $account->session = md5(uniqid());
         $account->save();
 
         session()->put('EXAM_SYSTEM_ACCOUNT_ID', $account->id);

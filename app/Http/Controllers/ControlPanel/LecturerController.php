@@ -204,6 +204,6 @@ class LecturerController extends Controller
      */
     public function destroy(Lecturer $lecturer)
     {
-        //
+        return "";
     }
 }

@@ -26,7 +26,7 @@
 
                         <li class="nav-item @if(request()->is("control-panel/admins*")) active @endif">
                             <a class="nav-link" href="/control-panel/admins">
-                                <span>ادارة الحسابات</span>
+                                <span>المدراء</span>
                             </a>
                         </li>
 

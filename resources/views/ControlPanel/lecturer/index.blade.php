@@ -44,15 +44,15 @@
                             <td>{{$lecturer->username}}</td>
                             <td>{{\App\Enums\AccountState::getState($lecturer->state)}}</td>
                             <td class="text-center">
-                                <a class="btn btn-sm btn-dark-green mx-0" href="/control-panel/lecturers/{{$lecturer->id}}" data-toggle="tooltip" title="مزيد من المعلومات">
+                                <a class="btn btn-sm btn-dark-green mx-0 my-1" href="/control-panel/lecturers/{{$lecturer->id}}" data-toggle="tooltip" title="مزيد من المعلومات">
                                     <i class="fa fa-info-circle"></i>
                                 </a>
 
-                                <a class="btn btn-sm btn-indigo mx-2" href="/control-panel/lecturers/{{$lecturer->id}}/edit?type=change-info" data-toggle="tooltip" title="تحرير معلومات الحساب">
+                                <a class="btn btn-sm btn-indigo mx-lg-3 mx-1 my-1" href="/control-panel/lecturers/{{$lecturer->id}}/edit?type=change-info" data-toggle="tooltip" title="تحرير معلومات الحساب">
                                     <i class="fa fa-pencil-alt"></i>
                                 </a>
 
-                                <a class="btn btn-sm btn-amber mx-0" href="/control-panel/lecturers/{{$lecturer->id}}/edit?type=change-password" data-toggle="tooltip" title="تغيير كلمة المرور">
+                                <a class="btn btn-sm btn-amber mx-0 my-1" href="/control-panel/lecturers/{{$lecturer->id}}/edit?type=change-password" data-toggle="tooltip" title="تغيير كلمة المرور" style="width: 62.39px">
                                     <i class="fa fa-unlock-alt"></i>
                                 </a>
                             </td>

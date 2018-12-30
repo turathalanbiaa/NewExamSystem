@@ -20,7 +20,7 @@
                         </div>
                     @endif
 
-                <!-- Session Create Lecturer Message -->
+                    <!-- Session Create Lecturer Message -->
                     @if (session('CreateLecturerMessage'))
                         <div class="alert alert-info text-center m-lg-4 m-3">
                             {{session('CreateLecturerMessage')}}

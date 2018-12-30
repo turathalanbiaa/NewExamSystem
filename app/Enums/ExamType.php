@@ -9,7 +9,7 @@
 namespace App\Enums;
 
 
-class RootExamType
+class ExamType
 {
     const MONTHLY = 1;
     const DAILY = 2;
