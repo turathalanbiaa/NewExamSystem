@@ -18,5 +18,4 @@ Route::resource('control-panel/profile', 'ControlPanel\ProfileController')->midd
 
 Route::resource('control-panel/admins', 'ControlPanel\AdminController')->middleware("Login");
 Route::resource('control-panel/lecturers', 'ControlPanel\LecturerController')->middleware("Login");
-
-Route::resource('control-panel/courses', 'ControlPanel\CourseController')->middleware(["Login", "Permission"]);
+Route::resource('control-panel/courses', 'ControlPanel\CourseController')->middleware("Login");
