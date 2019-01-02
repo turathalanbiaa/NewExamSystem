@@ -7,9 +7,7 @@
             <span class="d-inline-block align-top mr-2">لوحة التحكم</span>
         </a>
 
-        @php $currentPath = \Illuminate\Support\Facades\Route::getFacadeRoot()->current()->uri(); @endphp
-
-        @if($currentPath !== "control-panel/login")
+        @if(!request()->is("control-panel/login"))
             <!-- Navbar Collapse -->
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse" aria-controls="navbarExampleDef"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -18,7 +16,7 @@
 
                 <div class="collapse navbar-collapse" id="navbar-collapse">
                     <ul class="w-100 navbar-nav nav-fill pr-1">
-                        <li class="nav-item @if(request()->is("control-panel")) active @endif">
+                        <li class="nav-item @if(request()->is("control-panel/profile")) active @endif">
                             <a class="nav-link" href="/control-panel">
                                 <span>الرئيسية</span>
                             </a>
@@ -36,8 +34,8 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
+                        <li class="nav-item @if(request()->is("control-panel/courses*")) active @endif">
+                            <a class="nav-link" href="/control-panel/courses">
                                 <span>المواد الدراسية</span>
                             </a>
                         </li>
@@ -54,7 +52,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item dropdown">
+                        <li class="nav-item dropdown @if(request()->is("control-panel/profile/*")) active @endif">
                             <a class="nav-link dropdown-toggle" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span>الاعدادات</span>
                             </a>
