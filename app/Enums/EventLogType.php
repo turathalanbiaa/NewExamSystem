@@ -15,13 +15,17 @@ class EventLogType
     const LECTURER = 2;
     const COURSE = 3;
     const EXAM = 4;
+    const ROOT_QUESTION = 5;
+    const QUESTION = 6;
 
     public static function getType($key) {
         switch ($key) {
-            case 1: return "مدير"; break;
-            case 2: return "استاذ";  break;
+            case 1: return "المدراء"; break;
+            case 2: return "الاساتذة";  break;
             case 3: return "المواد";  break;
             case 4: return "الامتحانات";  break;
+            case 5: return "عناوين الاسئلة";  break;
+            case 6: return "الاسئلة";  break;
         }
 
         return "";
