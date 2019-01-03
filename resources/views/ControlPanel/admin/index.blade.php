@@ -44,17 +44,26 @@
                             <td>{{$admin->username}}</td>
                             <td>{{\App\Enums\AccountState::getState($admin->state)}}</td>
                             <td class="text-center">
-                                <a class="btn btn-sm btn-dark-green mx-0 my-1" href="/control-panel/admins/{{$admin->id}}" data-toggle="tooltip" title="مزيد من المعلومات">
+                                <a class="btn btn-sm btn-outline-dark m-1" href="/control-panel/admins/{{$admin->id}}" data-toggle="tooltip" title="مزيد من المعلومات">
                                     <i class="fa fa-info-circle"></i>
                                 </a>
 
-                                <a class="btn btn-sm btn-indigo mx-lg-3 mx-1 my-1" href="/control-panel/admins/{{$admin->id}}/edit?type=change-info" data-toggle="tooltip" title="تحرير معلومات الحساب">
+                                <a class="btn btn-sm btn-outline-dark m-1" href="/control-panel/admins/{{$admin->id}}/edit?type=change-info" data-toggle="tooltip" title="تحرير معلومات الحساب">
                                     <i class="fa fa-pencil-alt"></i>
                                 </a>
 
-                                <a class="btn btn-sm btn-amber mx-0 my-1" href="/control-panel/admins/{{$admin->id}}/edit?type=change-password" data-toggle="tooltip" title="تغيير كلمة المرور" style="width: 62.39px">
+                                <a class="btn btn-sm btn-outline-dark m-1" href="/control-panel/admins/{{$admin->id}}/edit?type=change-password" data-toggle="tooltip" title="تغيير كلمة المرور" style="width: 62.39px">
                                     <i class="fa fa-unlock-alt"></i>
                                 </a>
+
+                                <button class="btn btn-sm btn-outline-dark m-1" type="button" onclick="$('#form').submit();" data-toggle="tooltip" title="ارشفة الحساب" style="width: 62.39px">
+                                    <i class="fa fa-file-archive"></i>
+                                </button>
+
+                                <form id="form" class="d-none" method="post" action="/control-panel/admins/{{$admin->id}}">
+                                    @method("DELETE")
+                                    @csrf
+                                </form>
                             </td>
                         </tr>
                     @endforeach

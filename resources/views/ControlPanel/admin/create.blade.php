@@ -28,7 +28,7 @@
                     @endif
 
 
-                    <div class="card-body px-lg-5 pt-0 border-bottom border-default">
+                    <div class="card-body px-lg-5 pt-0 border-bottom border-primary">
                         <form class="md-form" method="post" action="/control-panel/admins">
                             {{ csrf_field() }}
 

@@ -244,12 +244,12 @@
 
                                <div class="p-2"></div>
 
-                               <a href="/control-panel/admins/{{$admin->id}}/edit?type=change-info" class="btn btn-indigo">
+                               <a href="/control-panel/admins/{{$admin->id}}/edit?type=change-info" class="btn btn-default">
                                    <i class="fa fa-pencil-alt ml-1"></i>
                                    <span>تعديل الحساب</span>
                                </a>
 
-                               <a href="/control-panel/admins/{{$admin->id}}/edit?type=change-password" class="btn btn-amber">
+                               <a href="/control-panel/admins/{{$admin->id}}/edit?type=change-password" class="btn btn-default">
                                    <i class="fa fa-unlock-alt ml-1"></i>
                                    <span>تغيير كلمة المرور</span>
                                </a>

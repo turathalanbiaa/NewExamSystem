@@ -223,12 +223,6 @@ class AdminController extends Controller
      */
     public function destroy(Admin $admin)
     {
-        return "";
+        return "OK";
     }
-
-    public static function UpdateSession()
-    {
-
-    }
-
 }
