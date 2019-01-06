@@ -24,13 +24,12 @@
                         </div>
                     @endif
 
-                <!-- Session Update Admin Message -->
+                    <!-- Session Update Admin Message -->
                     @if (session('UpdateAdminMessage'))
                         <div class="alert alert-info text-center m-lg-4 m-3">
                             {{session('UpdateAdminMessage')}}
                         </div>
                     @endif
-
 
                     <div class="card-body px-lg-5 pt-0 border-bottom border-primary">
                         <form class="md-form" method="post" action="/control-panel/admins/{{$admin->id}}">

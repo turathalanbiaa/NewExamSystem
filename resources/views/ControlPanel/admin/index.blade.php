@@ -14,6 +14,29 @@
                 </a>
             </div>
         </div>
+
+        <!-- Session Update Admin Message -->
+        @if (session('UpdateAdminMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info text-center my-3">
+                        {{session('UpdateAdminMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <!-- Session Archive Admin Message -->
+        @if (session('ArchiveAdminMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info text-center my-3">
+                        {{session('ArchiveAdminMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <div class="row">
             <div class="col-12">
                 <table id="dtAdmins" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
@@ -52,14 +75,15 @@
                                     <i class="fa fa-pencil-alt"></i>
                                 </a>
 
-                                <a class="btn btn-sm btn-outline-dark m-1" href="/control-panel/admins/{{$admin->id}}/edit?type=change-password" data-toggle="tooltip" title="تغيير كلمة المرور" style="width: 62.39px">
+                                <a class="btn btn-sm btn-outline-dark m-1" href="/control-panel/admins/{{$admin->id}}/edit?type=change-password" data-toggle="tooltip" title="تغيير كلمة المرور">
                                     <i class="fa fa-unlock-alt"></i>
                                 </a>
 
-                                <button class="btn btn-sm btn-outline-dark m-1" type="button" onclick="$('#form').submit();" data-toggle="tooltip" title="ارشفة الحساب" style="width: 62.39px">
+                                <button class="btn btn-sm btn-outline-dark m-1" type="button" onclick="$('#form').submit();" data-toggle="tooltip" title="ارشفة الحساب">
                                     <i class="fa fa-file-archive"></i>
                                 </button>
 
+                                <!-- Form-Hidden for archive admin account  -->
                                 <form id="form" class="d-none" method="post" action="/control-panel/admins/{{$admin->id}}">
                                     @method("DELETE")
                                     @csrf

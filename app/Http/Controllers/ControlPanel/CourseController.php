@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\CourseState;
 use App\Enums\EventLogType;
 use App\Models\Course;
 use App\Models\EventLog;
@@ -98,6 +99,7 @@ class CourseController extends Controller
     {
         $lecturers = Lecturer::all("id");
         $lecturersId = [];
+
         foreach ($lecturers as $lecturer)
             array_push($lecturersId, $lecturer->id);
 
@@ -189,6 +191,21 @@ class CourseController extends Controller
      */
     public function destroy(Course $course)
     {
-        //
+        $course->state = CourseState::CLOSE;
+        $success = $course->save();
+
+        if (!$success)
+            return redirect("control-panel/courses")->with([
+                "ArchiveCourseMessage" => "لم يتم ارشفة المادة  - " . $course->name
+            ]);
+
+        $target = $course->id;
+        $type = EventLogType::COURSE;
+        $event = "اغلاق المادة";
+        EventLog::create($target, $type, $event);
+
+        return redirect("control-panel/courses")->with([
+            "ArchiveCourseMessage" => "تم ارشفة المادة - " . $course->name
+        ]);
     }
 }

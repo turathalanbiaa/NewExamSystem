@@ -54,7 +54,7 @@
 
                                     <li class="nav-item mb-1">
                                         <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#courses-event-log" role="tab">
-                                            <span>الدورات</span>
+                                            <span>المواد الدراسية</span>
                                         </a>
                                     </li>
 
@@ -199,6 +199,9 @@
                                                     <span>رقم</span>
                                                 </th>
                                                 <th class="th-sm fa d-table-cell">
+                                                    <span>النوع</span>
+                                                </th>
+                                                <th class="th-sm fa d-table-cell">
                                                     <span>الحدث</span>
                                                 </th>
                                                 <th class="th-sm fa d-table-cell">
@@ -209,9 +212,10 @@
                                             <tbody>
                                             @php $i=0; @endphp
                                             @foreach($events as $event)
-                                                @if($event->type == \App\Enums\EventLogType::EXAM)
+                                                @if(($event->type == \App\Enums\EventLogType::EXAM) || ($event->type == \App\Enums\EventLogType::ROOT_QUESTION) || ($event->type == \App\Enums\EventLogType::QUESTION))
                                                     <tr data-content="{{$event->id}}">
                                                         <td>{{++$i}}</td>
+                                                        <td>{{\App\Enums\EventLogType::getType($event->type)}}</td>
                                                         <td>{{$event->event}}</td>
                                                         <td>{{$event->time}}</td>
                                                     </tr>

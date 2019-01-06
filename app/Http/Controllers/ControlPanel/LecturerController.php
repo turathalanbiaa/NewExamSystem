@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\AccountState;
 use App\Enums\AccountType;
 use App\Enums\EventLogType;
 use App\Models\EventLog;
@@ -156,8 +157,8 @@ class LecturerController extends Controller
             $event = "تغيير كلمة المرور";
             EventLog::create($target, $type, $event);
 
-            return redirect("control-panel/lecturers/$lecturer->id/edit?type=change-password")->with([
-                "UpdateLecturerMessage" => "تم تغيير كلمة المرور"
+            return redirect("control-panel/lecturers")->with([
+                "UpdateLecturerMessage" => "تم تغيير كلمة المرور - " . $lecturer->name
             ]);
         }
         //For Change Info Account
@@ -190,8 +191,8 @@ class LecturerController extends Controller
             $event = "تعديل الحساب";
             EventLog::create($target, $type, $event);
 
-            return redirect("control-panel/lecturers/$lecturer->id/edit?type=change-info")->with([
-                "UpdateLecturerMessage" => "تم تحديث المعلومات"
+            return redirect("control-panel/lecturers")->with([
+                "UpdateLecturerMessage" => "تم تحديث المعلومات - " . $lecturer->name
             ]);
         }
     }
@@ -204,6 +205,21 @@ class LecturerController extends Controller
      */
     public function destroy(Lecturer $lecturer)
     {
-        return "";
+        $lecturer->state = AccountState::CLOSE;
+        $success = $lecturer->save();
+
+        if (!$success)
+            return redirect("control-panel/lecturers")->with([
+                "ArchiveLecturerMessage" => "لم يتم غلق حساب - " . $lecturer->name
+            ]);
+
+        $target = $lecturer->id;
+        $type = EventLogType::LECTURER;
+        $event = "اغلاق الحساب";
+        EventLog::create($target, $type, $event);
+
+        return redirect("control-panel/lecturers")->with([
+            "ArchiveLecturerMessage" => "تم غلق حساب - " . $lecturer->name
+        ]);
     }
 }

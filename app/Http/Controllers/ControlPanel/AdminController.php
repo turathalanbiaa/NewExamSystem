@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\AccountState;
 use App\Enums\AccountType;
 use App\Enums\EventLogType;
 use App\Models\Admin;
@@ -163,8 +164,8 @@ class AdminController extends Controller
             $event = "تغيير كلمة المرور";
             EventLog::create($target, $type, $event);
 
-            return redirect("control-panel/admins/$admin->id/edit?type=change-password")->with([
-                "UpdateAdminMessage" => "تم تغيير كلمة المرور"
+            return redirect("control-panel/admins")->with([
+                "UpdateAdminMessage" => "تم تغيير كلمة المرور - " . $admin->name
             ]);
         }
         //For Change Info Account
@@ -209,8 +210,8 @@ class AdminController extends Controller
             $event = "تعديل الحساب";
             EventLog::create($target, $type, $event);
 
-            return redirect("control-panel/admins/$admin->id/edit?type=change-info")->with([
-                "UpdateAdminMessage" => "تم تحديث المعلومات"
+            return redirect("control-panel/admins")->with([
+                "UpdateAdminMessage" => "تم تحديث المعلومات - " . $admin->name
             ]);
         }
     }
@@ -223,6 +224,31 @@ class AdminController extends Controller
      */
     public function destroy(Admin $admin)
     {
-        return "OK";
+        $admin->state = AccountState::CLOSE;
+        $success = $admin->save();
+
+        if (!$success)
+            return redirect("control-panel/admins")->with([
+                "ArchiveAdminMessage" => "لم يتم غلق حساب - " . $admin->name
+            ]);
+
+        /**
+         * Update session for current admin.
+         * If current admin archive from admins.
+         */
+        if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") == $admin->id)
+        {
+            session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $admin->state);
+            session()->save();
+        }
+
+        $target = $admin->id;
+        $type = EventLogType::ADMIN;
+        $event = "اغلاق الحساب";
+        EventLog::create($target, $type, $event);
+
+        return redirect("control-panel/admins")->with([
+            "ArchiveAdminMessage" => "تم غلق حساب - " . $admin->name
+        ]);
     }
 }

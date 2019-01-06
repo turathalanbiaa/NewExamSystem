@@ -6,7 +6,7 @@
 
 @section("content")
     <div class="container pt-4">
-        <div class="row mb-3">
+        <div class="row pb-3">
             <div class="col-12">
                 <a href="/control-panel/courses/create" class="btn btn-outline-secondary">
                     <i class="fa fa-plus ml-1"></i>
@@ -14,16 +14,30 @@
                 </a>
             </div>
         </div>
-        <div class="row">
-            <!-- Session Update Course Message -->
-            @if (session('UpdateCourseMessage'))
+
+        <!-- Session Update Course Message -->
+        @if (session('UpdateCourseMessage'))
+            <div class="row">
                 <div class="col-12">
                     <div class="alert alert-info text-center">
                         {{session('UpdateCourseMessage')}}
                     </div>
                 </div>
-            @endif
+            </div>
+        @endif
 
+        <!-- Session Archive Course Message -->
+        @if (session('ArchiveCourseMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        {{session('ArchiveCourseMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="row">
             @foreach($courses as $course)
                 <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
                     <!-- Card -->
@@ -39,7 +53,7 @@
                         </div>
 
                         <!-- Card content -->
-                        <div class="card-body" style="padding-bottom: 75px;">
+                        <div class="card-body" style="padding-bottom: 100px;">
                             <h4>
                                 <i class="fa fa-user-graduate"></i>
                                 {{$course->lecturer->name}}
@@ -48,13 +62,27 @@
                                 {{$course->detail}}
                             </p>
 
-                            <div style="position:absolute; bottom: 20px; width: calc(100% - 40px); text-align: center;">
+                            <div style="position: absolute; right: 0; bottom: 0; width: 100%; padding: 0 20px 20px 20px">
                                 <hr>
-                                <a href="/control-panel/courses/{{$course->id}}/edit" class="btn btn-sm btn-outline-default font-weight-bold">
-                                    <i class="fa fa-edit ml-1"></i>
-                                    <span>تعديل المادة</span>
-                                </a>
-                                <button class="btn btn-sm btn-outline-default font-weight-bold">
+
+                                <div class="btn-group w-100">
+                                    <a class="btn btn-sm btn-outline-default w-50 ml-1 mr-0" href="/control-panel/courses/{{$course->id}}/edit">
+                                        <i class="fa fa-edit ml-1"></i>
+                                        <span>تعديل المادة</span>
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-default w-50 ml-0 mr-1" type="button" onclick="$('#form-{{$course->id}}').submit();">
+                                        <i class="fa fa-file-archive ml-1"></i>
+                                        <span>ارشفة المادة</span>
+                                    </button>
+
+                                    <!-- Form-Hidden for archive course  -->
+                                    <form id="form-{{$course->id}}" class="d-none" method="post" action="/control-panel/courses/{{$course->id}}">
+                                        @method("DELETE")
+                                        @csrf
+                                    </form>
+                                </div>
+
+                                <button class="btn btn-sm btn-block btn-outline-default mt-2">
                                     <i class="fa fa-plus ml-1"></i>
                                     <span>انشاء نموذج امتحاني</span>
                                 </button>
