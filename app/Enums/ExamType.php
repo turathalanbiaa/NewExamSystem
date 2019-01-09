@@ -18,8 +18,8 @@ class ExamType
 
     public static function getType($key) {
         switch ($key) {
-            case 1: return "شهر الاول"; break;
-            case 2: return "شهر الثاني"; break;
+            case 1: return "الشهر الاول"; break;
+            case 2: return "الشهر الثاني"; break;
             case 3: return "نهائي (الدور الاول)"; break;
             case 4: return "نهائي (الدور الثاني)"; break;
         }

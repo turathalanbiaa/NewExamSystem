@@ -5,7 +5,7 @@
 @endsection
 
 @section("content")
-    <div class="container pt-4">
+    <div class="container pt-3">
         <div class="row">
             <div class="col-12">
                 <a href="/control-panel/lecturers/create" class="btn btn-outline-secondary">

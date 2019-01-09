@@ -7,6 +7,7 @@ use App\Models\Admin;
 use App\Models\Lecturer;
 use Closure;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Session;
 use phpDocumentor\Reflection\DocBlock;
 
 class AutoLoginAccountMiddleware
@@ -21,6 +22,9 @@ class AutoLoginAccountMiddleware
     public function handle($request, Closure $next)
     {
         $request->session()->reflash();
+
+        if (session()->has("EXAM_SYSTEM_ACCOUNT_SESSION"))
+            return $next($request);
 
         if ((Cookie::has("EXAM_SYSTEM_ACCOUNT_SESSION")) && (Cookie::has("EXAM_SYSTEM_ACCOUNT_TYPE")))
         {

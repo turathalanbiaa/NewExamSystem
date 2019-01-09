@@ -5,7 +5,7 @@
 @endsection
 
 @section("content")
-    <div class="container pt-4">
+    <div class="container pt-3">
         <div class="row pb-3">
             <div class="col-12">
                 <a href="/control-panel/courses/create" class="btn btn-outline-secondary">
@@ -37,6 +37,17 @@
             </div>
         @endif
 
+        <!-- Session Generate Exams Message -->
+        @if (session('GenerateExamsMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        {{session('GenerateExamsMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <div class="row">
             @foreach($courses as $course)
                 <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
@@ -62,7 +73,7 @@
                                 {{$course->detail}}
                             </p>
 
-                            <div style="position: absolute; right: 0; bottom: 0; width: 100%; padding: 0 20px 20px 20px">
+                            <div class="card-body-content-fixed">
                                 <hr>
 
                                 <div class="btn-group w-100">
@@ -75,17 +86,23 @@
                                         <span>ارشفة المادة</span>
                                     </button>
 
-                                    <!-- Form-Hidden for archive course  -->
+                                    <!-- Form-Hidden for archive course -->
                                     <form id="form-{{$course->id}}" class="d-none" method="post" action="/control-panel/courses/{{$course->id}}">
                                         @method("DELETE")
                                         @csrf
                                     </form>
                                 </div>
 
-                                <button class="btn btn-sm btn-block btn-outline-default mt-2">
+                                <a class="btn btn-sm btn-block btn-outline-default mt-2" href="javascript:void(0)" onclick="$('#form-{{$course->id}}-generate-exams').submit();">
                                     <i class="fa fa-plus ml-1"></i>
-                                    <span>انشاء نموذج امتحاني</span>
-                                </button>
+                                    <span>انشاء النماذج الامتحانية</span>
+                                </a>
+
+                                <!-- Form-Hidden for generate exams -->
+                                <form class="d-none" id="form-{{$course->id}}-generate-exams" method="post" action="/control-panel/courses/generate-exams">
+                                    {{csrf_field()}}
+                                    <input type="hidden" name="id" value="{{$course->id}}">
+                                </form>
                             </div>
                         </div>
                     </div>

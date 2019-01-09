@@ -4,11 +4,15 @@ namespace App\Http\Controllers\ControlPanel;
 
 use App\Enums\CourseState;
 use App\Enums\EventLogType;
+use App\Enums\ExamState;
+use App\Enums\ExamType;
 use App\Models\Course;
 use App\Models\EventLog;
+use App\Models\Exam;
 use App\Models\Lecturer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
 
@@ -78,7 +82,7 @@ class CourseController extends Controller
         $success = $course->save();
 
         if (!$success)
-            return redirect("control-panel/courses/create")->with([
+            return redirect("/control-panel/courses/create")->with([
                 "CreateCourseMessage" => "لم تتم عملية اضافة المادة بنجاح"
             ]);
 
@@ -87,7 +91,7 @@ class CourseController extends Controller
         $event = "اضافة مادة جديدة";
         EventLog::create($target, $type, $event);
 
-        return redirect("control-panel/courses/create")->with([
+        return redirect("/control-panel/courses/create")->with([
             "CreateCourseMessage" => "تمت عملية اضافة المادة بنجاح"
         ]);
     }
@@ -114,7 +118,7 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
-
+        return redirect("/control-panel/courses");
     }
 
     /**
@@ -169,7 +173,7 @@ class CourseController extends Controller
         $success = $course->save();
 
         if (!$success)
-            return redirect("control-panel/courses/$course->id/edit")->with([
+            return redirect("/control-panel/courses/$course->id/edit")->with([
                 "UpdateCourseMessage" => "لم يتم تعديل المادة"
             ]);
 
@@ -178,7 +182,7 @@ class CourseController extends Controller
         $event = "تعديل المادة";
         EventLog::create($target, $type, $event);
 
-        return redirect("control-panel/courses")->with([
+        return redirect("/control-panel/courses")->with([
             "UpdateCourseMessage" => "تم تعديل المادة - " . $course->name
         ]);
     }
@@ -195,7 +199,7 @@ class CourseController extends Controller
         $success = $course->save();
 
         if (!$success)
-            return redirect("control-panel/courses")->with([
+            return redirect("/control-panel/courses")->with([
                 "ArchiveCourseMessage" => "لم يتم ارشفة المادة  - " . $course->name
             ]);
 
@@ -204,8 +208,44 @@ class CourseController extends Controller
         $event = "اغلاق المادة";
         EventLog::create($target, $type, $event);
 
-        return redirect("control-panel/courses")->with([
+        return redirect("/control-panel/courses")->with([
             "ArchiveCourseMessage" => "تم ارشفة المادة - " . $course->name
+        ]);
+    }
+
+    /**
+     * Generation exams for this course
+     */
+    public function generateExams()
+    {
+        $course = Course::findOrFail(Input::get("id"));
+        $exams = Exam::where("course_id", $course->id)->get();
+
+        if (count($exams) == 0)
+        {
+            DB::transaction(function (){
+                $course = Course::find(Input::get("id"));
+                for($i=1; $i<=4; ++$i)
+                {
+                    $exam = new Exam();
+                    $exam->title = $course->name." - ".ExamType::getType($i);
+                    $exam->course_id = $course->id;
+                    $exam->type = $i;
+                    $exam->state = ExamState::CLOSE;
+                    $exam->mark = 0;
+                    $exam->curve = 0;
+                    $exam->date = null;
+                    $exam->save();
+                }
+            });
+
+            return redirect("/control-panel/courses")->with([
+                "GenerateExamsMessage" => "تم انشاء النماذج للمادة  - " . $course->name
+            ]);
+        }
+
+        return redirect("/control-panel/courses")->with([
+            "GenerateExamsMessage" => "تم انشاء هذه النماذج مسبقا للمادة  - " . $course->name
         ]);
     }
 }

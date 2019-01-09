@@ -75,7 +75,7 @@ class LecturerController extends Controller
         $success = $lecturer->save();
 
         if (!$success)
-            return redirect("control-panel/lecturers/create")->with([
+            return redirect("/control-panel/lecturers/create")->with([
                 "CreateLecturerMessage" => "لم تتم عملية الاضافة بنجاح"
             ]);
 
@@ -84,7 +84,7 @@ class LecturerController extends Controller
         $event = "اضافة حساب جديد";
         EventLog::create($target, $type, $event);
 
-        return redirect("control-panel/lecturers/create")->with([
+        return redirect("/control-panel/lecturers/create")->with([
             "CreateLecturerMessage" => "تمت عملية الاضافة بنجاح"
         ]);
     }
@@ -148,7 +148,7 @@ class LecturerController extends Controller
             $success = $lecturer->save();
 
             if (!$success)
-                return redirect("control-panel/lecturers/$lecturer->id/edit?type=change-password")->with([
+                return redirect("/control-panel/lecturers/$lecturer->id/edit?type=change-password")->with([
                     "UpdateLecturerMessage" => "لم يتم تغيير كلمة المرور"
                 ]);
 
@@ -157,7 +157,7 @@ class LecturerController extends Controller
             $event = "تغيير كلمة المرور";
             EventLog::create($target, $type, $event);
 
-            return redirect("control-panel/lecturers")->with([
+            return redirect("/control-panel/lecturers")->with([
                 "UpdateLecturerMessage" => "تم تغيير كلمة المرور - " . $lecturer->name
             ]);
         }
@@ -182,7 +182,7 @@ class LecturerController extends Controller
             $success = $lecturer->save();
 
             if (!$success)
-                return redirect("control-panel/lecturers/$lecturer->id/edit?type=change-info")->with([
+                return redirect("/control-panel/lecturers/$lecturer->id/edit?type=change-info")->with([
                     "UpdateLecturerMessage" => "لم يتم تحديث المعلومات"
                 ]);
 
@@ -191,7 +191,7 @@ class LecturerController extends Controller
             $event = "تعديل الحساب";
             EventLog::create($target, $type, $event);
 
-            return redirect("control-panel/lecturers")->with([
+            return redirect("/control-panel/lecturers")->with([
                 "UpdateLecturerMessage" => "تم تحديث المعلومات - " . $lecturer->name
             ]);
         }
@@ -209,7 +209,7 @@ class LecturerController extends Controller
         $success = $lecturer->save();
 
         if (!$success)
-            return redirect("control-panel/lecturers")->with([
+            return redirect("/control-panel/lecturers")->with([
                 "ArchiveLecturerMessage" => "لم يتم غلق حساب - " . $lecturer->name
             ]);
 
@@ -218,7 +218,7 @@ class LecturerController extends Controller
         $event = "اغلاق الحساب";
         EventLog::create($target, $type, $event);
 
-        return redirect("control-panel/lecturers")->with([
+        return redirect("/control-panel/lecturers")->with([
             "ArchiveLecturerMessage" => "تم غلق حساب - " . $lecturer->name
         ]);
     }

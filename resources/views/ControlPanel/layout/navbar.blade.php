@@ -16,29 +16,33 @@
 
                 <div class="collapse navbar-collapse" id="navbar-collapse">
                     <ul class="w-100 navbar-nav nav-fill pr-1">
-                        <li class="nav-item @if(request()->is("control-panel/profile")) active @endif">
+                        <li class="nav-item @if(request()->is("control-panel")) active @endif">
                             <a class="nav-link" href="/control-panel">
                                 <span>الرئيسية</span>
                             </a>
                         </li>
 
-                        <li class="nav-item @if(request()->is("control-panel/admins*")) active @endif">
-                            <a class="nav-link" href="/control-panel/admins">
-                                <span>المدراء</span>
-                            </a>
-                        </li>
+                        @if((session("EXAM_SYSTEM_ACCOUNT_ID") == 1) && (session("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER))
+                            <li class="nav-item @if(request()->is("control-panel/admins*")) active @endif">
+                                <a class="nav-link" href="/control-panel/admins">
+                                    <span>المدراء</span>
+                                </a>
+                            </li>
+                        @endif
 
-                        <li class="nav-item @if(request()->is("control-panel/lecturers*")) active @endif">
-                            <a class="nav-link" href="/control-panel/lecturers">
-                                <span>الاساتذة</span>
-                            </a>
-                        </li>
+                        @if(session("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER)
+                            <li class="nav-item @if(request()->is("control-panel/lecturers*")) active @endif">
+                                <a class="nav-link" href="/control-panel/lecturers">
+                                    <span>الاساتذة</span>
+                                </a>
+                            </li>
 
-                        <li class="nav-item @if(request()->is("control-panel/courses*")) active @endif">
-                            <a class="nav-link" href="/control-panel/courses">
-                                <span>المواد الدراسية</span>
-                            </a>
-                        </li>
+                            <li class="nav-item @if(request()->is("control-panel/courses*")) active @endif">
+                                <a class="nav-link" href="/control-panel/courses">
+                                    <span>المواد الدراسية</span>
+                                </a>
+                            </li>
+                        @endif
 
                         <li class="nav-item">
                             <a class="nav-link" href="#">

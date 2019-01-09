@@ -17,37 +17,8 @@ class LoginController extends Controller
      */
     public function login()
     {
-        if ((Cookie::has("EXAM_SYSTEM_ACCOUNT_SESSION")) && (Cookie::has("EXAM_SYSTEM_ACCOUNT_TYPE")))
-        {
-            $accountType = Cookie::get("EXAM_SYSTEM_ACCOUNT_TYPE");
-            switch ($accountType)
-            {
-                case (AccountType::MANAGER):
-                    $account = Admin::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
-                        ->first();
-                    break;
-
-                case (AccountType::LECTURER):
-                    $account = Lecturer::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
-                        ->first();
-                    break;
-
-                default: $account = false;
-            }
-
-            if (!$account)
-                return view("ControlPanel.login");
-
-            session()->put('EXAM_SYSTEM_ACCOUNT_ID', $account->id);
-            session()->put('EXAM_SYSTEM_ACCOUNT_NAME', $account->name);
-            session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME', $account->username);
-            session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $account->state);
-            session()->put('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session);
-            session()->put('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType);
-            session()->save();
-
-            return redirect("/control-panel/profile");
-        }
+        if (session()->has("EXAM_SYSTEM_ACCOUNT_SESSION"))
+            return redirect("/control-panel");
 
         return view("ControlPanel.login");
     }
@@ -62,11 +33,13 @@ class LoginController extends Controller
         $this->validate($request, [
             "username"    => "required",
             "password"    => "required",
-            "accountType" => "required"
+            "accountType" => "required|integer|between:1,2"
         ], [
             "username.required"    => "يرجى ادخال اسم المستخدم.",
             "password.required"    => "يرجى ادخال كلمة المرور.",
-            "accountType.required" => "يرجى اختيار نوع الحساب."
+            "accountType.required" => "يرجى اختيار نوع الحساب.",
+            'accountType.integer'  => 'يجب اختيار نوع الحساب اما 1 او 2.',
+            'accountType.between'  => 'يجب اختيار نوع الحساب اما مدير او استاذ.'
         ]);
 
         $username = Input::get("username");
@@ -110,7 +83,7 @@ class LoginController extends Controller
         session()->save();
 
         //Session for one year (525600 minutes)
-        return redirect("/control-panel/profile")
+        return redirect("/control-panel")
             ->withCookie(cookie('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session, 525600))
             ->withCookie(cookie('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType, 525600));
     }

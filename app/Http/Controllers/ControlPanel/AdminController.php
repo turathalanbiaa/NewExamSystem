@@ -75,7 +75,7 @@ class AdminController extends Controller
         $success = $admin->save();
 
         if (!$success)
-            return redirect("control-panel/admins/create")->with([
+            return redirect("/control-panel/admins/create")->with([
                 "CreateAdminMessage" => "لم تتم عملية الاضافة بنجاح"
             ]);
 
@@ -84,7 +84,7 @@ class AdminController extends Controller
         $event = "اضافة حساب جديد";
         EventLog::create($target, $type, $event);
 
-        return redirect("control-panel/admins/create")->with([
+        return redirect("/control-panel/admins/create")->with([
             "CreateAdminMessage" => "تمت عملية الاضافة بنجاح"
         ]);
     }
@@ -155,7 +155,7 @@ class AdminController extends Controller
             $success = $admin->save();
 
             if (!$success)
-                return redirect("control-panel/admins/$admin->id/edit?type=change-password")->with([
+                return redirect("/control-panel/admins/$admin->id/edit?type=change-password")->with([
                     "UpdateAdminMessage" => "لم يتم تغيير كلمة المرور"
                 ]);
 
@@ -164,7 +164,7 @@ class AdminController extends Controller
             $event = "تغيير كلمة المرور";
             EventLog::create($target, $type, $event);
 
-            return redirect("control-panel/admins")->with([
+            return redirect("/control-panel/admins")->with([
                 "UpdateAdminMessage" => "تم تغيير كلمة المرور - " . $admin->name
             ]);
         }
@@ -189,7 +189,7 @@ class AdminController extends Controller
             $success = $admin->save();
 
             if (!$success)
-                return redirect("control-panel/admins/$admin->id/edit?type=change-info")->with([
+                return redirect("/control-panel/admins/$admin->id/edit?type=change-info")->with([
                     "UpdateAdminMessage" => "لم يتم تحديث المعلومات"
                 ]);
 
@@ -210,7 +210,7 @@ class AdminController extends Controller
             $event = "تعديل الحساب";
             EventLog::create($target, $type, $event);
 
-            return redirect("control-panel/admins")->with([
+            return redirect("/control-panel/admins")->with([
                 "UpdateAdminMessage" => "تم تحديث المعلومات - " . $admin->name
             ]);
         }
@@ -228,7 +228,7 @@ class AdminController extends Controller
         $success = $admin->save();
 
         if (!$success)
-            return redirect("control-panel/admins")->with([
+            return redirect("/control-panel/admins")->with([
                 "ArchiveAdminMessage" => "لم يتم غلق حساب - " . $admin->name
             ]);
 
@@ -247,7 +247,7 @@ class AdminController extends Controller
         $event = "اغلاق الحساب";
         EventLog::create($target, $type, $event);
 
-        return redirect("control-panel/admins")->with([
+        return redirect("/control-panel/admins")->with([
             "ArchiveAdminMessage" => "تم غلق حساب - " . $admin->name
         ]);
     }
