@@ -55,9 +55,9 @@
                     <div class="card shadow h-100">
                         <!-- Card view -->
                         <div class="view shadow mdb-color px-3 py-4">
-                            <h3 class="text-center text-white mb-3">
-                                <a href="/control-panel/courses/{{$course->id}}" class="text-white">{{$course->name}}</a>
-                            </h3>
+                            <h5 class="text-center text-white mb-3">
+                                <a href="javascript:void(0)" class="text-white">{{$course->name}}</a>
+                            </h5>
                             <p class="text-center text-white font-weight-bold mb-0">
                                 {{\App\Enums\Level::get($course->level)}}
                             </p>
@@ -65,10 +65,10 @@
 
                         <!-- Card content -->
                         <div class="card-body" style="padding-bottom: 100px;">
-                            <h4>
+                            <h5>
                                 <i class="fa fa-user-graduate"></i>
                                 {{$course->lecturer->name}}
-                            </h4>
+                            </h5>
                             <p class="card-text text-justify">
                                 {{$course->detail}}
                             </p>
@@ -77,11 +77,11 @@
                                 <hr>
 
                                 <div class="btn-group w-100">
-                                    <a class="btn btn-sm btn-outline-default w-50 ml-1 mr-0" href="/control-panel/courses/{{$course->id}}/edit">
+                                    <a class="btn btn-sm btn-outline-secondary w-50 ml-1 mr-0" href="/control-panel/courses/{{$course->id}}/edit">
                                         <i class="fa fa-edit ml-1"></i>
                                         <span>تعديل المادة</span>
                                     </a>
-                                    <button class="btn btn-sm btn-outline-default w-50 ml-0 mr-1" type="button" onclick="$('#form-{{$course->id}}').submit();">
+                                    <button class="btn btn-sm btn-outline-secondary w-50 ml-0 mr-1" type="button" onclick="$('#form-{{$course->id}}').submit();">
                                         <i class="fa fa-file-archive ml-1"></i>
                                         <span>ارشفة المادة</span>
                                     </button>
@@ -93,7 +93,7 @@
                                     </form>
                                 </div>
 
-                                <a class="btn btn-sm btn-block btn-outline-default mt-2" href="javascript:void(0)" onclick="$('#form-{{$course->id}}-generate-exams').submit();">
+                                <a class="btn btn-sm btn-block btn-outline-secondary mt-2" href="javascript:void(0)" onclick="$('#form-{{$course->id}}-generate-exams').submit();">
                                     <i class="fa fa-plus ml-1"></i>
                                     <span>انشاء النماذج الامتحانية</span>
                                 </a>

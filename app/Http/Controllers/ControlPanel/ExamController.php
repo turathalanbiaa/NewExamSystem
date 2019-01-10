@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\AccountType;
+use App\Models\Course;
 use App\Models\Exam;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -15,7 +17,21 @@ class ExamController extends Controller
      */
     public function index()
     {
-        return view("ControlPanel.exam.index");
+        if (session("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)
+        {
+            $courses = Course::all();
+            $exams = Exam::all();
+        }
+        else
+        {
+            $courses = Course::where("lecturer_id", session("EXAM_SYSTEM_ACCOUNT_ID"))->get();
+            $exams = Exam::whereIn("course_id", $courses->pluck('id')->toArray())->get();
+        }
+
+        return view("ControlPanel.exam.index")->with([
+            "courses" => $courses,
+            "exams"   => $exams
+        ]);
     }
 
     /**

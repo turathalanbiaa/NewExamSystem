@@ -9,8 +9,7 @@
 
         @if(!request()->is("control-panel/login"))
             <!-- Navbar Collapse -->
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse" aria-controls="navbarExampleDef"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -22,6 +21,7 @@
                             </a>
                         </li>
 
+                        <!-- Just for super admin-->
                         @if((session("EXAM_SYSTEM_ACCOUNT_ID") == 1) && (session("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER))
                             <li class="nav-item @if(request()->is("control-panel/admins*")) active @endif">
                                 <a class="nav-link" href="/control-panel/admins">
@@ -30,6 +30,7 @@
                             </li>
                         @endif
 
+                        <!-- Just for admin-->
                         @if(session("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER)
                             <li class="nav-item @if(request()->is("control-panel/lecturers*")) active @endif">
                                 <a class="nav-link" href="/control-panel/lecturers">
@@ -45,7 +46,7 @@
                         @endif
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="/control-panel/exams">
                                 <span>الامتحانات</span>
                             </a>
                         </li>
