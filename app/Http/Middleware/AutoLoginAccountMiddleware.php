@@ -35,12 +35,10 @@ class AutoLoginAccountMiddleware
                     $account = Admin::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
                         ->first();
                     break;
-
                 case (AccountType::LECTURER):
                     $account = Lecturer::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
                         ->first();
                     break;
-
                 default: $account = false;
             }
 

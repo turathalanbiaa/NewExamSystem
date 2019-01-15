@@ -19,12 +19,10 @@ class LogoutController extends Controller
                 $account = Admin::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
                     ->first();
                 break;
-
             case (AccountType::LECTURER):
                 $account = Lecturer::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
                     ->first();
                 break;
-
             default: $account = false;
         }
 
@@ -42,9 +40,9 @@ class LogoutController extends Controller
         session()->remove("EXAM_SYSTEM_ACCOUNT_SESSION");
         session()->save();
 
-        $cookie = Cookie::forget("EXAM_SYSTEM_ACCOUNT_SESSION");
-        $cookie = Cookie::forget("EXAM_SYSTEM_ACCOUNT_TYPE");
+        Cookie::forget("EXAM_SYSTEM_ACCOUNT_SESSION");
+        Cookie::forget("EXAM_SYSTEM_ACCOUNT_TYPE");
 
-        return redirect("/control-panel")->withCookie($cookie);
+        return redirect("/control-panel");
     }
 }

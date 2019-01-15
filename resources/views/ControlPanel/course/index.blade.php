@@ -37,17 +37,6 @@
             </div>
         @endif
 
-        <!-- Session Generate Exams Message -->
-        @if (session('GenerateExamsMessage'))
-            <div class="row">
-                <div class="col-12">
-                    <div class="alert alert-info text-center">
-                        {{session('GenerateExamsMessage')}}
-                    </div>
-                </div>
-            </div>
-        @endif
-
         <div class="row">
             @foreach($courses as $course)
                 <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
@@ -64,7 +53,7 @@
                         </div>
 
                         <!-- Card content -->
-                        <div class="card-body" style="padding-bottom: 100px;">
+                        <div class="card-body" style="padding-bottom: 75px;">
                             <h5>
                                 <i class="fa fa-user-graduate"></i>
                                 {{$course->lecturer->name}}
@@ -92,17 +81,6 @@
                                         @csrf
                                     </form>
                                 </div>
-
-                                <a class="btn btn-sm btn-block btn-outline-secondary mt-2" href="javascript:void(0)" onclick="$('#form-{{$course->id}}-generate-exams').submit();">
-                                    <i class="fa fa-plus ml-1"></i>
-                                    <span>انشاء النماذج الامتحانية</span>
-                                </a>
-
-                                <!-- Form-Hidden for generate exams -->
-                                <form class="d-none" id="form-{{$course->id}}-generate-exams" method="post" action="/control-panel/courses/generate-exams">
-                                    {{csrf_field()}}
-                                    <input type="hidden" name="id" value="{{$course->id}}">
-                                </form>
                             </div>
                         </div>
                     </div>
@@ -111,9 +89,4 @@
             @endforeach
         </div>
     </div>
-@endsection
-
-@section("script")
-    <script>
-    </script>
 @endsection

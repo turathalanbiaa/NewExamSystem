@@ -9,9 +9,11 @@ use App\Models\Lecturer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
+
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
      */
@@ -19,6 +21,36 @@ class LoginController extends Controller
     {
         if (session()->has("EXAM_SYSTEM_ACCOUNT_SESSION"))
             return redirect("/control-panel");
+
+        if ((Cookie::has("EXAM_SYSTEM_ACCOUNT_SESSION")) && (Cookie::has("EXAM_SYSTEM_ACCOUNT_TYPE")))
+        {
+            $accountType = Cookie::get("EXAM_SYSTEM_ACCOUNT_TYPE");
+            switch ($accountType)
+            {
+                case (AccountType::MANAGER):
+                    $account = Admin::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                        ->first();
+                    break;
+                case (AccountType::LECTURER):
+                    $account = Lecturer::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                        ->first();
+                    break;
+                default: $account = false;
+            }
+
+            if ($account)
+            {
+                session()->put('EXAM_SYSTEM_ACCOUNT_ID', $account->id);
+                session()->put('EXAM_SYSTEM_ACCOUNT_NAME' , $account->name);
+                session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME' , $account->username);
+                session()->put('EXAM_SYSTEM_ACCOUNT_STATE' , $account->state);
+                session()->put('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session);
+                session()->put('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType);
+                session()->save();
+
+                return redirect("/control-panel");
+            }
+        }
 
         return view("ControlPanel.login");
     }
@@ -82,9 +114,8 @@ class LoginController extends Controller
         session()->put('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType);
         session()->save();
 
-        //Session for one year (525600 minutes)
         return redirect("/control-panel")
-            ->withCookie(cookie('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session, 525600))
-            ->withCookie(cookie('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType, 525600));
+            ->withCookie(cookie()->forever('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session))
+            ->withCookie(cookie()->forever('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType));
     }
 }

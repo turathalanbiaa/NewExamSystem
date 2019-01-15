@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\ControlPanel;
 
 use App\Enums\AccountType;
+use App\Enums\CourseState;
 use App\Models\Course;
 use App\Models\Exam;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Validation\Rule;
 
 class ExamController extends Controller
 {
@@ -41,18 +43,45 @@ class ExamController extends Controller
      */
     public function create()
     {
-        //
+        if (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::LECTURER)
+            $courses = Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
+                ->where("state", CourseState::OPEN)
+                ->get();
+        else
+            $courses = Course::where("state", CourseState::OPEN)
+                ->get();
+
+        return view("ControlPanel.exam.create")->with([
+            "courses" => $courses
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'title'  => 'required',
+            'course' => ['required', Rule::in(
+                session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::LECTURER ?
+                    Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
+                        ->where("state", CourseState::OPEN)
+                        ->pluck("id")
+                        ->toArray() :
+                    Course::where("state", CourseState::OPEN)
+                            ->pluck("id")
+                            ->toArray()
+            )],
+            'type'   => ['required'],
+            'date'  => ""
+        ], []);
+
+        return "";
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\AccountState;
 use App\Enums\CourseState;
 use App\Enums\EventLogType;
 use App\Enums\ExamState;
@@ -53,10 +54,14 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
+        $lecturers = Lecturer::where("state", AccountState::OPEN)
+            ->pluck("id")
+            ->toArray();
+
         $this->validate($request, [
             'name'     => 'required',
             'level'    => 'required|integer|between:1,7',
-            'lecturer' => ['required', Rule::in(self::getLecturers())],
+            'lecturer' => ['required', Rule::in($lecturers)],
             'state'    => 'required|integer|between:1,2',
             'detail'   => 'required'
         ], [
@@ -94,20 +99,6 @@ class CourseController extends Controller
         return redirect("/control-panel/courses/create")->with([
             "CreateCourseMessage" => "تمت عملية اضافة المادة بنجاح"
         ]);
-    }
-
-    /**
-     * Get lecturers id
-     */
-    public static function getLecturers()
-    {
-        $lecturers = Lecturer::all("id");
-        $lecturersId = [];
-
-        foreach ($lecturers as $lecturer)
-            array_push($lecturersId, $lecturer->id);
-
-        return $lecturersId;
     }
 
     /**

@@ -6,21 +6,30 @@
 
 @section("content")
     <div class="container pt-4">
+        <div class="row mb-3">
+            <div class="col-12">
+                <a href="/control-panel/exams/create" class="btn btn-outline-secondary waves-effect waves-light">
+                    <i class="fa fa-plus ml-1"></i>
+                    <span>انشاء نموذج امتحاني</span>
+                </a>
+            </div>
+        </div>
+
         @foreach($courses as $course)
-            <div class="row mb-5">
+            <div class="row mb-3">
                 <div class="col-12">
-                    <h4 class="bg-light p-3" data-toggle="collapse" data-target="#course-exams-{{$course->id}}" data-expande="false">
-                        <i class="fa fa-bars text-secondary"></i>
+                    <h4 class="bg-light p-3" data-toggle="collapse" data-target="#course-exams-{{$course->id}}" aria-expanded="false" aria-controls="collapseExams">
+                        <i class="fa fa-bars text-secondary ml-1"></i>
                         {{$course->name}}
-                        <span> - </span>
+                        <span> -> </span>
                         {{\App\Enums\Level::get($course->level)}}
                     </h4>
                 </div>
-                <div class="col-12" id="course-exams-{{$course->id}}">
+                <div class="col-12 collapse" id="course-exams-{{$course->id}}">
                     <div class="row">
                         @foreach($exams as $exam)
                             @if($exam->course_id == $course->id)
-                                <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                                <div class="col-lg-6 col-md-6 col-sm-12 mb-3">
                                     <!-- Card -->
                                     <div class="card shadow h-100">
                                         <!-- Card view -->
