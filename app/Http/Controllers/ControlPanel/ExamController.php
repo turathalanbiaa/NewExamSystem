@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\Exam;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
 
 class ExamController extends Controller
@@ -66,7 +67,6 @@ class ExamController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'title'  => 'required',
             'course' => ['required', Rule::in(
                 session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::LECTURER ?
                     Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
@@ -77,11 +77,27 @@ class ExamController extends Controller
                             ->pluck("id")
                             ->toArray()
             )],
-            'type'   => ['required'],
-            'date'  => ""
-        ], []);
+            'type'   => ['required', 'integer', 'between:1,4', Rule::notIn(
+                Exam::where("course_id", Input::get("course"))
+                    ->pluck("type")
+                    ->toArray()
+            )],
+            'title'  => ['required'],
+            'mark'   => ['required'],
+            'date'   => ['required', 'date', 'after_or_equal:today']
+        ], [
+            'course.required'      => 'يرجى اختيار المادة',
+            'course.in'            => 'المادة المختارة غير مقبولة.',
+            'type.required'        => 'يرجى اختيار نوع الامتحان.',
+            'type.integer'         => 'نوع الامتحان غير مقبولة.',
+            'type.between'         => 'نوع الامتحان من 1 الى 4.',
+            'type.not_in'          => 'تم انشاء هذا النموذج الامتحاني مسبقا، لهذه المادة في هذا النوع من الامتحان.',
+            'title.required'       => 'يرجى ملىء عنوان الامتحان.',
+            'date.required'        => 'يرجى ملىء تاريخ الامتحان.',
+            'date.date'            => 'تاريخ الامتحان غير مقبولة.',
+            'date.after_or_equal'  => 'تاريخ الامتحان يجب ان يكون من اليوم فصاعدا.'
+        ]);
 
-        return "";
     }
 
     /**

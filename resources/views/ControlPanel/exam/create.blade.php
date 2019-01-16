@@ -33,14 +33,9 @@
                             {{ csrf_field() }}
 
                             <div class="mb-4">
-                                <label for="title">عنوان الامتحان</label>
-                                <input type="text" name="title" id="title" class="form-control" value="{{old("title")}}">
-                            </div>
-
-                            <div class="mb-4">
                                 <label for="course">اختر المادة</label>
                                 <select class="browser-default custom-select" name="course" id="course">
-                                    <option value="100" selected="">يرجى اختيار امادة</option>
+                                    <option value="" selected="">يرجى اختيار امادة</option>
                                     @forelse($courses as $course)
                                         <option value="{{$course->id}}" {{(old("course") == $course->id ? "selected":"")}}>
                                             {{$course->name}}
@@ -70,6 +65,16 @@
                                 </select>
                             </div>
 
+                            <div class="mb-4">
+                                <label for="title">عنوان الامتحان</label>
+                                <input type="text" name="title" id="title" class="form-control" value="{{old("title")}}">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="mark">درجة الامتحان</label>
+                                <input type="number" name="mark" id="mark" class="form-control" value="{{old("mark")}}">
+                            </div>
+
                             <div class="mb-5">
                                 <label for="date">تاريخ الامتحان</label>
                                 <input type="date" name="date" id="date" class="form-control" value="{{old("date")}}">
@@ -84,4 +89,19 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section("script")
+    <script>
+        $(document).ready(function(){
+            $("select#type").change(function(){
+                if (($(this).val() == '{{\App\Enums\ExamType::FINAL_FIRST_ROLE}}') || ($(this).val() == '{{\App\Enums\ExamType::FINAL_SECOND_ROLE}}'))
+                {
+                    $("input#mark").val("60").attr("disabled","disabled");
+                }
+                else
+                    $("input#mark").val("").removeAttr("disabled");
+            });
+        });
+    </script>
 @endsection

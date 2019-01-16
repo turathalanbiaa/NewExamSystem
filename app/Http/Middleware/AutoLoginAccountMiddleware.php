@@ -21,8 +21,6 @@ class AutoLoginAccountMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $request->session()->reflash();
-
         if (session()->has("EXAM_SYSTEM_ACCOUNT_SESSION"))
             return $next($request);
 
