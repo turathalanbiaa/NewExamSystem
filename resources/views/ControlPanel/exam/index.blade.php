@@ -15,6 +15,17 @@
             </div>
         </div>
 
+        <!-- Session Create Exam Message -->
+        @if (session('CreateExamMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        {{session('CreateExamMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         @foreach($courses as $course)
             <div class="row mb-3">
                 <div class="col-12">
@@ -29,51 +40,24 @@
                     <div class="row">
                         @foreach($exams as $exam)
                             @if($exam->course_id == $course->id)
-                                <div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+                                <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
                                     <!-- Card -->
                                     <div class="card shadow h-100">
                                         <!-- Card view -->
                                         <div class="view shadow mdb-color px-3 py-4">
-                                            <h5 class="text-center text-white mb-3">
+                                            <h5 class="text-center text-white">
                                                 <a href="/control-panel/courses/{{$exam->id}}" class="text-white">{{$exam->title}}</a>
                                             </h5>
-                                            <p class="text-center text-white font-weight-bold mb-0">
-                                                {{\App\Enums\Level::get($course->level)}}
-                                            </p>
                                         </div>
 
                                         <!-- Card content -->
-                                        <div class="card-body" style="padding-bottom: 100px;">
-                                            <div class="card-body-content-fixed">
-                                                <hr>
-
-                                                <div class="btn-group w-100">
-                                                    <a class="btn btn-sm btn-outline-default w-50 ml-1 mr-0" href="/control-panel/courses/{{$course->id}}/edit">
-                                                        <i class="fa fa-edit ml-1"></i>
-                                                        <span>تعديل المادة</span>
-                                                    </a>
-                                                    <button class="btn btn-sm btn-outline-default w-50 ml-0 mr-1" type="button" onclick="$('#form-{{$course->id}}').submit();">
-                                                        <i class="fa fa-file-archive ml-1"></i>
-                                                        <span>ارشفة المادة</span>
-                                                    </button>
-
-                                                    <!-- Form-Hidden for archive course -->
-                                                    <form id="form-{{$course->id}}" class="d-none" method="post" action="/control-panel/courses/{{$course->id}}">
-                                                        @method("DELETE")
-                                                        @csrf
-                                                    </form>
-                                                </div>
-
-                                                <a class="btn btn-sm btn-block btn-outline-default mt-2" href="javascript:void(0)" onclick="$('#form-{{$course->id}}-generate-exams').submit();">
-                                                    <i class="fa fa-plus ml-1"></i>
-                                                    <span>انشاء النماذج الامتحانية</span>
-                                                </a>
-
-                                                <!-- Form-Hidden for generate exams -->
-                                                <form class="d-none" id="form-{{$course->id}}-generate-exams" method="post" action="/control-panel/courses/generate-exams">
-                                                    {{csrf_field()}}
-                                                    <input type="hidden" name="id" value="{{$course->id}}">
-                                                </form>
+                                        <div class="card-body">
+                                            <div class="list-group list-group-flush">
+                                                <a href="#!" class="list-group-item list-group-item-action">Cras justo odio</a>
+                                                <a href="#!" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
+                                                <a href="#!" class="list-group-item list-group-item-action">Morbi leo risus</a>
+                                                <a href="#!" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
+                                                <a href="#!" class="list-group-item list-group-item-action">Vestibulum at eros</a>
                                             </div>
                                         </div>
                                     </div>

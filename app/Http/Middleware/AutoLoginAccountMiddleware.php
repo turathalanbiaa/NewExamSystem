@@ -21,6 +21,8 @@ class AutoLoginAccountMiddleware
      */
     public function handle($request, Closure $next)
     {
+//        dd(Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"));
+
         if (session()->has("EXAM_SYSTEM_ACCOUNT_SESSION"))
             return $next($request);
 

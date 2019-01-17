@@ -9,9 +9,25 @@
         <div class="row justify-content-center">
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
+                    <!-- Alert Info -->
+                    <div class="alert alert-info mx-4 mt-4">
+                        <h5 class="text-center pb-2 border-bottom border-primary">طريفة توزيع الدرجة حسب الامتحان</h5>
+                        <ul class="mb-0 pr-3">
+                            <li>مجموع درجة امتحان الشهر الاول وامتحان الشهر الثاني يساوي (25) درجة.</li>
+                            <li>يمكنك وضع درجة امتحان الشهر الاول.</li>
+                            <li>لا يمكنك انشاء النموذج الامتحاني للشهر الثاني الا بعد انشاء النموذج الامتحاني للشهر الاول.</li>
+                            <li>لا يمكنك انشاء النموذج الامتحاني للشهر الثاني اذا كانت درجة امتحان الشهر الاول 25 درجة.</li>
+                            <li>
+                                <span>توضع درجة امتحان الشهر الثاني تلقائيا وذلك حسب المعادلة التالية،</span><br>
+                                <span class="font-weight-bold">درجة امتحان الشهر الثاني = 25 - درجة امتحان الشهر الاول</span>
+                            </li>
+                            <li>درجة الامتحان النهائي هي (60) درجة، سواء كان الامتحان النهائي دور اول او دور ثاني.</li>
+                        </ul>
+                    </div>
+
                     <!-- Errors -->
                     @if ($errors->any())
-                        <div class="alert alert-info m-lg-4 m-3">
+                        <div class="alert alert-info mx-4 mt-4">
                             <ul class="mb-0 pr-3">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
@@ -22,14 +38,13 @@
 
                     <!-- Session Create Exam Message -->
                     @if (session('CreateExamMessage'))
-                        <div class="alert alert-info text-center m-lg-4 m-3">
+                        <div class="alert alert-info text-center mx-4 mt-4">
                             {{session('CreateExamMessage')}}
                         </div>
                     @endif
 
-
-                    <div class="card-body px-lg-5 border-bottom border-primary">
-                        <form class="my-4" method="post" action="/control-panel/exams">
+                    <div class="card-body px-4 border-bottom border-primary">
+                        <form method="post" action="/control-panel/exams">
                             {{ csrf_field() }}
 
                             <div class="mb-4">
@@ -72,7 +87,7 @@
 
                             <div class="mb-4">
                                 <label for="mark">درجة الامتحان</label>
-                                <input type="number" name="mark" id="mark" class="form-control" value="{{old("mark")}}">
+                                <input type="number" name="mark" id="mark" class="form-control" value="{{old("mark", 0)}}">
                             </div>
 
                             <div class="mb-5">
@@ -80,7 +95,7 @@
                                 <input type="date" name="date" id="date" class="form-control" value="{{old("date")}}">
                             </div>
 
-                            <button class="btn btn-outline-secondary btn-block" type="submit">
+                            <button class="btn btn-outline-secondary btn-block mb-4" type="submit">
                                 <span>انشاء النموذج الامتحاني</span>
                             </button>
                         </form>
@@ -97,10 +112,17 @@
             $("select#type").change(function(){
                 if (($(this).val() == '{{\App\Enums\ExamType::FINAL_FIRST_ROLE}}') || ($(this).val() == '{{\App\Enums\ExamType::FINAL_SECOND_ROLE}}'))
                 {
-                    $("input#mark").val("60").attr("disabled","disabled");
+                    $("input#mark").val("60").attr("readonly","readonly");
+                }
+                else if ($(this).val() == '{{\App\Enums\ExamType::SECOND_MONTH}}')
+                {
+                    $("input#mark").val("0").attr("readonly","readonly");
                 }
                 else
-                    $("input#mark").val("").removeAttr("disabled");
+                {
+                    $("input#mark").val("0").removeAttr("readonly");
+                }
+
             });
         });
     </script>
