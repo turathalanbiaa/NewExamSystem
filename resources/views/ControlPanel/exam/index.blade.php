@@ -53,11 +53,11 @@
                                         <!-- Card content -->
                                         <div class="card-body">
                                             <div class="list-group list-group-flush">
-                                                <a href="#!" class="list-group-item list-group-item-action">Cras justo odio</a>
-                                                <a href="#!" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
-                                                <a href="#!" class="list-group-item list-group-item-action">Morbi leo risus</a>
-                                                <a href="#!" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
-                                                <a href="#!" class="list-group-item list-group-item-action">Vestibulum at eros</a>
+                                                <a href="#!" class="list-group-item list-group-item-action">عرض جميع الاسئلة</a>
+                                                <a href="/control-panel/exams/{{$exam->id}}/edit" class="list-group-item list-group-item-action">تعديل النموذج الامتحاني</a>
+
+                                                <a href="#!" class="list-group-item list-group-item-action">فتح الامتحان</a>
+                                                <a href="#!" class="list-group-item list-group-item-action">اغلاق الامتحان</a>
                                             </div>
                                         </div>
                                     </div>

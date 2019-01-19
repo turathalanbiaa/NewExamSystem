@@ -1,7 +1,7 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>انشاء نموذج امتحاني</title>
+    <title>{{$exam->title}}</title>
 @endsection
 
 @section("content")
@@ -37,67 +37,35 @@
                         </div>
                     @endif
 
-                    <!-- Session Create Exam Message -->
-                    @if (session('CreateExamMessage'))
+                <!-- Session Update Exam Message -->
+                    @if (session('UpdateExamMessage'))
                         <div class="alert alert-info text-center mx-4 mt-4">
-                            {{session('CreateExamMessage')}}
+                            {{session('UpdateExamMessage')}}
                         </div>
                     @endif
 
                     <div class="card-body px-4 border-bottom border-primary">
-                        <form method="post" action="/control-panel/exams">
+                        <form method="post" action="/control-panel/exams/{{$exam->id}}">
                             {{ csrf_field() }}
-
-                            <div class="mb-4">
-                                <label for="course">اختر المادة</label>
-                                <select class="browser-default custom-select" name="course" id="course">
-                                    <option value="" selected="">يرجى اختيار امادة</option>
-                                    @forelse($courses as $course)
-                                        <option value="{{$course->id}}" {{(old("course") == $course->id ? "selected":"")}}>
-                                            {{$course->name}}
-                                        </option>
-                                    @empty
-                                        <option value="" disabled="" selected="">لا توجد مواد</option>
-                                    @endforelse
-                                </select>
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="type">اختر نوع الامتحان</label>
-                                <select class="browser-default custom-select" name="type" id="type">
-                                    <option value="" selected="" disabled="">يرجى اختيار نوع الامتحان</option>
-                                    <option value="{{\App\Enums\ExamType::FIRST_MONTH}}" {{(old("type") == \App\Enums\ExamType::FIRST_MONTH ? "selected":"")}}>
-                                        {{\App\Enums\ExamType::getType(\App\Enums\ExamType::FIRST_MONTH)}}
-                                    </option>
-                                    <option value="{{\App\Enums\ExamType::SECOND_MONTH}}" {{(old("type") == \App\Enums\ExamType::SECOND_MONTH ? "selected":"")}}>
-                                        {{\App\Enums\ExamType::getType(\App\Enums\ExamType::SECOND_MONTH)}}
-                                    </option>
-                                    <option value="{{\App\Enums\ExamType::FINAL_FIRST_ROLE}}" {{(old("type") == \App\Enums\ExamType::FINAL_FIRST_ROLE ? "selected":"")}}>
-                                        {{\App\Enums\ExamType::getType(\App\Enums\ExamType::FINAL_FIRST_ROLE)}}
-                                    </option>
-                                    <option value="{{\App\Enums\ExamType::FINAL_SECOND_ROLE}}" {{(old("type") == \App\Enums\ExamType::FINAL_SECOND_ROLE ? "selected":"")}}>
-                                        {{\App\Enums\ExamType::getType(\App\Enums\ExamType::FINAL_SECOND_ROLE)}}
-                                    </option>
-                                </select>
-                            </div>
+                            @method("PUT")
 
                             <div class="mb-4">
                                 <label for="title">عنوان الامتحان</label>
-                                <input type="text" name="title" id="title" class="form-control" value="{{old("title")}}">
+                                <input type="text" name="title" id="title" class="form-control" value="{{$exam->title}}">
                             </div>
 
                             <div class="mb-4">
                                 <label for="mark">درجة الامتحان</label>
-                                <input type="number" name="mark" id="mark" class="form-control" value="{{old("mark", 0)}}">
+                                <input type="number" name="mark" id="mark" class="form-control" value="{{$exam->real_mark}}">
                             </div>
 
                             <div class="mb-5">
                                 <label for="date">تاريخ الامتحان</label>
-                                <input type="date" name="date" id="date" class="form-control" value="{{old("date")}}">
+                                <input type="date" name="date" id="date" class="form-control" value="{{$exam->date}}">
                             </div>
 
                             <button class="btn btn-outline-secondary btn-block mb-4" type="submit">
-                                <span>انشاء النموذج الامتحاني</span>
+                                <span>حفظ التغييرات على النموذج الامتحاني</span>
                             </button>
                         </form>
                     </div>
@@ -117,7 +85,7 @@
                 }
                 else if ($(this).val() == '{{\App\Enums\ExamType::SECOND_MONTH}}')
                 {
-                    $("input#mark").val("25").attr("readonly","readonly");
+                    $("input#mark").val("0").attr("readonly","readonly");
                 }
                 else
                 {

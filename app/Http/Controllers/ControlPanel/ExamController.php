@@ -15,6 +15,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\In;
+use phpDocumentor\Reflection\DocBlock\Tags\Return_;
 
 class ExamController extends Controller
 {
@@ -28,12 +29,16 @@ class ExamController extends Controller
         if (session("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)
         {
             $courses = Course::all();
-            $exams = Exam::all();
+            $exams = Exam::OrderBy("type")
+                ->get();
         }
         else
         {
-            $courses = Course::where("lecturer_id", session("EXAM_SYSTEM_ACCOUNT_ID"))->get();
-            $exams = Exam::whereIn("course_id", $courses->pluck('id')->toArray())->get();
+            $courses = Course::where("lecturer_id", session("EXAM_SYSTEM_ACCOUNT_ID"))
+                ->get();
+            $exams = Exam::whereIn("course_id", $courses->pluck('id')->toArray())
+                ->orderBy("type")
+                ->get();
         }
 
         return view("ControlPanel.exam.index")->with([
@@ -116,15 +121,27 @@ class ExamController extends Controller
 
             if (!$firstMonth)
                 return redirect("/control-panel/exams/create")->with([
-                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني للشهر الثاني الا بعد انشاء النموذج الامتحاني للشهر الاول."
+                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لشهر الثاني الا بعد انشاء النموذج الامتحاني لشهر الاول."
                 ]);
 
             if ($firstMonth->real_mark == 25)
                 return redirect("/control-panel/exams/create")->with([
-                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني للشهر الثاني لان درجة امتحان الشهر الاول 25 درجة."
+                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لشهر الثاني لان درجة امتحان الشهر الاول 25 درجة."
                 ]);
 
             $mark = 25 - $firstMonth->real_mark;
+        }
+
+        if (Input::get("type") == ExamType::FINAL_SECOND_ROLE)
+        {
+            $finalFirstRole = Exam::where("course_id", Input::get("course"))
+                ->where("type", ExamType::FINAL_FIRST_ROLE)
+                ->first();
+
+            if (!$finalFirstRole)
+                return redirect("/control-panel/exams/create")->with([
+                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لنهائي الدور الثاني الا بعد انشاء النموذج الامتحاني لنهائي الدور الثاني."
+                ]);
         }
 
         $exam = new Exam();
@@ -172,19 +189,100 @@ class ExamController extends Controller
      */
     public function edit(Exam $exam)
     {
-        //
+        if (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::LECTURER)
+            $courses = Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
+                ->where("state", CourseState::OPEN)
+                ->get();
+        else
+            $courses = Course::where("state", CourseState::OPEN)
+                ->get();
+
+        if(!in_array($exam->course_id, $courses->pluck("id")->toArray()))
+            abort(404);
+
+        return view("ControlPanel.exam.edit")->with([
+            "exam"    => $exam,
+            "courses" => $courses
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Exam  $exam
+     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Models\Exam $exam
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function update(Request $request, Exam $exam)
     {
-        //
+        $this->validate($request, [
+            'title'  => ['required'],
+            'mark'   => ['required', 'integer', (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
+            'date'   => ['required', 'date']
+        ], [
+            'title.required'       => 'يرجى ملىء عنوان الامتحان.',
+            'mark.required'        => 'يرجى ملىء درجة الامتحان.',
+            'mark.integer'         => 'درجة الامتحان غير مقبولة.',
+            'mark.between'         => (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'درجة الامتحان من 25.' : 'درجة الامتحان من 60.',
+            'date.required'        => 'يرجى ملىء تاريخ الامتحان.',
+            'date.date'            => 'تاريخ الامتحان غير مقبولة.',
+        ]);
+
+        //Update mark for exam.
+        $mark = Input::get("mark");
+        if ($exam->type == ExamType::FIRST_MONTH)
+        {
+            $secondMonthExam = Exam::where("course_id", $exam->course_id)
+                ->where("type", ExamType::SECOND_MONTH)
+                ->first();
+
+            if (($mark == 25) && ($secondMonthExam))
+                redirect("/control-panel/exams/$exam->id/edit")->with([
+                    "UpdateExamMessage" => "لا يمكنك وضع (25 درجة) لامتحان الشهر الاول  لهذه المادة لانها تملك امتحان شهر ثاني."
+                ]);
+
+            if ($secondMonthExam)
+            {
+                $secondMonthExam->real_mark = 25 - $mark;
+                $secondMonthExam->save();
+            }
+        }
+
+        if ($exam->type == ExamType::SECOND_MONTH)
+        {
+            $firstMonthExam = Exam::where("course_id", $exam->course_id)
+                ->where("type", ExamType::FIRST_MONTH)
+                ->first();
+
+            if ($mark == 25)
+                redirect("/control-panel/exams/$exam->id/edit")->with([
+                    "UpdateExamMessage" => "لا يمكنك وضع (25 درجة) لامتحان الشهر الثاني."
+                ]);
+
+            $firstMonthExam->real_mark = 25 - $mark;
+            $firstMonthExam->save();
+        }
+
+        $exam->title = Input::get("title");
+        $exam->real_mark = $mark;
+        $exam->date = Input::get("date");
+        $success = $exam->save();
+
+        if (!$success)
+            return redirect("/control-panel/exams/$exam->id/edit")->with([
+                "UpdateExamMessage" => "لم يتم نعديل النموذج الامتحاني."
+            ]);
+
+        $target = $exam->id;
+        $type = EventLogType::EXAM;
+        $event = "تعديل النموذج الامتحاني " . $exam->title;
+        EventLog::create($target, $type, $event);
+
+        return redirect("/control-panel/exams")->with([
+            "UpdateExamMessage" => "تم تعديل النموذج الامتحاني " . $exam->title . "."
+        ]);
+
     }
 
     /**
