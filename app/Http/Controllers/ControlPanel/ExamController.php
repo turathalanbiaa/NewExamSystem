@@ -216,6 +216,13 @@ class ExamController extends Controller
      */
     public function update(Request $request, Exam $exam)
     {
+        //
+        if ()
+        {
+
+        }
+
+        //General Update
         $this->validate($request, [
             'title'  => ['required'],
             'mark'   => ['required', 'integer', (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
@@ -282,7 +289,6 @@ class ExamController extends Controller
         return redirect("/control-panel/exams")->with([
             "UpdateExamMessage" => "تم تعديل النموذج الامتحاني " . $exam->title . "."
         ]);
-
     }
 
     /**

@@ -56,8 +56,13 @@
                                                 <a href="#!" class="list-group-item list-group-item-action">عرض جميع الاسئلة</a>
                                                 <a href="/control-panel/exams/{{$exam->id}}/edit" class="list-group-item list-group-item-action">تعديل النموذج الامتحاني</a>
 
-                                                <a href="#!" class="list-group-item list-group-item-action">فتح الامتحان</a>
-                                                <a href="#!" class="list-group-item list-group-item-action">اغلاق الامتحان</a>
+                                                @if($exam->state == \App\Enums\ExamState::CLOSE)
+                                                    <a href="#!" class="list-group-item list-group-item-action" data-action="showModelOpenExamState" data-exam="{{$exam->id}}" data-toggle="modal" data-target="#modelOpenExamState">فتح الامتحان</a>
+                                                @elseif($exam->state == \App\Enums\ExamState::OPEN)
+                                                    <a href="#!" class="list-group-item list-group-item-action">اغلاق الامتحان</a>
+                                                @else
+                                                    <a href="#!" class="list-group-item list-group-item-action">فتح الامتحان مرة اخرى</a>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -70,4 +75,56 @@
             </div>
         @endforeach
     </div>
+
+    <!-- Central Open Exam Modal Medium -->
+    <div class="modal fade" id="modelOpenExamState" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notify modal-success" role="document">
+            <!--Content-->
+            <div class="modal-content">
+                <!--Header-->
+                <div class="modal-header">
+                    <p class="heading lead">اسم الامتحان</p>
+
+                    <a href="javascript:void(0)" class="close ml-0" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="white-text">&times;</span>
+                    </a>
+                </div>
+
+                <!--Body-->
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fa fa-check fa-4x mb-3 animated rotateIn"></i>
+                        <h2 class="text-success">هل تريد فتح الامتحان</h2>
+                        <p>بعد فتح الامتحان سوف يتمكن الطالب من الدخول الى القاعة الامتحانية والاجابة على الاسئلة.</p>
+                    </div>
+                </div>
+
+                <!--Footer-->
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success">فتح الامتحان</button>
+                    <button type="button" class="btn btn-outline-success" data-dismiss="modal">لا شكرا</button>
+                </div>
+            </div>
+            <!--/.Content-->
+        </div>
+    </div>
+    <!-- Central Open Exam Modal Medium -->
+    
+    <!-- Form Exam State -->
+    <form id="formExamState" method="post" action="">
+        {!! csrf_field() !!}
+        @method("PUT")
+        <input type="hidden" name="state" value="open">
+    </form>
+@endsection
+
+@section("script")
+    <script>
+        $("#showModelOpenExamState").click(function () {
+            
+        });
+        // $("#centralModalWarning").on('show.bs.modal', function(){
+        //     alert("Hello World!");
+        // });
+    </script>
 @endsection
