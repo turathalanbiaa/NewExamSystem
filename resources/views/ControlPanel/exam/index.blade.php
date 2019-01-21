@@ -8,19 +8,41 @@
     <div class="container pt-4">
         <div class="row mb-3">
             <div class="col-12">
-                <a href="/control-panel/exams/create" class="btn btn-outline-secondary waves-effect waves-light">
+                <a href="/control-panel/exams/create" class="btn btn-outline-default waves-effect waves-light">
                     <i class="fa fa-plus ml-1"></i>
                     <span>انشاء نموذج امتحاني</span>
                 </a>
             </div>
         </div>
 
-        <!-- Session Create Exam Message -->
+        {{-- Session Create Exam Message --}}
         @if (session('CreateExamMessage'))
             <div class="row">
                 <div class="col-12">
-                    <div class="alert alert-info text-center">
+                    <div class="alert alert-success text-center">
                         {{session('CreateExamMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Session Update Exam Message --}}
+        @if (session('UpdateExamMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-success text-center">
+                        {{session('UpdateExamMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Session Update Exam State Message --}}
+        @if (session('UpdateExamStateMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-success text-center">
+                        {{session('UpdateExamStateMessage')}}
                     </div>
                 </div>
             </div>
@@ -30,9 +52,9 @@
             <div class="row mb-3">
                 <div class="col-12">
                     <h4 class="bg-light p-3" data-toggle="collapse" data-target="#course-exams-{{$course->id}}" aria-expanded="false" aria-controls="collapseExams">
-                        <i class="fa fa-bars text-secondary ml-1"></i>
+                        <i class="fa fa-bars text-default ml-1"></i>
                         {{$course->name}}
-                        <span> -> </span>
+                        <span class="text-default">&gt;&gt;&gt;</span>
                         {{\App\Enums\Level::get($course->level)}}
                     </h4>
                 </div>
@@ -41,32 +63,41 @@
                         @foreach($exams as $exam)
                             @if($exam->course_id == $course->id)
                                 <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
-                                    <!-- Card -->
                                     <div class="card shadow h-100">
-                                        <!-- Card view -->
+                                        {{-- Card View --}}
                                         <div class="view shadow mdb-color px-3 py-4">
-                                            <h5 class="text-center text-white">
-                                                <a href="/control-panel/courses/{{$exam->id}}" class="text-white">{{$exam->title}}</a>
+                                            <h5 class="text-center text-white m-0">
+                                                {{$exam->title}}
                                             </h5>
                                         </div>
 
-                                        <!-- Card content -->
+                                        {{-- Card Content --}}
                                         <div class="card-body">
                                             <div class="list-group list-group-flush">
-                                                <a href="#!" class="list-group-item list-group-item-action">عرض جميع الاسئلة</a>
+                                                <a href="###" class="list-group-item list-group-item-action">عرض جميع الاسئلة</a>
                                                 <a href="/control-panel/exams/{{$exam->id}}/edit" class="list-group-item list-group-item-action">تعديل النموذج الامتحاني</a>
 
                                                 @if($exam->state == \App\Enums\ExamState::CLOSE)
-                                                    <a href="#!" class="list-group-item list-group-item-action" data-action="showModelOpenExamState" data-exam="{{$exam->id}}" data-toggle="modal" data-target="#modelOpenExamState">فتح الامتحان</a>
+                                                    <div class="list-group-item">
+                                                        <span>الامتحان مغلق حاليا</span>
+                                                        <button type="button" class="btn btn-success btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="open" data-toggle="modal" data-target="#modelOpenExamState">فتح الامتحان</button>
+                                                    </div>
                                                 @elseif($exam->state == \App\Enums\ExamState::OPEN)
-                                                    <a href="#!" class="list-group-item list-group-item-action">اغلاق الامتحان</a>
+                                                    <div class="list-group-item">
+                                                        <span>الامتحان مفتوح حاليا</span>
+                                                        <button type="button" class="btn btn-danger btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="close" data-toggle="modal" data-target="#modelEndExamState">انهاء الامتحان</button>
+                                                    </div>
                                                 @else
-                                                    <a href="#!" class="list-group-item list-group-item-action">فتح الامتحان مرة اخرى</a>
+                                                    <div class="list-group-item">
+                                                        <span>الامتحان منتهي حاليا</span>
+                                                        <button type="button" class="btn btn-warning btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="reopen" data-toggle="modal" data-target="#modelReopenExamState">اعادة فتح الامتحان</button>
+                                                    </div>
                                                 @endif
+
+                                                <a href="/control-panel/exams/{{$exam->id}}" class="list-group-item list-group-item-action">حذف النموذج الامتحاني</a>
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Card -->
                                 </div>
                             @endif
                         @endforeach
@@ -76,12 +107,10 @@
         @endforeach
     </div>
 
-    <!-- Central Open Exam Modal Medium -->
+    {{-- Open Exam Modal --}}
     <div class="modal fade" id="modelOpenExamState" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-notify modal-success" role="document">
-            <!--Content-->
             <div class="modal-content">
-                <!--Header-->
                 <div class="modal-header">
                     <p class="heading lead">اسم الامتحان</p>
 
@@ -90,41 +119,102 @@
                     </a>
                 </div>
 
-                <!--Body-->
                 <div class="modal-body">
                     <div class="text-center">
-                        <i class="fa fa-check fa-4x mb-3 animated rotateIn"></i>
+                        <i class="fa fa-unlock fa-4x mb-3 animated fadeIn"></i>
                         <h2 class="text-success">هل تريد فتح الامتحان</h2>
                         <p>بعد فتح الامتحان سوف يتمكن الطالب من الدخول الى القاعة الامتحانية والاجابة على الاسئلة.</p>
                     </div>
                 </div>
 
-                <!--Footer-->
                 <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-success">فتح الامتحان</button>
+                    <button type="button" class="btn btn-success" onclick="$('form#examState').submit();">فتح الامتحان</button>
                     <button type="button" class="btn btn-outline-success" data-dismiss="modal">لا شكرا</button>
                 </div>
             </div>
-            <!--/.Content-->
         </div>
     </div>
-    <!-- Central Open Exam Modal Medium -->
+
+    {{-- End Exam Modal --}}
+    <div class="modal fade" id="modelEndExamState" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notify modal-danger" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="heading lead">اسم الامتحان</p>
+
+                    <a href="javascript:void(0)" class="close ml-0" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="white-text">&times;</span>
+                    </a>
+                </div>
+
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fa fa-lock fa-4x mb-3 animated fadeIn"></i>
+                        <h2 class="text-danger">هل تريد غلق الامتحان</h2>
+                        <p>بعد غلق الامتحان، لا يستطيع الطالب الدخول الى القاعة الامتحانية والاجابة على الاسئلة.</p>
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-danger" onclick="$('form#examState').submit();">غلق الامتحان</button>
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">لا شكرا</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Reopen Exam Modal --}}
+    <div class="modal fade" id="modelReopenExamState" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notify modal-warning" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="heading lead">اسم الامتحان</p>
+
+                    <a href="javascript:void(0)" class="close ml-0" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="white-text">&times;</span>
+                    </a>
+                </div>
+
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fa fa-retweet fa-4x mb-3 animated fadeIn"></i>
+                        <h2 class="text-warning">هل تريد اعادة فتح الامتحان</h2>
+                        <p>ستقوم باعادة فتح الامتحان بعد ان كان الامتحان مغلق لكي يستطيع الطالب الدخول الى القاعة الامتحانية والاجابة على الاسئلة.</p>
+                </div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-warning" onclick="$('form#examState').submit();">اعادة فتح الامتحان</button>
+                    <button type="button" class="btn btn-outline-warning" data-dismiss="modal">لا شكرا</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    <!-- Form Exam State -->
-    <form id="formExamState" method="post" action="">
-        {!! csrf_field() !!}
+    {{-- Form Exam State --}}
+    <form id="examState" method="post" action="">
+        @csrf
         @method("PUT")
-        <input type="hidden" name="state" value="open">
+        <input type="hidden" name="state" value="">
     </form>
 @endsection
 
 @section("script")
     <script>
-        $("#showModelOpenExamState").click(function () {
-            
+        $("[data-action='fillExamStateForm']").click(function () {
+            let examId = $(this).data("exam-id");
+            let examState = $(this).data("exam-state");
+            let examTitle = $(this).data("exam-title");
+
+            if (examState === "open")
+                $("#modelOpenExamState .heading.lead").html(examTitle);
+            else if (examState === "close")
+                $("#modelEndExamState .heading.lead").html(examTitle);
+            else if (examState ==="reopen")
+                $("#modelReopenExamState .heading.lead").html(examTitle);
+
+            $("form#examState").attr("action","/control-panel/exams/" + examId);
+            $("form#examState>input[name='state']").attr("value", examState);
         });
-        // $("#centralModalWarning").on('show.bs.modal', function(){
-        //     alert("Hello World!");
-        // });
     </script>
 @endsection

@@ -9,7 +9,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
-                    <!-- Alert Info -->
+                    {{-- Alert Info --}}
                     <div class="alert alert-info mx-4 mt-4">
                         <h5 class="text-center pb-2 border-bottom border-primary">طريفة توزيع الدرجة حسب الامتحان</h5>
                         <ul class="mb-0 pr-3">
@@ -26,9 +26,9 @@
                         </ul>
                     </div>
 
-                    <!-- Errors -->
+                    {{-- Errors --}}
                     @if ($errors->any())
-                        <div class="alert alert-info mx-4 mt-4">
+                        <div class="alert alert-danger mx-4 mt-4">
                             <ul class="mb-0 pr-3">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
@@ -37,16 +37,16 @@
                         </div>
                     @endif
 
-                <!-- Session Update Exam Message -->
+                    {{-- Session Update Exam Message --}}
                     @if (session('UpdateExamMessage'))
-                        <div class="alert alert-info text-center mx-4 mt-4">
+                        <div class="alert alert-danger text-center mx-4 mt-4">
                             {{session('UpdateExamMessage')}}
                         </div>
                     @endif
 
                     <div class="card-body px-4 border-bottom border-primary">
                         <form method="post" action="/control-panel/exams/{{$exam->id}}">
-                            {{ csrf_field() }}
+                            @csrf
                             @method("PUT")
 
                             <div class="mb-4">
@@ -64,7 +64,7 @@
                                 <input type="date" name="date" id="date" class="form-control" value="{{$exam->date}}">
                             </div>
 
-                            <button class="btn btn-outline-secondary btn-block mb-4" type="submit">
+                            <button class="btn btn-outline-default btn-block mb-4" type="submit">
                                 <span>حفظ التغييرات على النموذج الامتحاني</span>
                             </button>
                         </form>
@@ -80,18 +80,11 @@
         $(document).ready(function(){
             $("select#type").change(function(){
                 if (($(this).val() == '{{\App\Enums\ExamType::FINAL_FIRST_ROLE}}') || ($(this).val() == '{{\App\Enums\ExamType::FINAL_SECOND_ROLE}}'))
-                {
                     $("input#mark").val("60").attr("readonly","readonly");
-                }
                 else if ($(this).val() == '{{\App\Enums\ExamType::SECOND_MONTH}}')
-                {
                     $("input#mark").val("0").attr("readonly","readonly");
-                }
                 else
-                {
                     $("input#mark").val("0").removeAttr("readonly");
-                }
-
             });
         });
     </script>

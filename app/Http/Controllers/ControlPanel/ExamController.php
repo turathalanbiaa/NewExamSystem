@@ -14,8 +14,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\In;
-use phpDocumentor\Reflection\DocBlock\Tags\Return_;
 
 class ExamController extends Controller
 {
@@ -140,7 +138,7 @@ class ExamController extends Controller
 
             if (!$finalFirstRole)
                 return redirect("/control-panel/exams/create")->with([
-                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لنهائي الدور الثاني الا بعد انشاء النموذج الامتحاني لنهائي الدور الثاني."
+                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لنهائي الدور الثاني الا بعد انشاء النموذج الامتحاني لنهائي الدور الاول."
                 ]);
         }
 
@@ -192,17 +190,18 @@ class ExamController extends Controller
         if (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::LECTURER)
             $courses = Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
                 ->where("state", CourseState::OPEN)
-                ->get();
+                ->pluck("id")
+                ->toArray();
         else
             $courses = Course::where("state", CourseState::OPEN)
-                ->get();
+                ->pluck("id")
+                ->toArray();
 
-        if(!in_array($exam->course_id, $courses->pluck("id")->toArray()))
+        if(!in_array($exam->course_id, $courses))
             abort(404);
 
         return view("ControlPanel.exam.edit")->with([
-            "exam"    => $exam,
-            "courses" => $courses
+            "exam"    => $exam
         ]);
     }
 
@@ -216,10 +215,55 @@ class ExamController extends Controller
      */
     public function update(Request $request, Exam $exam)
     {
-        //
-        if ()
+        //Update state for exam
+        if (Input::get("state"))
         {
+            if (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::LECTURER)
+                $courses = Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
+                    ->where("state", CourseState::OPEN)
+                    ->pluck("id")
+                    ->toArray();
+            else
+                $courses = Course::where("state", CourseState::OPEN)
+                    ->pluck("id")
+                    ->toArray();
 
+            if(!in_array($exam->course_id, $courses))
+                abort(404);
+
+            switch (Input::get("state"))
+            {
+                case "open":
+                    $exam->state = ExamState::OPEN;
+                    $event = "فتح النموذج الامتحاني " . $exam->title;
+                    break;
+                case "end":
+                    $exam->state = ExamState::END;
+                    $event = "انهاء النموذج الامتحاني " . $exam->title;
+                    break;
+                case "reopen":
+                    $exam->state = ExamState::OPEN;
+                    $event = "اعادة فتح النموذج الامتحاني " . $exam->title;
+                    break;
+                default:
+                    $exam->state = ExamState::CLOSE;
+                    $event = "غلق النموذج الامتحاني " . $exam->title . " بسبب تلاعب المستخدم بالبيانات";
+            }
+
+            $success = $exam->save();
+
+            if (!$success)
+                return redirect("/control-panel/exams")->with([
+                    "UpdateExamStateMessage" => "لم يتم تغيير حالة النموذج الامتحاني " . $exam->title
+                ]);
+
+            $target = $exam->id;
+            $type = EventLogType::EXAM;
+            EventLog::create($target, $type, $event);
+
+            return redirect("/control-panel/exams")->with([
+                "UpdateExamStateMessage" => "تم " . $event
+            ]);
         }
 
         //General Update
