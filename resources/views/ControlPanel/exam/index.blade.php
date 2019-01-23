@@ -60,46 +60,44 @@
                 </div>
                 <div class="col-12 collapse" id="course-exams-{{$course->id}}">
                     <div class="row">
-                        @foreach($exams as $exam)
-                            @if($exam->course_id == $course->id)
-                                <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
-                                    <div class="card shadow h-100">
-                                        {{-- Card View --}}
-                                        <div class="view shadow mdb-color px-3 py-4">
-                                            <h5 class="text-center text-white m-0">
-                                                {{$exam->title}}
-                                            </h5>
-                                        </div>
+                        @foreach($course->exams as $exam)
+                            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                                <div class="card shadow h-100">
+                                    {{-- Card View --}}
+                                    <div class="view shadow mdb-color px-3 py-4">
+                                        <h5 class="text-center text-white m-0">
+                                            {{$exam->title}}
+                                        </h5>
+                                    </div>
 
-                                        {{-- Card Content --}}
-                                        <div class="card-body">
-                                            <div class="list-group list-group-flush">
-                                                {{--<a href="###" class="list-group-item list-group-item-action">عرض جميع الاسئلة</a>--}}
-                                                <a href="/control-panel/exams/{{$exam->id}}/edit" class="list-group-item list-group-item-action">تعديل النموذج الامتحاني</a>
+                                    {{-- Card Content --}}
+                                    <div class="card-body">
+                                        <div class="list-group list-group-flush">
+                                            {{--<a href="###" class="list-group-item list-group-item-action">عرض جميع الاسئلة</a>--}}
+                                            <a href="/control-panel/exams/{{$exam->id}}/edit" class="list-group-item list-group-item-action">تعديل النموذج الامتحاني</a>
 
-                                                @if($exam->state == \App\Enums\ExamState::CLOSE)
-                                                    <div class="list-group-item">
-                                                        <span>الامتحان مغلق حاليا</span>
-                                                        <button type="button" class="btn btn-success btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="open" data-toggle="modal" data-target="#modelOpenExamState">فتح الامتحان</button>
-                                                    </div>
-                                                @elseif($exam->state == \App\Enums\ExamState::OPEN)
-                                                    <div class="list-group-item">
-                                                        <span>الامتحان مفتوح حاليا</span>
-                                                        <button type="button" class="btn btn-danger btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="close" data-toggle="modal" data-target="#modelEndExamState">انهاء الامتحان</button>
-                                                    </div>
-                                                @else
-                                                    <div class="list-group-item">
-                                                        <span>الامتحان منتهي حاليا</span>
-                                                        <button type="button" class="btn btn-warning btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="reopen" data-toggle="modal" data-target="#modelReopenExamState">اعادة فتح الامتحان</button>
-                                                    </div>
-                                                @endif
+                                            @if($exam->state == \App\Enums\ExamState::CLOSE)
+                                                <div class="list-group-item">
+                                                    <span>الامتحان مغلق حاليا</span>
+                                                    <button type="button" class="btn btn-success btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="open" data-toggle="modal" data-target="#modelOpenExamState">فتح الامتحان</button>
+                                                </div>
+                                            @elseif($exam->state == \App\Enums\ExamState::OPEN)
+                                                <div class="list-group-item">
+                                                    <span>الامتحان مفتوح حاليا</span>
+                                                    <button type="button" class="btn btn-danger btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="close" data-toggle="modal" data-target="#modelEndExamState">انهاء الامتحان</button>
+                                                </div>
+                                            @else
+                                                <div class="list-group-item">
+                                                    <span>الامتحان منتهي حاليا</span>
+                                                    <button type="button" class="btn btn-warning btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="reopen" data-toggle="modal" data-target="#modelReopenExamState">اعادة فتح الامتحان</button>
+                                                </div>
+                                            @endif
 
-                                                <a href="javascript:void(0)" class="list-group-item list-group-item-action" data-action="fillDeleteExamForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-toggle="modal" data-target="#modelDeleteExam">حذف النموذج الامتحاني</a>
-                                            </div>
+                                            <a href="javascript:void(0)" class="list-group-item list-group-item-action" data-action="fillDeleteExamForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-toggle="modal" data-target="#modelDeleteExam">حذف النموذج الامتحاني</a>
                                         </div>
                                     </div>
                                 </div>
-                            @endif
+                            </div>
                         @endforeach
                     </div>
                 </div>

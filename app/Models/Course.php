@@ -10,9 +10,10 @@ class Course extends Model
     protected $primaryKey = "id";
     public $timestamps = false;
 
-    function exams()
+    public function exams()
     {
-        return $this->hasMany('App\Models\Exam', 'course_id');
+        return $this->hasMany('App\Models\Exam', 'course_id')
+            ->orderBy("type");
     }
 
     public function lecturer()

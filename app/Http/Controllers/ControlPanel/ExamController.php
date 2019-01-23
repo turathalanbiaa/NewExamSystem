@@ -7,6 +7,7 @@ use App\Enums\CourseState;
 use App\Enums\EventLogType;
 use App\Enums\ExamState;
 use App\Enums\ExamType;
+use App\Models\Admin;
 use App\Models\Course;
 use App\Models\EventLog;
 use App\Models\Exam;
@@ -27,23 +28,13 @@ class ExamController extends Controller
     public function index()
     {
         if (session("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)
-        {
             $courses = Course::all();
-            $exams = Exam::OrderBy("type")
-                ->get();
-        }
         else
-        {
             $courses = Course::where("lecturer_id", session("EXAM_SYSTEM_ACCOUNT_ID"))
                 ->get();
-            $exams = Exam::whereIn("course_id", $courses->pluck('id')->toArray())
-                ->orderBy("type")
-                ->get();
-        }
 
         return view("ControlPanel.exam.index")->with([
-            "courses" => $courses,
-            "exams"   => $exams
+            "courses" => $courses
         ]);
     }
 
