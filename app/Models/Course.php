@@ -10,8 +10,13 @@ class Course extends Model
     protected $primaryKey = "id";
     public $timestamps = false;
 
+    function exams()
+    {
+        return $this->hasMany('App\Models\Exam', 'course_id');
+    }
+
     public function lecturer()
     {
-        return $this->belongsTo("App\Models\Lecturer","lecturer_id","id");
+        return $this->belongsTo("App\Models\Lecturer", "lecturer_id", "id");
     }
 }

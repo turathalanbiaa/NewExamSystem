@@ -484,115 +484,6 @@ function toComment(sourceMap) {
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports) {
-
-/* globals __VUE_SSR_CONTEXT__ */
-
-// IMPORTANT: Do NOT use ES2015 features in this file.
-// This module is a runtime utility for cleaner component module output and will
-// be included in the final webpack user bundle.
-
-module.exports = function normalizeComponent (
-  rawScriptExports,
-  compiledTemplate,
-  functionalTemplate,
-  injectStyles,
-  scopeId,
-  moduleIdentifier /* server only */
-) {
-  var esModule
-  var scriptExports = rawScriptExports = rawScriptExports || {}
-
-  // ES6 modules interop
-  var type = typeof rawScriptExports.default
-  if (type === 'object' || type === 'function') {
-    esModule = rawScriptExports
-    scriptExports = rawScriptExports.default
-  }
-
-  // Vue.extend constructor export interop
-  var options = typeof scriptExports === 'function'
-    ? scriptExports.options
-    : scriptExports
-
-  // render functions
-  if (compiledTemplate) {
-    options.render = compiledTemplate.render
-    options.staticRenderFns = compiledTemplate.staticRenderFns
-    options._compiled = true
-  }
-
-  // functional template
-  if (functionalTemplate) {
-    options.functional = true
-  }
-
-  // scopedId
-  if (scopeId) {
-    options._scopeId = scopeId
-  }
-
-  var hook
-  if (moduleIdentifier) { // server build
-    hook = function (context) {
-      // 2.3 injection
-      context =
-        context || // cached call
-        (this.$vnode && this.$vnode.ssrContext) || // stateful
-        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
-      // 2.2 with runInNewContext: true
-      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-        context = __VUE_SSR_CONTEXT__
-      }
-      // inject component styles
-      if (injectStyles) {
-        injectStyles.call(this, context)
-      }
-      // register component module identifier for async chunk inferrence
-      if (context && context._registeredComponents) {
-        context._registeredComponents.add(moduleIdentifier)
-      }
-    }
-    // used by ssr in case component is cached and beforeCreate
-    // never gets called
-    options._ssrRegister = hook
-  } else if (injectStyles) {
-    hook = injectStyles
-  }
-
-  if (hook) {
-    var functional = options.functional
-    var existing = functional
-      ? options.render
-      : options.beforeCreate
-
-    if (!functional) {
-      // inject component registration as beforeCreate hook
-      options.beforeCreate = existing
-        ? [].concat(existing, hook)
-        : [hook]
-    } else {
-      // for template-only hot-reload because in that case the render fn doesn't
-      // go through the normalizer
-      options._injectStyles = hook
-      // register for functioal component in vue file
-      options.render = function renderWithStyleInjection (h, context) {
-        hook.call(context)
-        return existing(h, context)
-      }
-    }
-  }
-
-  return {
-    esModule: esModule,
-    exports: scriptExports,
-    options: options
-  }
-}
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -696,7 +587,7 @@ module.exports = defaults;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -919,6 +810,115 @@ function applyToTag (styleElement, obj) {
       styleElement.removeChild(styleElement.firstChild)
     }
     styleElement.appendChild(document.createTextNode(css))
+  }
+}
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+/* globals __VUE_SSR_CONTEXT__ */
+
+// IMPORTANT: Do NOT use ES2015 features in this file.
+// This module is a runtime utility for cleaner component module output and will
+// be included in the final webpack user bundle.
+
+module.exports = function normalizeComponent (
+  rawScriptExports,
+  compiledTemplate,
+  functionalTemplate,
+  injectStyles,
+  scopeId,
+  moduleIdentifier /* server only */
+) {
+  var esModule
+  var scriptExports = rawScriptExports = rawScriptExports || {}
+
+  // ES6 modules interop
+  var type = typeof rawScriptExports.default
+  if (type === 'object' || type === 'function') {
+    esModule = rawScriptExports
+    scriptExports = rawScriptExports.default
+  }
+
+  // Vue.extend constructor export interop
+  var options = typeof scriptExports === 'function'
+    ? scriptExports.options
+    : scriptExports
+
+  // render functions
+  if (compiledTemplate) {
+    options.render = compiledTemplate.render
+    options.staticRenderFns = compiledTemplate.staticRenderFns
+    options._compiled = true
+  }
+
+  // functional template
+  if (functionalTemplate) {
+    options.functional = true
+  }
+
+  // scopedId
+  if (scopeId) {
+    options._scopeId = scopeId
+  }
+
+  var hook
+  if (moduleIdentifier) { // server build
+    hook = function (context) {
+      // 2.3 injection
+      context =
+        context || // cached call
+        (this.$vnode && this.$vnode.ssrContext) || // stateful
+        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
+      // 2.2 with runInNewContext: true
+      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+        context = __VUE_SSR_CONTEXT__
+      }
+      // inject component styles
+      if (injectStyles) {
+        injectStyles.call(this, context)
+      }
+      // register component module identifier for async chunk inferrence
+      if (context && context._registeredComponents) {
+        context._registeredComponents.add(moduleIdentifier)
+      }
+    }
+    // used by ssr in case component is cached and beforeCreate
+    // never gets called
+    options._ssrRegister = hook
+  } else if (injectStyles) {
+    hook = injectStyles
+  }
+
+  if (hook) {
+    var functional = options.functional
+    var existing = functional
+      ? options.render
+      : options.beforeCreate
+
+    if (!functional) {
+      // inject component registration as beforeCreate hook
+      options.beforeCreate = existing
+        ? [].concat(existing, hook)
+        : [hook]
+    } else {
+      // for template-only hot-reload because in that case the render fn doesn't
+      // go through the normalizer
+      options._injectStyles = hook
+      // register for functioal component in vue file
+      options.render = function renderWithStyleInjection (h, context) {
+        hook.call(context)
+        return existing(h, context)
+      }
+    }
+  }
+
+  return {
+    esModule: esModule,
+    exports: scriptExports,
+    options: options
   }
 }
 
@@ -25474,7 +25474,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(67);
+var	fixUrls = __webpack_require__(64);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -25791,7 +25791,7 @@ function updateLink (link, options, obj) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(17);
-module.exports = __webpack_require__(75);
+module.exports = __webpack_require__(72);
 
 
 /***/ }),
@@ -25804,11 +25804,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__App_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__App_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_router__ = __webpack_require__(49);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__routes_js__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_vuetify__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_vuetify__ = __webpack_require__(61);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_vuetify___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_vuetify__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_vuetify_dist_vuetify_min_css__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_vuetify_dist_vuetify_min_css__ = __webpack_require__(62);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_vuetify_dist_vuetify_min_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_vuetify_dist_vuetify_min_css__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_material_design_icons_iconfont_dist_material_design_icons_css__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_material_design_icons_iconfont_dist_material_design_icons_css__ = __webpack_require__(65);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_material_design_icons_iconfont_dist_material_design_icons_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_material_design_icons_iconfont_dist_material_design_icons_css__);
 __webpack_require__(18);
 window.Vue = __webpack_require__(14);
@@ -47004,7 +47004,7 @@ module.exports = __webpack_require__(23);
 var utils = __webpack_require__(0);
 var bind = __webpack_require__(8);
 var Axios = __webpack_require__(25);
-var defaults = __webpack_require__(4);
+var defaults = __webpack_require__(3);
 
 /**
  * Create an instance of Axios
@@ -47087,7 +47087,7 @@ function isSlowBuffer (obj) {
 "use strict";
 
 
-var defaults = __webpack_require__(4);
+var defaults = __webpack_require__(3);
 var utils = __webpack_require__(0);
 var InterceptorManager = __webpack_require__(34);
 var dispatchRequest = __webpack_require__(35);
@@ -47626,7 +47626,7 @@ module.exports = InterceptorManager;
 var utils = __webpack_require__(0);
 var transformData = __webpack_require__(36);
 var isCancel = __webpack_require__(12);
-var defaults = __webpack_require__(4);
+var defaults = __webpack_require__(3);
 var isAbsoluteURL = __webpack_require__(37);
 var combineURLs = __webpack_require__(38);
 
@@ -48148,7 +48148,7 @@ function injectStyle (ssrContext) {
   if (disposed) return
   __webpack_require__(44)
 }
-var normalizeComponent = __webpack_require__(3)
+var normalizeComponent = __webpack_require__(5)
 /* script */
 var __vue_script__ = __webpack_require__(47)
 /* template */
@@ -48201,7 +48201,7 @@ var content = __webpack_require__(45);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(5)("4b430f29", content, false, {});
+var update = __webpack_require__(4)("4b430f29", content, false, {});
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -48225,7 +48225,7 @@ exports = module.exports = __webpack_require__(2)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -48326,28 +48326,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
@@ -48386,6 +48364,10 @@ var render = function() {
           }
         },
         [
+          _c("v-img", {
+            attrs: { "aspect-ratio": 16 / 9, src: "online-Exam.jpg" }
+          }),
+          _vm._v(" "),
           _c(
             "v-list",
             { attrs: { dense: "" } },
@@ -48411,53 +48393,6 @@ var render = function() {
                   )
                 ],
                 1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-list-tile",
-                { attrs: { to: { name: "Page2" } } },
-                [
-                  _c(
-                    "v-list-tile-action",
-                    [
-                      _c(
-                        "v-icon",
-                        { attrs: { color: "light-blue lighten-1" } },
-                        [_vm._v("navigate_before")]
-                      )
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-list-tile-content",
-                    [_c("v-list-tile-title", [_vm._v("الامتحانات الحاليه")])],
-                    1
-                  )
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-list-tile",
-                [
-                  _c(
-                    "v-list-tile-action",
-                    [
-                      _c("v-icon", { attrs: { color: "teal lighten-1" } }, [
-                        _vm._v("navigate_next")
-                      ])
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-list-tile-content",
-                    [_c("v-list-tile-title", [_vm._v("الامتحانات القادمه")])],
-                    1
-                  )
-                ],
-                1
               )
             ],
             1
@@ -48471,7 +48406,7 @@ var render = function() {
         {
           attrs: {
             "clipped-right": "",
-            color: "#6f42c1",
+            color: "blue darken-3",
             dark: "",
             app: "",
             fixed: ""
@@ -48491,49 +48426,29 @@ var render = function() {
                 }
               }),
               _vm._v(" "),
-              _c("span", { staticClass: "hidden-sm-and-down" }, [
-                _vm._v("نضام الامتحانات")
-              ])
+              _c("span", [_vm._v("نضام الامتحانات")])
             ],
             1
           ),
           _vm._v(" "),
           _c("v-spacer"),
           _vm._v(" "),
-          _c(
-            "v-btn",
-            { attrs: { icon: "" } },
-            [_c("v-icon", [_vm._v("apps")])],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "v-btn",
-            { attrs: { icon: "" } },
-            [_c("v-icon", [_vm._v("notifications")])],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "v-btn",
-            { attrs: { icon: "", large: "" } },
-            [
-              _c("v-avatar", { attrs: { size: "32px", tile: "" } }, [
-                _c("img", {
-                  attrs: {
-                    src: "https://cdn.vuetifyjs.com/images/logos/logo.svg",
-                    alt: "Vuetify"
-                  }
-                })
-              ])
-            ],
-            1
-          )
+          _c("v-avatar", { attrs: { size: "32px", tile: "" } }, [
+            _c("img", { attrs: { src: "logo.png" } })
+          ])
         ],
         1
       ),
       _vm._v(" "),
-      _c("v-content", [_c("router-view")], 1)
+      _c(
+        "v-content",
+        [
+          _c("router-view", { attrs: { name: "Page1" } }),
+          _vm._v(" "),
+          _c("router-view")
+        ],
+        1
+      )
     ],
     1
   )
@@ -51179,44 +51094,38 @@ if (inBrowser && window.Vue) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return routes; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Page1__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Page1__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Page1___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_Page1__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_Page2__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_Page2__ = __webpack_require__(56);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_Page2___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_Page2__);
+
 
 
 var routes = [{
     path: '/',
-    redirect: {
-        name: "Page1"
+    components: {
+        Page1: __WEBPACK_IMPORTED_MODULE_0__components_Page1___default.a
     }
+
 }, {
-    path: '/Page1',
-    name: 'Page1',
-    component: __WEBPACK_IMPORTED_MODULE_0__components_Page1___default.a
-}, {
-    path: '/page2',
-    name: 'Page2',
+    path: '/page2/:id',
     component: __WEBPACK_IMPORTED_MODULE_1__components_Page2___default.a
 }];
 
 /***/ }),
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(55)
+  __webpack_require__(52)
 }
-var normalizeComponent = __webpack_require__(3)
+var normalizeComponent = __webpack_require__(5)
 /* script */
-var __vue_script__ = __webpack_require__(57)
+var __vue_script__ = __webpack_require__(54)
 /* template */
-var __vue_template__ = __webpack_require__(58)
+var __vue_template__ = __webpack_require__(55)
 /* template functional */
 var __vue_template_functional__ = false
 /* styles */
@@ -51255,17 +51164,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 55 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(56);
+var content = __webpack_require__(53);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(5)("4f13dd59", content, false, {});
+var update = __webpack_require__(4)("4f13dd59", content, false, {});
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -51281,7 +51190,7 @@ if(false) {
 }
 
 /***/ }),
-/* 56 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(2)(false);
@@ -51289,13 +51198,13 @@ exports = module.exports = __webpack_require__(2)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 57 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -51363,13 +51272,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    name: "Page1"
+    name: "Page2",
+    data: function data() {
+        return {};
+    }
 });
 
 /***/ }),
-/* 58 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -51386,51 +51300,42 @@ var render = function() {
         [
           _c(
             "v-flex",
-            { attrs: { xs12: "" } },
+            { attrs: { xl12: "", lg12: "", md12: "", sm12: "", xs12: "" } },
             [
               _c(
                 "v-card",
                 [
                   _c("v-card-title", { attrs: { "primary-title": "" } }, [
-                    _c("div", [
-                      _c("h5", { staticClass: "headline mb-0" }, [
-                        _vm._v("السؤال الاول:")
-                      ]),
-                      _vm._v(" "),
-                      _c("div", [
-                        _vm._v(
-                          "ما هي الصلاة التي يركع فيها المصلي أربع مرات ويسجد أربع مرات؟"
-                        )
-                      ])
+                    _c("h3", { staticClass: "title mb-0" }, [
+                      _vm._v("امتحان الشهر الاول عقائد")
                     ])
+                  ]),
+                  _vm._v(" "),
+                  _c("v-card-text", [
+                    _vm._v(
+                      "\n                    يعتبر هذا الامتحان تقييم اساسي للمرحلة القادمة\n                "
+                    )
                   ]),
                   _vm._v(" "),
                   _c(
                     "v-card-actions",
                     [
                       _c(
-                        "v-radio-group",
+                        "v-btn",
                         {
-                          attrs: { row: "" },
-                          model: {
-                            value: _vm.row,
-                            callback: function($$v) {
-                              _vm.row = $$v
-                            },
-                            expression: "row"
+                          staticClass: "mb-2",
+                          attrs: {
+                            to: "/page2/1",
+                            round: "",
+                            color: "primary",
+                            dark: ""
                           }
                         },
                         [
-                          _c("v-radio", {
-                            attrs: {
-                              label: "صلاة الخسوف والكسوف",
-                              value: "radio-1"
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c("v-radio", {
-                            attrs: { label: "صلاة الليل", value: "radio-2" }
-                          })
+                          _vm._v("بدء\n                    "),
+                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
+                            _vm._v("launch")
+                          ])
                         ],
                         1
                       )
@@ -51446,24 +51351,46 @@ var render = function() {
           _vm._v(" "),
           _c(
             "v-flex",
-            { attrs: { xs12: "" } },
+            { attrs: { xl12: "", lg12: "", md12: "", sm12: "", xs12: "" } },
             [
               _c(
                 "v-card",
                 [
                   _c("v-card-title", { attrs: { "primary-title": "" } }, [
-                    _c("div", [
-                      _c("h5", { staticClass: "headline mb-0" }, [
-                        _vm._v("السوال الثاني:")
-                      ]),
-                      _vm._v(" "),
-                      _c("div", [_vm._v(" عرف الصوم")])
+                    _c("h3", { staticClass: "title mb-0" }, [
+                      _vm._v("امتحان الشهر الاول عقائد")
                     ])
+                  ]),
+                  _vm._v(" "),
+                  _c("v-card-text", [
+                    _vm._v(
+                      "\n                    يعتبر هذا الامتحان تقييم اساسي للمرحلة القادمة\n                "
+                    )
                   ]),
                   _vm._v(" "),
                   _c(
                     "v-card-actions",
-                    [_c("v-textarea", { attrs: { name: "input-7-1" } })],
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          staticClass: "mb-2",
+                          attrs: {
+                            to: "/page2/2",
+                            round: "",
+                            color: "primary",
+                            dark: ""
+                          }
+                        },
+                        [
+                          _vm._v("بدء\n                        "),
+                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
+                            _vm._v("launch")
+                          ])
+                        ],
+                        1
+                      )
+                    ],
                     1
                   )
                 ],
@@ -51475,48 +51402,42 @@ var render = function() {
           _vm._v(" "),
           _c(
             "v-flex",
-            { attrs: { xs12: "" } },
+            { attrs: { xl12: "", lg12: "", md12: "", sm12: "", xs12: "" } },
             [
               _c(
                 "v-card",
                 [
                   _c("v-card-title", { attrs: { "primary-title": "" } }, [
-                    _c("div", [
-                      _c("h5", { staticClass: "headline mb-0" }, [
-                        _vm._v("Kangaroo Valley Safari")
-                      ]),
-                      _vm._v(" "),
-                      _c("div", [
-                        _vm._v(
-                          "Located two hours south of Sydney in the Southern Highlands of New South Wales, ..."
-                        )
-                      ])
+                    _c("h3", { staticClass: "title mb-0" }, [
+                      _vm._v("امتحان الشهر الاول عقائد")
                     ])
+                  ]),
+                  _vm._v(" "),
+                  _c("v-card-text", [
+                    _vm._v(
+                      "\n                   يعتبر هذا الامتحان تقييم اساسي للمرحلة القادمة\n                "
+                    )
                   ]),
                   _vm._v(" "),
                   _c(
                     "v-card-actions",
                     [
                       _c(
-                        "v-radio-group",
+                        "v-btn",
                         {
-                          attrs: { row: "" },
-                          model: {
-                            value: _vm.row,
-                            callback: function($$v) {
-                              _vm.row = $$v
-                            },
-                            expression: "row"
+                          staticClass: "mb-2",
+                          attrs: {
+                            to: "/page2/3",
+                            round: "",
+                            color: "primary",
+                            dark: ""
                           }
                         },
                         [
-                          _c("v-radio", {
-                            attrs: { label: "Option 1", value: "radio-1" }
-                          }),
-                          _vm._v(" "),
-                          _c("v-radio", {
-                            attrs: { label: "Option 2", value: "radio-2" }
-                          })
+                          _vm._v("بدء\n                        "),
+                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
+                            _vm._v("launch")
+                          ])
                         ],
                         1
                       )
@@ -51547,19 +51468,19 @@ if (false) {
 }
 
 /***/ }),
-/* 59 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(60)
+  __webpack_require__(57)
 }
-var normalizeComponent = __webpack_require__(3)
+var normalizeComponent = __webpack_require__(5)
 /* script */
-var __vue_script__ = __webpack_require__(62)
+var __vue_script__ = __webpack_require__(59)
 /* template */
-var __vue_template__ = __webpack_require__(63)
+var __vue_template__ = __webpack_require__(60)
 /* template functional */
 var __vue_template_functional__ = false
 /* styles */
@@ -51598,17 +51519,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 60 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(61);
+var content = __webpack_require__(58);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(5)("0304f07f", content, false, {});
+var update = __webpack_require__(4)("0304f07f", content, false, {});
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -51624,7 +51545,7 @@ if(false) {
 }
 
 /***/ }),
-/* 61 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(2)(false);
@@ -51632,13 +51553,13 @@ exports = module.exports = __webpack_require__(2)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 62 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -51684,13 +51605,168 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    name: "Page2"
+    name: "Page1",
+    data: function data() {
+        return {
+            page: 1,
+            dialog: false,
+            namesThatRhyme: [],
+            snackbar: false,
+            snackbarText: '',
+            color: '',
+            questionId: null,
+            answer: null
+        };
+    },
+    mounted: function mounted() {
+        console.log(this.items);
+    },
+
+    methods: {
+        saveAnswer: function saveAnswer(id) {
+            if (id !== this.questionId) {
+                this.color = 'error';
+                this.snackbarText = 'يجب الاجابة على السوال او تغيير الاجابة';
+                this.snackbar = true;
+                return;
+            } else {
+                console.log("id " + this.questionId);
+                console.log("answer " + this.answer);
+                this.color = 'success';
+                this.snackbarText = 'تم الحفظ بنجاح';
+                this.snackbar = true;
+                this.questionId = null;
+                this.answer = null;
+            }
+        },
+        getAnswer: function getAnswer(e, id) {
+            console.log("Id ", id);
+            console.log("Value ", e);
+
+            this.questionId = id;
+            this.answer = e;
+        },
+        onPageChange: function onPageChange() {
+            console.log('page clicked');
+        },
+        initData: function initData() {
+            var _this = this;
+
+            axios.get('api/map', { params: { lang: this.$i18n.locale } }).then(function (_ref) {
+                var data = _ref.data;
+
+                _this.markers = data.data;
+            }).catch(function (resp) {
+                console.log(resp);
+            });
+        }
+    }
 });
 
 /***/ }),
-/* 63 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -51701,68 +51777,74 @@ var render = function() {
     "v-container",
     { attrs: { fluid: "", "grid-list-lg": "" } },
     [
+      _c("p", { staticClass: "text-lg-right headline" }, [
+        _vm._v(" امتحان اسئلة دينيه عامه الشهر الاول ")
+      ]),
+      _c("div", [_vm._v("Id " + _vm._s(_vm.$route.params.id))]),
+      _c("p"),
+      _vm._v(" "),
       _c(
         "v-layout",
         { attrs: { row: "", wrap: "" } },
         [
           _c(
             "v-flex",
-            { attrs: { xs12: "", sm6: "", "offset-sm3": "" } },
+            { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } },
             [
               _c(
                 "v-card",
                 [
-                  _c("v-img", {
-                    attrs: {
-                      src:
-                        "https://cdn.vuetifyjs.com/images/cards/sunshine.jpg",
-                      height: "200px"
-                    }
-                  }),
-                  _vm._v(" "),
                   _c("v-card-title", { attrs: { "primary-title": "" } }, [
-                    _c("div", [
-                      _c("div", { staticClass: "headline" }, [
-                        _vm._v("Top western road trips")
-                      ]),
-                      _vm._v(" "),
-                      _c("span", { staticClass: "grey--text" }, [
-                        _vm._v("1,000 miles of wonder")
-                      ])
+                    _c("h3", { staticClass: "title mb-0" }, [
+                      _vm._v("من أول ملك فرعوني آمن بالتوحيد ؟")
                     ])
                   ]),
                   _vm._v(" "),
                   _c(
-                    "v-card-actions",
+                    "v-card-text",
                     [
-                      _c("v-btn", { attrs: { flat: "" } }, [_vm._v("Share")]),
-                      _vm._v(" "),
-                      _c("v-btn", { attrs: { flat: "", color: "purple" } }, [
-                        _vm._v("Explore")
-                      ]),
-                      _vm._v(" "),
-                      _c("v-spacer"),
-                      _vm._v(" "),
                       _c(
-                        "v-btn",
-                        {
-                          attrs: { icon: "" },
-                          on: {
-                            click: function($event) {
-                              _vm.show = !_vm.show
-                            }
-                          }
-                        },
+                        "v-radio-group",
+                        { attrs: { column: "" } },
                         [
-                          _c("v-icon", [
-                            _vm._v(
-                              _vm._s(
-                                _vm.show
-                                  ? "keyboard_arrow_down"
-                                  : "keyboard_arrow_up"
-                              )
-                            )
-                          ])
+                          _c("v-radio", {
+                            attrs: { label: "اخناتون", value: "اخناتون" },
+                            on: {
+                              change: function($event) {
+                                _vm.getAnswer($event, 1)
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("v-radio", {
+                            attrs: {
+                              label: "توت عنغ امون",
+                              value: "توت عنغ امون"
+                            },
+                            on: {
+                              change: function($event) {
+                                _vm.getAnswer($event, 1)
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("v-radio", {
+                            attrs: { label: "خوفو", value: "خوفو" },
+                            on: {
+                              change: function($event) {
+                                _vm.getAnswer($event, 1)
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("v-radio", {
+                            attrs: { label: "خفرع", value: "خفرع" },
+                            on: {
+                              change: function($event) {
+                                _vm.getAnswer($event, 1)
+                              }
+                            }
+                          })
                         ],
                         1
                       )
@@ -51771,25 +51853,354 @@ var render = function() {
                   ),
                   _vm._v(" "),
                   _c(
-                    "v-slide-y-transition",
+                    "v-card-actions",
                     [
                       _c(
-                        "v-card-text",
+                        "v-btn",
                         {
-                          directives: [
-                            {
-                              name: "show",
-                              rawName: "v-show",
-                              value: _vm.show,
-                              expression: "show"
+                          staticClass: "mb-2",
+                          attrs: { round: "", color: "success", dark: "" },
+                          on: {
+                            click: function($event) {
+                              _vm.saveAnswer(1)
                             }
-                          ]
+                          }
+                        },
+                        [
+                          _vm._v("حفظ\n                            "),
+                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
+                            _vm._v("save")
+                          ])
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-flex",
+            { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } },
+            [
+              _c(
+                "v-card",
+                [
+                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
+                    _c("h3", { staticClass: "title mb-0" }, [
+                      _vm._v("أول قاضي في البصرة ابو مريم الحنفي؟")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _c(
+                        "v-radio-group",
+                        { attrs: { column: "" } },
+                        [
+                          _c("v-radio", {
+                            attrs: { label: "صح", value: "صح" },
+                            on: {
+                              change: function($event) {
+                                _vm.getAnswer($event, 2)
+                              }
+                            },
+                            model: {
+                              value: _vm.namesThatRhyme,
+                              callback: function($$v) {
+                                _vm.namesThatRhyme = $$v
+                              },
+                              expression: "namesThatRhyme"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("v-radio", {
+                            attrs: { label: "خطأ", value: "خطأ" },
+                            on: {
+                              change: function($event) {
+                                _vm.getAnswer($event, 2)
+                              }
+                            }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          staticClass: "mb-2",
+                          attrs: { round: "", color: "success", dark: "" },
+                          on: {
+                            click: function($event) {
+                              _vm.saveAnswer(2)
+                            }
+                          }
+                        },
+                        [
+                          _vm._v("حفظ\n                        "),
+                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
+                            _vm._v("save")
+                          ])
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-flex",
+            { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } },
+            [
+              _c(
+                "v-card",
+                [
+                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
+                    _c("h3", { staticClass: "title mb-0" }, [
+                      _vm._v("أول جبل وضع في الأرض ؟")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _c("v-text-field", {
+                        attrs: {
+                          "single-line": "",
+                          outline: "",
+                          value: "Answer"
+                        },
+                        on: {
+                          input: function($event) {
+                            _vm.getAnswer($event, 3)
+                          }
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          staticClass: "mb-2",
+                          attrs: { round: "", color: "success", dark: "" },
+                          on: {
+                            click: function($event) {
+                              _vm.saveAnswer(3)
+                            }
+                          }
+                        },
+                        [
+                          _vm._v("حفظ\n                        "),
+                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
+                            _vm._v("save")
+                          ])
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-flex",
+            { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } },
+            [
+              _c(
+                "v-card",
+                [
+                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
+                    _c("h3", { staticClass: "title mb-0" }, [
+                      _vm._v("اشرح العمره")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _c("v-textarea", {
+                        attrs: { outline: "", value: "Answer" },
+                        on: {
+                          input: function($event) {
+                            _vm.getAnswer($event, 4)
+                          }
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          staticClass: "mb-2",
+                          attrs: { round: "", color: "success", dark: "" },
+                          on: {
+                            click: function($event) {
+                              _vm.saveAnswer(4)
+                            }
+                          }
+                        },
+                        [
+                          _vm._v("حفظ\n                        "),
+                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
+                            _vm._v("save")
+                          ])
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-snackbar",
+            {
+              attrs: { color: _vm.color, bottom: "", timeout: 6000 },
+              model: {
+                value: _vm.snackbar,
+                callback: function($$v) {
+                  _vm.snackbar = $$v
+                },
+                expression: "snackbar"
+              }
+            },
+            [_vm._v("\n            " + _vm._s(_vm.snackbarText) + "\n        ")]
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "text-xs-center" },
+            [
+              _c(
+                "v-dialog",
+                {
+                  attrs: { persistent: "", "max-width": "290" },
+                  model: {
+                    value: _vm.dialog,
+                    callback: function($$v) {
+                      _vm.dialog = $$v
+                    },
+                    expression: "dialog"
+                  }
+                },
+                [
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: {
+                        slot: "activator",
+                        color: "red",
+                        round: "",
+                        dark: ""
+                      },
+                      slot: "activator"
+                    },
+                    [
+                      _vm._v(
+                        "\n                    أنهاء الأمتحان\n                "
+                      )
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card",
+                    [
+                      _c(
+                        "v-card-title",
+                        {
+                          staticClass: "title red  white--text",
+                          attrs: { "primary-title": "" }
                         },
                         [
                           _vm._v(
-                            "\n                    I'm a thing. But, like most politicians, he promised more than he could deliver. You won't have time for sleeping, soldier, not with all the bed making you'll be doing. Then we'll go with that data file! Hey, you add a one and two zeros to that or we walk! You're going to do his laundry? I've got to find a way to escape.\n                "
+                            "\n                        العقائد\n                    "
                           )
                         ]
+                      ),
+                      _vm._v(" "),
+                      _c("v-card-text", [
+                        _vm._v(
+                          "\n                        هل انت متأكد\n                    "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "v-card-actions",
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { color: "info darken-1", flat: "" },
+                              on: {
+                                click: function($event) {
+                                  _vm.dialog = false
+                                }
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                            نعم\n                        "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { color: "info darken-1", flat: "" },
+                              on: {
+                                click: function($event) {
+                                  _vm.dialog = false
+                                }
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                            لا\n                        "
+                              )
+                            ]
+                          )
+                        ],
+                        1
                       )
                     ],
                     1
@@ -51818,7 +52229,7 @@ if (false) {
 }
 
 /***/ }),
-/* 64 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -74678,13 +75089,13 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_vue__;
 //# sourceMappingURL=vuetify.js.map
 
 /***/ }),
-/* 65 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(66);
+var content = __webpack_require__(63);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -74709,7 +75120,7 @@ if(false) {
 }
 
 /***/ }),
-/* 66 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(2)(false);
@@ -74723,7 +75134,7 @@ exports.push([module.i, "/*!\n* Vuetify v1.3.12\n* Forged by John Leider\n* Rele
 
 
 /***/ }),
-/* 67 */
+/* 64 */
 /***/ (function(module, exports) {
 
 
@@ -74818,13 +75229,13 @@ module.exports = function (css) {
 
 
 /***/ }),
-/* 68 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(69);
+var content = __webpack_require__(66);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -74849,22 +75260,22 @@ if(false) {
 }
 
 /***/ }),
-/* 69 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var escape = __webpack_require__(70);
+var escape = __webpack_require__(67);
 exports = module.exports = __webpack_require__(2)(false);
 // imports
 
 
 // module
-exports.push([module.i, "@font-face {\n  font-family: 'Material Icons';\n  font-style: normal;\n  font-weight: 400;\n  src: url(" + escape(__webpack_require__(71)) + ");\n  /* For IE6-8 */\n  src: local(\"Material Icons\"), local(\"MaterialIcons-Regular\"), url(" + escape(__webpack_require__(72)) + ") format(\"woff2\"), url(" + escape(__webpack_require__(73)) + ") format(\"woff\"), url(" + escape(__webpack_require__(74)) + ") format(\"truetype\"); }\n\n.material-icons {\n  font-family: 'Material Icons';\n  font-weight: normal;\n  font-style: normal;\n  font-size: 24px;\n  /* Preferred icon size */\n  display: inline-block;\n  line-height: 1;\n  text-transform: none;\n  letter-spacing: normal;\n  word-wrap: normal;\n  white-space: nowrap;\n  direction: ltr;\n  /* Support for all WebKit browsers. */\n  -webkit-font-smoothing: antialiased;\n  /* Support for Safari and Chrome. */\n  text-rendering: optimizeLegibility;\n  /* Support for Firefox. */\n  -moz-osx-font-smoothing: grayscale;\n  /* Support for IE. */\n  font-feature-settings: 'liga';\n  font-display: block; }\n", ""]);
+exports.push([module.i, "@font-face {\n  font-family: 'Material Icons';\n  font-style: normal;\n  font-weight: 400;\n  src: url(" + escape(__webpack_require__(68)) + ");\n  /* For IE6-8 */\n  src: local(\"Material Icons\"), local(\"MaterialIcons-Regular\"), url(" + escape(__webpack_require__(69)) + ") format(\"woff2\"), url(" + escape(__webpack_require__(70)) + ") format(\"woff\"), url(" + escape(__webpack_require__(71)) + ") format(\"truetype\"); }\n\n.material-icons {\n  font-family: 'Material Icons';\n  font-weight: normal;\n  font-style: normal;\n  font-size: 24px;\n  /* Preferred icon size */\n  display: inline-block;\n  line-height: 1;\n  text-transform: none;\n  letter-spacing: normal;\n  word-wrap: normal;\n  white-space: nowrap;\n  direction: ltr;\n  /* Support for all WebKit browsers. */\n  -webkit-font-smoothing: antialiased;\n  /* Support for Safari and Chrome. */\n  text-rendering: optimizeLegibility;\n  /* Support for Firefox. */\n  -moz-osx-font-smoothing: grayscale;\n  /* Support for IE. */\n  font-feature-settings: 'liga';\n  font-display: block; }\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 70 */
+/* 67 */
 /***/ (function(module, exports) {
 
 module.exports = function escape(url) {
@@ -74886,31 +75297,31 @@ module.exports = function escape(url) {
 
 
 /***/ }),
-/* 71 */
+/* 68 */
 /***/ (function(module, exports) {
 
 module.exports = "/fonts/vendor/material-design-icons-icondist/MaterialIcons-Regular.eot?016c14adad95a0e21a2ae4fbc36955c6";
 
 /***/ }),
-/* 72 */
+/* 69 */
 /***/ (function(module, exports) {
 
 module.exports = "/fonts/vendor/material-design-icons-icondist/MaterialIcons-Regular.woff2?8a9a261c8b8dfe90db11f1817a9d22e1";
 
 /***/ }),
-/* 73 */
+/* 70 */
 /***/ (function(module, exports) {
 
 module.exports = "/fonts/vendor/material-design-icons-icondist/MaterialIcons-Regular.woff?c38ebd3cd38c98fbd16bf31d1d24ce64";
 
 /***/ }),
-/* 74 */
+/* 71 */
 /***/ (function(module, exports) {
 
 module.exports = "/fonts/vendor/material-design-icons-icondist/MaterialIcons-Regular.ttf?55242ea5c378da626cab5b4aaf9c2255";
 
 /***/ }),
-/* 75 */
+/* 72 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
