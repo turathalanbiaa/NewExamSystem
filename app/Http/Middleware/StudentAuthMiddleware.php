@@ -13,7 +13,6 @@ class StudentAuthMiddleware
      */
     public function handle($request, Closure $next)
     {
-        //session(['id' => 1]);
           if (session('id')==null)
               return redirect('info');
        else
