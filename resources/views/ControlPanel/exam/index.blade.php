@@ -74,7 +74,7 @@
                                         {{-- Card Content --}}
                                         <div class="card-body">
                                             <div class="list-group list-group-flush">
-                                                <a href="###" class="list-group-item list-group-item-action">عرض جميع الاسئلة</a>
+                                                {{--<a href="###" class="list-group-item list-group-item-action">عرض جميع الاسئلة</a>--}}
                                                 <a href="/control-panel/exams/{{$exam->id}}/edit" class="list-group-item list-group-item-action">تعديل النموذج الامتحاني</a>
 
                                                 @if($exam->state == \App\Enums\ExamState::CLOSE)
@@ -94,7 +94,7 @@
                                                     </div>
                                                 @endif
 
-                                                <a href="/control-panel/exams/{{$exam->id}}" class="list-group-item list-group-item-action">حذف النموذج الامتحاني</a>
+                                                <a href="javascript:void(0)" class="list-group-item list-group-item-action" data-action="fillDeleteExamForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-toggle="modal" data-target="#modelDeleteExam">حذف النموذج الامتحاني</a>
                                             </div>
                                         </div>
                                     </div>
@@ -191,11 +191,45 @@
         </div>
     </div>
     
-    {{-- Form Exam State --}}
+    {{-- Exam State Form --}}
     <form id="examState" method="post" action="">
         @csrf
         @method("PUT")
         <input type="hidden" name="state" value="">
+    </form>
+
+    {{-- Delete Exam Modal --}}
+    <div class="modal fade" id="modelDeleteExam" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notify modal-danger" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="heading lead">اسم الامتحان</p>
+
+                    <a href="javascript:void(0)" class="close ml-0" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="white-text">&times;</span>
+                    </a>
+                </div>
+
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fa fa-trash-alt fa-4x mb-3 animated fadeIn"></i>
+                        <h2 class="text-danger">هل تريد حذف الامتحان</h2>
+                        <p>بعد حذف الامتحان سوف يتم مسح جميع متعلقات هذا الامتحان</p>
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-danger" onclick="$('form#deleteExam').submit();">حذف الامتحان</button>
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">لا شكرا</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Delete Exam Form--}}
+    <form id="deleteExam" method="post" action="">
+        @csrf
+        @method("DELETE")
     </form>
 @endsection
 
@@ -215,6 +249,13 @@
 
             $("form#examState").attr("action","/control-panel/exams/" + examId);
             $("form#examState>input[name='state']").attr("value", examState);
+        });
+        $("[data-action='fillDeleteExamForm']").click(function () {
+            let examId = $(this).data("exam-id");
+            let examTitle = $(this).data("exam-title");
+
+            $("form#deleteExam").attr("action","/control-panel/exams/" + examId);
+            $("#modelDeleteExam .heading.lead").html(examTitle);
         });
     </script>
 @endsection

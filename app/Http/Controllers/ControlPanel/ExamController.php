@@ -10,8 +10,10 @@ use App\Enums\ExamType;
 use App\Models\Course;
 use App\Models\EventLog;
 use App\Models\Exam;
+use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
 
@@ -75,21 +77,8 @@ class ExamController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'course' => ['required', Rule::in(
-                session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::LECTURER ?
-                    Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
-                        ->where("state", CourseState::OPEN)
-                        ->pluck("id")
-                        ->toArray() :
-                    Course::where("state", CourseState::OPEN)
-                            ->pluck("id")
-                            ->toArray()
-            )],
-            'type'   => ['required', 'integer', 'between:1,4', Rule::notIn(
-                Exam::where("course_id", Input::get("course"))
-                    ->pluck("type")
-                    ->toArray()
-            )],
+            'course' => ['required', Rule::in(self::getMyCoursesIds())],
+            'type'   => ['required', 'integer', 'between:1,4', Rule::notIn(self::getExamTypes(Input::get("course")))],
             'title'  => ['required'],
             'mark'   => ['required', 'integer', ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
             'date'   => ['required', 'date', 'after_or_equal:today']
@@ -187,18 +176,7 @@ class ExamController extends Controller
      */
     public function edit(Exam $exam)
     {
-        if (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::LECTURER)
-            $courses = Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
-                ->where("state", CourseState::OPEN)
-                ->pluck("id")
-                ->toArray();
-        else
-            $courses = Course::where("state", CourseState::OPEN)
-                ->pluck("id")
-                ->toArray();
-
-        if(!in_array($exam->course_id, $courses))
-            abort(404);
+        self::watchExam($exam);
 
         return view("ControlPanel.exam.edit")->with([
             "exam"    => $exam
@@ -215,22 +193,11 @@ class ExamController extends Controller
      */
     public function update(Request $request, Exam $exam)
     {
+        self::watchExam($exam);
+
         //Update state for exam
         if (Input::get("state"))
         {
-            if (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::LECTURER)
-                $courses = Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
-                    ->where("state", CourseState::OPEN)
-                    ->pluck("id")
-                    ->toArray();
-            else
-                $courses = Course::where("state", CourseState::OPEN)
-                    ->pluck("id")
-                    ->toArray();
-
-            if(!in_array($exam->course_id, $courses))
-                abort(404);
-
             switch (Input::get("state"))
             {
                 case "open":
@@ -343,6 +310,58 @@ class ExamController extends Controller
      */
     public function destroy(Exam $exam)
     {
-        //
+        self::watchExam($exam);
+
+        DB::transaction(function (){
+
+            Question::where("");
+        });
+    }
+
+
+    /**
+     * Get the specified courses ids from storage
+     *
+     * @return mixed
+     */
+    private static function getMyCoursesIds()
+    {
+        if (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::LECTURER)
+            $courses = Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
+                ->where("state", CourseState::OPEN)
+                ->pluck("id")
+                ->toArray();
+        else
+            $courses = Course::where("state", CourseState::OPEN)
+                ->pluck("id")
+                ->toArray();
+
+        return $courses;
+    }
+
+    /**
+     * Get exam types from the specified course
+     *
+     * @param $course
+     * @return mixed
+     */
+    private static function getExamTypes($course)
+    {
+        return Exam::where("course_id", $course)
+            ->pluck("type")
+            ->toArray();
+    }
+
+    /**
+     * Check can watch the specified exam form storage
+     *
+     * @param $exam
+     */
+    private static function watchExam($exam)
+    {
+        $courses = self::getMyCoursesIds();
+
+        if(!in_array($exam->course_id, $courses))
+            abort(404);
     }
 }

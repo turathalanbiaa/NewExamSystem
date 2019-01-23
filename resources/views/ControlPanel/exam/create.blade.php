@@ -9,7 +9,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
-                    {{-- Alert Info --}}
+                    {{-- Alert Info About Method of distribution Mark OF Exam--}}
                     <div class="alert alert-info mx-4 mt-4">
                         <h5 class="text-center pb-2 border-bottom border-primary">طريفة توزيع الدرجة حسب الامتحان</h5>
                         <ul class="mb-0 pr-3">
@@ -26,7 +26,7 @@
                         </ul>
                     </div>
 
-                    {{-- Errors --}}
+                    {{-- Alert Errors --}}
                     @if ($errors->any())
                         <div class="alert alert-danger mx-4 mt-4">
                             <ul class="mb-0 pr-3">
@@ -44,6 +44,7 @@
                         </div>
                     @endif
 
+                    {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
                         <form method="post" action="/control-panel/exams">
                             @csrf

@@ -7,54 +7,52 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     @yield("title")
-    <!-- Font Awesome icons -->
+    {{-- Font Awesome Icons --}}
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-    <!-- Bootstrap core CSS -->
+    {{-- Bootstrap Core CSS --}}
     <link href="{{asset("mdb/css/bootstrap.min.css")}}" rel="stylesheet">
-    <!-- Material Design Bootstrap -->
+    {{-- MDBootstrap --}}
     <link href="{{asset("mdb/css/mdb.min.css")}}" rel="stylesheet">
-    <!-- MDBootstrap Datatables  -->
+    {{-- MDBootstrap Datatables --}}
     <link href="{{asset("mdb/css/addons/datatables.min.css")}}" rel="stylesheet">
-    <!-- My Custom Styles -->
+    {{-- My Custom Style --}}
     <link href="{{asset("mdb/css/style.css")}}" rel="stylesheet">
 
 </head>
 <body>
-    <!--Main Navigation-->
+    {{-- Main Navigation --}}
     <header>
         @include("ControlPanel.layout.navbar")
     </header>
-    <!--Main Navigation-->
 
-    <!--Main layout-->
+    {{-- Main Content--}}
     <main style="margin: 60px 0;">
         @yield("content")
     </main>
-    <!--Main layout-->
 
-    <!--Footer-->
+    {{-- Extra Content --}}
+    @yield("extra-content")
+
+    {{-- Footer --}}
     <footer class="page-footer font-small primary-color fixed-bottom">
-        <!-- Copyright -->
         <div class="footer-copyright text-center py-3" style="direction: ltr; text-align: right;">
             <span>© 2018 Copyright:</span>
             <a href="https://turathalanbiaa.com" target="_blank">turathalanbiaa.com</a>
         </div>
-        <!-- Copyright -->
     </footer>
-    <!--Footer-->
 
-    <!-- SCRIPTS -->
-    <!-- JQuery -->
+    {{-- SCRIPTS --}}
+    {{-- JQuery --}}
     <script type="text/javascript" src="{{asset("mdb/js/jquery-3.3.1.min.js")}}"></script>
-    <!-- Bootstrap tooltips -->
+    {{-- Bootstrap Tooltips --}}
     <script type="text/javascript" src="{{asset("mdb/js/popper.min.js")}}"></script>
-    <!-- Bootstrap core JavaScript -->
+    {{-- Bootstrap Core JavaScript --}}
     <script type="text/javascript" src="{{asset("mdb/js/bootstrap.min.js")}}"></script>
-    <!-- MDB core JavaScript -->
+    {{-- MDB Core JavaScript --}}
     <script type="text/javascript" src="{{asset("mdb/js/mdb.min.js")}}"></script>
-    <!-- MDBootstrap Datatables  -->
+    {{-- MDBootstrap Datatables --}}
     <script type="text/javascript" src="{{asset("mdb/js/addons/datatables.min.js")}}"></script>
-    <!-- My Custom Script -->
+    {{-- My Custom Script --}}
     @yield("script")
 </body>
 </html>
