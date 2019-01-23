@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
-use App\Enums\AdminType;
+use App\Enums\AccountState;
+use App\Enums\AccountType;
 use App\Enums\EventLogType;
 use App\Models\Admin;
 use App\Models\EventLog;
-use App\Models\Lecturer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
@@ -34,10 +34,7 @@ class AdminController extends Controller
      */
     public function create()
     {
-        $lecturers = Lecturer::all();
-        return view("ControlPanel.admin.create")->with([
-            "lecturers" => $lecturers
-        ]);
+        return view("ControlPanel.admin.create");
     }
 
     /**
@@ -49,54 +46,45 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
-        $rule = [
-            'name' => 'required',
-            'username' => 'required|unique:admin,username',
-            'password' => 'required|min:8',
+        $this->validate($request, [
+            'name'                  => 'required',
+            'username'              => 'required|unique:admin,username',
+            'password'              => 'required|min:8',
             'password_confirmation' => 'required_with:password|same:password',
-            'type' => 'required',
-            'lecturer_id' => 'required_if:type,2',
-            'state' => 'required'
-        ];
-
-        $ruleMessages = [
-            'name.required' => 'الاسم الحقيقي فارغ.',
-            'username.required' => 'اسم المستخدم فارغ.',
-            'username.unique' => 'يوجد مستخدم اخر بنفس الاسم.',
-            'password.required' => 'كلمة المرور فارغ.',
-            'password.min' => 'كلمة المرور يجب ان لاتقل عن 8 حروف.',
+            'state'                 => 'required|integer|between:1,2'
+        ], [
+            'name.required'                       => 'الاسم الحقيقي فارغ.',
+            'username.required'                   => 'اسم المستخدم فارغ.',
+            'username.unique'                     => 'يوجد مستخدم اخر بنفس الاسم.',
+            'password.required'                   => 'كلمة المرور فارغ.',
+            'password.min'                        => 'كلمة المرور يجب ان لاتقل عن 8 حروف.',
             'password_confirmation.required_with' => 'يرجى اعادة كتابة كلمة المرور.',
-            'password_confirmation.same' => 'كلمتا المرور ليس متطابقتان.',
-            'type.required' => 'يجب اختيار نوع الحساب.',
-            'lecturer_id.required_if' => 'يجب اختيار الاستاذ لان نوع الحساب هو استاذ.',
-            'state.required' => 'يجب اختيار حالة الحساب.'
-        ];
-
-        $this->validate($request, $rule, $ruleMessages);
+            'password_confirmation.same'          => 'كلمتا المرور ليس متطابقتان.',
+            'state.required'                      => 'يجب اختيار حالة الحساب.',
+            'state.integer'                       => 'يجب اختيار حالة الحساب اما 1 او 2.',
+            'state.between'                       => 'يجب اختيار حالة الحساب اما مفتوح او مغلق.'
+        ]);
 
         $admin = new Admin();
         $admin->name = Input::get("name");
         $admin->username = Input::get("username");
         $admin->password = md5(Input::get("password"));
-        $admin->type = Input::get("type");
-        $admin->lecturer_id = ($admin->type == AdminType::LECTURER) ? Input::get("lecturer_id") : null;
         $admin->state = Input::get("state");
         $admin->session = null;
         $admin->date = date("Y-m-d");
         $success = $admin->save();
 
         if (!$success)
-            return redirect("control-panel/admins/create")->with([
+            return redirect("/control-panel/admins/create")->with([
                 "CreateAdminMessage" => "لم تتم عملية الاضافة بنجاح"
             ]);
 
-        $source = session()->get("EXAM_SYSTEM_ADMIN_ID");
-        $destination = $admin->id;
+        $target = $admin->id;
         $type = EventLogType::ADMIN;
         $event = "اضافة حساب جديد";
-        EventLog::create($source, $destination, $type, $event);
+        EventLog::create($target, $type, $event);
 
-        return redirect("control-panel/admins/create")->with([
+        return redirect("/control-panel/admins/create")->with([
             "CreateAdminMessage" => "تمت عملية الاضافة بنجاح"
         ]);
     }
@@ -109,7 +97,8 @@ class AdminController extends Controller
      */
     public function show(Admin $admin)
     {
-        $events = EventLog::where("source", $admin->id)
+        $events = EventLog::where("account_id", $admin->id)
+            ->where("account_type",AccountType::MANAGER)
             ->orderBy("id","DESC")
             ->get();
         return view("ControlPanel.admin.show")->with([
@@ -126,10 +115,8 @@ class AdminController extends Controller
      */
     public function edit(Admin $admin)
     {
-        $lecturers = Lecturer::all();
         return view("ControlPanel.admin.edit")->with([
-            "admin" => $admin,
-            "lecturers" => $lecturers
+            "admin" => $admin
         ]);
     }
 
@@ -144,81 +131,87 @@ class AdminController extends Controller
     public function update(Request $request, Admin $admin)
     {
         //For Change Password
-        if (Input::get("type") == "change-password") {
-            $rule = [
-                'password' => 'required|min:8',
+        if (Input::get("type") == "change-password")
+        {
+            $this->validate($request, [
+                'password'              => 'required|min:8',
                 'password_confirmation' => 'required_with:password|same:password'
-            ];
-
-            $ruleMessages = [
-                'password.required' => 'كلمة المرور الجديدة فارغه.',
-                'password.min' => 'كلمة المرور الجديدة يجب ان لاتقل عن 8 حروف.',
+            ], [
+                'password.required'                   => 'كلمة المرور الجديدة فارغه.',
+                'password.min'                        => 'كلمة المرور الجديدة يجب ان لاتقل عن 8 حروف.',
                 'password_confirmation.required_with' => 'يرجى اعادة كتابة كلمة المرور الجديدة.',
-                'password_confirmation.same' => 'كلمتا المرور ليس متطابقتان.'
-            ];
-
-            $this->validate($request, $rule, $ruleMessages);
+                'password_confirmation.same'          => 'كلمتا المرور ليس متطابقتان.'
+            ]);
 
             $admin->password = md5(Input::get("password"));
-            $admin->session = null;
+
+            /**
+             * Store auto login for current admin.
+             * If current admin change your password from admins.
+             */
+            if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") != $admin->id)
+                $admin->session = null;
+
             $success = $admin->save();
 
             if (!$success)
-                return redirect("control-panel/admins/$admin->id/edit?type=change-password")->with([
+                return redirect("/control-panel/admins/$admin->id/edit?type=change-password")->with([
                     "UpdateAdminMessage" => "لم يتم تغيير كلمة المرور"
                 ]);
 
-            $source = session()->get("EXAM_SYSTEM_ADMIN_ID");
-            $destination = $admin->id;
+            $target = $admin->id;
             $type = EventLogType::ADMIN;
             $event = "تغيير كلمة المرور";
-            EventLog::create($source, $destination, $type, $event);
+            EventLog::create($target, $type, $event);
 
-            return redirect("control-panel/admins/$admin->id/edit?type=change-password")->with([
-                "UpdateAdminMessage" => "تم تغيير كلمة المرور"
+            return redirect("/control-panel/admins")->with([
+                "UpdateAdminMessage" => "تم تغيير كلمة المرور - " . $admin->name
             ]);
         }
         //For Change Info Account
         else {
-            $rule = [
-                'name' => 'required',
+            $this->validate($request, [
+                'name'     => 'required',
                 'username' => ["required", Rule::unique('admin')->ignore($admin->id)],
-                'type' => 'required',
-                'lecturer_id' => 'required_if:type,2',
-                'state' => 'required'
-            ];
-
-            $ruleMessages = [
-                'name.required' => 'الاسم الحقيقي فارغ.',
+                'state'    => 'required|integer|between:1,2'
+            ], [
+                'name.required'     => 'الاسم الحقيقي فارغ.',
                 'username.required' => 'اسم المستخدم فارغ.',
-                'username.unique' => 'يوجد مستخدم اخر بنفس الاسم.',
-                'type.required' => 'يجب اختيار نوع الحساب.',
-                'lecturer_id.required_if' => 'يجب اختيار الاستاذ لان نوع الحساب هو استاذ.',
-                'state.required' => 'يجب اختيار حالة الحساب.'
-            ];
-
-            $this->validate($request, $rule, $ruleMessages);
+                'username.unique'   => 'يوجد مستخدم اخر بنفس الاسم.',
+                'state.required'    => 'يجب اختيار حالة الحساب.',
+                'state.integer'     => 'يجب اختيار حالة الحساب اما 1 او 2.',
+                'state.between'     => 'يجب اختيار حالة الحساب اما مفتوح او مغلق.'
+            ]);
 
             $admin->name = Input::get("name");
             $admin->username = Input::get("username");
-            $admin->type = Input::get("type");
-            $admin->lecturer_id = ($admin->type == AdminType::LECTURER) ? Input::get("lecturer_id") : null;
             $admin->state = Input::get("state");
             $success = $admin->save();
 
             if (!$success)
-                return redirect("control-panel/admins/$admin->id/edit?type=change-info")->with([
+                return redirect("/control-panel/admins/$admin->id/edit?type=change-info")->with([
                     "UpdateAdminMessage" => "لم يتم تحديث المعلومات"
                 ]);
 
-            $source = session()->get("EXAM_SYSTEM_ADMIN_ID");
-            $destination = $admin->id;
+            /**
+             * Update session for current admin.
+             * If current admin change your info from admins.
+             */
+            if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") == $admin->id)
+            {
+                session()->put('EXAM_SYSTEM_ACCOUNT_NAME', $admin->name);
+                session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME', $admin->username);
+                session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $admin->state);
+                session()->save();
+            }
+
+            $target = $admin->id;
             $type = EventLogType::ADMIN;
             $event = "تعديل الحساب";
-            EventLog::create($source, $destination, $type, $event);
+            EventLog::create($target, $type, $event);
 
-            return redirect("control-panel/admins/$admin->id/edit?type=change-info")->with([
-                "UpdateAdminMessage" => "تم تحديث المعلومات"
+            return redirect("/control-panel/admins")->with([
+                "UpdateAdminMessage" => "تم تحديث المعلومات - " . $admin->name
             ]);
         }
     }
@@ -231,6 +224,31 @@ class AdminController extends Controller
      */
     public function destroy(Admin $admin)
     {
-        //
+        $admin->state = AccountState::CLOSE;
+        $success = $admin->save();
+
+        if (!$success)
+            return redirect("/control-panel/admins")->with([
+                "ArchiveAdminMessage" => "لم يتم غلق حساب - " . $admin->name
+            ]);
+
+        /**
+         * Update session for current admin.
+         * If current admin archive from admins.
+         */
+        if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") == $admin->id)
+        {
+            session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $admin->state);
+            session()->save();
+        }
+
+        $target = $admin->id;
+        $type = EventLogType::ADMIN;
+        $event = "اغلاق الحساب";
+        EventLog::create($target, $type, $event);
+
+        return redirect("/control-panel/admins")->with([
+            "ArchiveAdminMessage" => "تم غلق حساب - " . $admin->name
+        ]);
     }
 }

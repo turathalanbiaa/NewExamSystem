@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\AdminType;
+use App\Enums\AccountType;
 use Illuminate\Database\Eloquent\Model;
 
 class Admin extends Model
@@ -12,7 +12,7 @@ class Admin extends Model
     public $timestamps = false;
 
     public function getLecturerName() {
-        if ($this->type == AdminType::LECTURER) {
+        if ($this->type == AccountType::LECTURER) {
             $lecturer = Lecturer::find($this->lecturer_id);
            return $lecturer["name"];
         }

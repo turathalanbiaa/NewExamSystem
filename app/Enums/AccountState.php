@@ -9,7 +9,7 @@
 namespace App\Enums;
 
 
-class AdminState
+class AccountState
 {
     const OPEN = 1;
     const CLOSE = 2;
@@ -19,6 +19,7 @@ class AdminState
             case 1: return "مفتوح"; break;
             case 2: return "مغلق";  break;
         }
+
         return "";
     }
 }

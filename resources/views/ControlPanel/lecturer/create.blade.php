@@ -1,7 +1,7 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>اضافة مدير</title>
+    <title>اضافة استاذ</title>
 @endsection
 
 @section("content")
@@ -20,16 +20,16 @@
                         </div>
                     @endif
 
-                <!-- Session Create Admin Message -->
-                    @if (session('CreateAdminMessage'))
+                    <!-- Session Create Lecturer Message -->
+                    @if (session('CreateLecturerMessage'))
                         <div class="alert alert-info text-center m-lg-4 m-3">
-                            {{session('CreateAdminMessage')}}
+                            {{session('CreateLecturerMessage')}}
                         </div>
                     @endif
 
 
                     <div class="card-body px-lg-5 pt-0 border-bottom border-primary">
-                        <form class="md-form" method="post" action="/control-panel/admins">
+                        <form class="md-form" method="post" action="/control-panel/lecturers">
                             {{ csrf_field() }}
 
                             <div class="md-form">
@@ -63,7 +63,6 @@
                                     </option>
                                 </select>
                             </div>
-
 
                             <button class="btn btn-outline-secondary btn-block mt-5" type="submit">
                                 <span>حفظ</span>

@@ -9,7 +9,7 @@
 namespace App\Enums;
 
 
-class AdminType
+class AccountType
 {
 
     const MANAGER = 1;
@@ -20,6 +20,7 @@ class AdminType
             case 1: return "مدير"; break;
             case 2: return "استاذ"; break;
         }
+
         return "";
     }
 }

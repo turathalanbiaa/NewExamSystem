@@ -2,9 +2,9 @@
 
 @section("title")
     @if($_GET["type"] == "change-password")
-        <title>{{"تغيير كلمة المرور-".$admin->name}}</title>
+        <title>{{"تغيير كلمة المرور-".$lecturer->name}}</title>
     @else
-        <title>{{"تعديل الحساب-".$admin->name}}</title>
+        <title>{{"تعديل الحساب-".$lecturer->name}}</title>
     @endif
 @endsection
 
@@ -24,15 +24,16 @@
                         </div>
                     @endif
 
-                    <!-- Session Update Admin Message -->
-                    @if (session('UpdateAdminMessage'))
+                    <!-- Session Update Lecturer Message -->
+                    @if (session('UpdateLecturerMessage'))
                         <div class="alert alert-info text-center m-lg-4 m-3">
-                            {{session('UpdateAdminMessage')}}
+                            {{session('UpdateLecturerMessage')}}
                         </div>
                     @endif
 
-                    <div class="card-body px-lg-5 pt-0 border-bottom border-primary">
-                        <form class="md-form" method="post" action="/control-panel/admins/{{$admin->id}}">
+
+                    <div class="card-body px-lg-5 pt-0 border-bottom border-default">
+                        <form class="md-form" method="post" action="/control-panel/lecturers/{{$lecturer->id}}">
                             @method('PUT')
                             {{ csrf_field() }}
 
@@ -50,21 +51,21 @@
                             @else
                                 <div class="md-form">
                                     <label class="w-100" for="name">الاسم الحقيقي</label>
-                                    <input type="text" name="name" id="name" class="form-control" value="{{$admin->name}}">
+                                    <input type="text" name="name" id="name" class="form-control" value="{{$lecturer->name}}">
                                 </div>
 
                                 <div class="md-form">
                                     <label class="w-100" for="username">اسم المستخدم</label>
-                                    <input type="text" name="username" id="username" class="form-control" value="{{$admin->username}}">
+                                    <input type="text" name="username" id="username" class="form-control" value="{{$lecturer->username}}">
                                 </div>
 
                                 <div class="md-form pt-3">
                                     <select class="browser-default custom-select" name="state">
                                         <option value="" disabled="" selected="">اختر حالة الحساب</option>
-                                        <option value="{{\App\Enums\AccountState::OPEN}}" {{($admin->state == \App\Enums\AccountState::OPEN ? "selected":"")}}>
+                                        <option value="{{\App\Enums\AccountState::OPEN}}" {{($lecturer->state == \App\Enums\AccountState::OPEN ? "selected":"")}}>
                                             {{\App\Enums\AccountState::getState(\App\Enums\AccountState::OPEN)}}
                                         </option>
-                                        <option value="{{\App\Enums\AccountState::CLOSE}}" {{($admin->state == \App\Enums\AccountState::CLOSE ? "selected":"")}}>
+                                        <option value="{{\App\Enums\AccountState::CLOSE}}" {{($lecturer->state == \App\Enums\AccountState::CLOSE ? "selected":"")}}>
                                             {{\App\Enums\AccountState::getState(\App\Enums\AccountState::CLOSE)}}
                                         </option>
                                     </select>

@@ -19,6 +19,7 @@ class EnrollmentState
             case 1: return "غير منتهي"; break;
             case 2: return "منتهي"; break;
         }
+
         return "";
     }
 }

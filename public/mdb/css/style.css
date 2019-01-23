@@ -59,3 +59,11 @@ table.dataTable thead .sorting_asc_disabled:before,
 table.dataTable thead .sorting_desc_disabled:after {
     opacity: 0
 }
+
+.card-body-content-fixed {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 0 20px 20px 20px;
+}
