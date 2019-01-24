@@ -3,7 +3,7 @@
     <div class="container">
         {{-- Navbar Brand --}}
         <a class="navbar-brand pull-right mr-0 ml-4" href="javascript:void(0);">
-            <img src="{{asset("mdb/img/escp.png")}}" height="20" alt="Route 66 in navbar">
+            <img src="{{asset("mdb/img/escp.png")}}" height="20">
             <span class="d-inline-block align-top mr-2">لوحة التحكم</span>
         </a>
 

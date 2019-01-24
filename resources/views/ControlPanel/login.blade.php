@@ -8,14 +8,14 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 col-sm-12">
-                <!-- Card login-->
+                {{-- Card Login --}}
                 <div class="card mt-4">
                     <div class="card-body">
                         <form method="post" action="/control-panel/login" class="text-left" dir="ltr">
-                            <p class="h4 text-center text-secondary py-4">Login</p>
-                            <!-- Errors -->
+                            <p class="h4 text-center text-default py-4">Login</p>
+                            {{-- Errors --}}
                             @if ($errors->any())
-                                <div class="alert alert-info mb-5" style="direction: rtl; text-align: right;">
+                                <div class="alert alert-info" style="direction: rtl; text-align: right;">
                                     <ul class="mb-0 pr-3">
                                         @foreach ($errors->all() as $error)
                                             <li>{{ $error }}</li>
@@ -24,23 +24,23 @@
                                 </div>
                             @endif
 
-                            <!-- Session Error Login Message -->
+                            {{-- Session Error Login Message --}}
                             @if (session('ErrorLoginMessage'))
-                                <div class="alert alert-info text-center">
+                                <div class="alert alert-danger text-center">
                                     {{ session('ErrorLoginMessage') }}
                                 </div>
                             @endif
 
-                            {{ csrf_field() }}
+                            @csrf
 
                             <div class="md-form">
-                                <i class="fa fa-user prefix text-secondary"></i>
+                                <i class="fa fa-user prefix text-default"></i>
                                 <input type="text" name="username" value="{{old("username")}}" id="username" class="form-control">
                                 <label for="username" class="font-weight-light">Username</label>
                             </div>
 
                             <div class="md-form">
-                                <i class="fa fa-lock prefix text-secondary"></i>
+                                <i class="fa fa-lock prefix text-default"></i>
                                 <input type="password" name="password" id="password" class="form-control">
                                 <label for="password" class="font-weight-light">Password</label>
                             </div>
@@ -57,8 +57,8 @@
                                 </select>
                             </div>
 
-                            <div class="text-center py-4 mt-3">
-                                <button class="btn btn-outline-secondary" type="submit">
+                            <div class="text-center py-4">
+                                <button class="btn btn-outline-default" type="submit">
                                     <span>Login</span>
                                     <i class="fa fa-paper-plane ml-2"></i>
                                 </button>

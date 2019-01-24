@@ -21,6 +21,7 @@ class AdminController extends Controller
      */
     public function index()
     {
+        Auth::check();
         $admins = Admin::all();
         return view("ControlPanel.admin.index")->with([
             "admins" => $admins

@@ -43,6 +43,6 @@ class LogoutController extends Controller
         Cookie::forget("EXAM_SYSTEM_ACCOUNT_SESSION");
         Cookie::forget("EXAM_SYSTEM_ACCOUNT_TYPE");
 
-        return redirect("/control-panel");
+        return redirect("/control-panel/login");
     }
 }

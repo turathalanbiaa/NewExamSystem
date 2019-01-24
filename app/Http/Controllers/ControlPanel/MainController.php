@@ -12,4 +12,9 @@ class MainController extends Controller
     {
         return view("ControlPanel.index");
     }
+
+    public function close()
+    {
+        return view("ControlPanel.close");
+    }
 }
