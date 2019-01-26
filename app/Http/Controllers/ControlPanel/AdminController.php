@@ -35,6 +35,7 @@ class AdminController extends Controller
      */
     public function create()
     {
+        Auth::check();
         return view("ControlPanel.admin.create");
     }
 
@@ -47,6 +48,7 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
+        Auth::check();
         $this->validate($request, [
             'name'                  => 'required',
             'username'              => 'required|unique:admin,username',
@@ -80,13 +82,16 @@ class AdminController extends Controller
                 "CreateAdminMessage" => "لم تتم عملية الاضافة بنجاح"
             ]);
 
+        /**
+         * Keep event log
+         */
         $target = $admin->id;
         $type = EventLogType::ADMIN;
-        $event = "اضافة حساب جديد";
+        $event = "اضافة حساب مدير - " . $admin->name;
         EventLog::create($target, $type, $event);
 
-        return redirect("/control-panel/admins/create")->with([
-            "CreateAdminMessage" => "تمت عملية الاضافة بنجاح"
+        return redirect("/control-panel/admins")->with([
+            "CreateAdminMessage" => "تمت عملية الاضافة بنجاح للمدير - " . $admin->name
         ]);
     }
 
@@ -98,6 +103,7 @@ class AdminController extends Controller
      */
     public function show(Admin $admin)
     {
+        Auth::check();
         $events = EventLog::where("account_id", $admin->id)
             ->where("account_type",AccountType::MANAGER)
             ->orderBy("id","DESC")
@@ -116,6 +122,7 @@ class AdminController extends Controller
      */
     public function edit(Admin $admin)
     {
+        Auth::check();
         return view("ControlPanel.admin.edit")->with([
             "admin" => $admin
         ]);
@@ -131,7 +138,10 @@ class AdminController extends Controller
      */
     public function update(Request $request, Admin $admin)
     {
-        //For Change Password
+        Auth::check();
+        /**
+         * For change password
+         */
         if (Input::get("type") == "change-password")
         {
             $this->validate($request, [
@@ -147,10 +157,9 @@ class AdminController extends Controller
             $admin->password = md5(Input::get("password"));
 
             /**
-             * Store auto login for current admin.
-             * If current admin change your password from admins.
+             * Keep logged in to super ِ admin
              */
-            if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") != $admin->id)
+            if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") != 1)
                 $admin->session = null;
 
             $success = $admin->save();
@@ -160,16 +169,21 @@ class AdminController extends Controller
                     "UpdateAdminMessage" => "لم يتم تغيير كلمة المرور"
                 ]);
 
+            /**
+             * Keep event log
+             */
             $target = $admin->id;
             $type = EventLogType::ADMIN;
-            $event = "تغيير كلمة المرور";
+            $event = "تغيير كلمة المرور المدير - " . $admin->name;
             EventLog::create($target, $type, $event);
 
             return redirect("/control-panel/admins")->with([
                 "UpdateAdminMessage" => "تم تغيير كلمة المرور - " . $admin->name
             ]);
         }
-        //For Change Info Account
+        /**
+         * For change info account
+         */
         else {
             $this->validate($request, [
                 'name'     => 'required',
@@ -195,10 +209,9 @@ class AdminController extends Controller
                 ]);
 
             /**
-             * Update session for current admin.
-             * If current admin change your info from admins.
+             * Keep session info for super admin
              */
-            if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") == $admin->id)
+            if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") == 1)
             {
                 session()->put('EXAM_SYSTEM_ACCOUNT_NAME', $admin->name);
                 session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME', $admin->username);
@@ -206,9 +219,12 @@ class AdminController extends Controller
                 session()->save();
             }
 
+            /**
+             * Keep event log
+             */
             $target = $admin->id;
             $type = EventLogType::ADMIN;
-            $event = "تعديل الحساب";
+            $event = "تعديل الحساب المدير - " . $admin->name;
             EventLog::create($target, $type, $event);
 
             return redirect("/control-panel/admins")->with([
@@ -225,31 +241,35 @@ class AdminController extends Controller
      */
     public function destroy(Admin $admin)
     {
+        Auth::check();
         $admin->state = AccountState::CLOSE;
+        $admin->session = null;
         $success = $admin->save();
 
         if (!$success)
             return redirect("/control-panel/admins")->with([
-                "ArchiveAdminMessage" => "لم يتم غلق حساب - " . $admin->name
+                "ArchiveAdminMessage" => "لم يتم غلق حساب المدير - " . $admin->name
             ]);
 
         /**
-         * Update session for current admin.
-         * If current admin archive from admins.
+         * Keep session info for super admin
          */
-        if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") == $admin->id)
+        if ($admin->id == 1)
         {
             session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $admin->state);
             session()->save();
         }
 
+        /**
+         * Keep event log
+         */
         $target = $admin->id;
         $type = EventLogType::ADMIN;
-        $event = "اغلاق الحساب";
+        $event = "اغلاق الحساب المدير - " . $admin->name;
         EventLog::create($target, $type, $event);
 
         return redirect("/control-panel/admins")->with([
-            "ArchiveAdminMessage" => "تم غلق حساب - " . $admin->name
+            "ArchiveAdminMessage" => "تم غلق حساب المدير - " . $admin->name
         ]);
     }
 }
