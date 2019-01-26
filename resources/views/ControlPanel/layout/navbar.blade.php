@@ -22,17 +22,17 @@
                         </a>
                     </li>
 
-                    {{-- Just For Super Admin --}}
-                    @if((session("EXAM_SYSTEM_ACCOUNT_ID") == 1) && (session("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER))
-                        <li class="nav-item @if(request()->is("control-panel/admins*")) active @endif">
-                            <a class="nav-link" href="/control-panel/admins">
-                                <span>المدراء</span>
-                            </a>
-                        </li>
-                    @endif
-
-                    <!-- Just For Admin-->
+                    {{-- For Admin --}}
                     @if(session("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER)
+                        {{-- Super Admin --}}
+                        @if(session("EXAM_SYSTEM_ACCOUNT_ID") == 1)
+                            <li class="nav-item @if(request()->is("control-panel/admins*")) active @endif">
+                                <a class="nav-link" href="/control-panel/admins">
+                                    <span>المدراء</span>
+                                </a>
+                            </li>
+                        @endif
+
                         <li class="nav-item @if(request()->is("control-panel/lecturers*")) active @endif">
                             <a class="nav-link" href="/control-panel/lecturers">
                                 <span>الاساتذة</span>
@@ -46,17 +46,10 @@
                         </li>
                     @endif
 
-                    {{-- For Admin And Lecturer --}}
+                    {{-- For Lecturer --}}
                     <li class="nav-item">
                         <a class="nav-link" href="/control-panel/exams">
                             <span>الامتحانات</span>
-                        </a>
-                    </li>
-
-                    {{-- For ***************** --}}
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span>الدرجات</span>
                         </a>
                     </li>
 
