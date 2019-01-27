@@ -6,17 +6,6 @@
 
 @section("content")
     <div class="container">
-        {{-- Session Create Admin Message --}}
-        @if (session('CreateAdminMessage'))
-            <div class="row">
-                <div class="col-12">
-                    <div class="alert alert-success text-center my-3">
-                        {{session('CreateAdminMessage')}}
-                    </div>
-                </div>
-            </div>
-        @endif
-
         {{-- Session Update Admin Message --}}
         @if (session('UpdateAdminMessage'))
             <div class="row">
@@ -32,7 +21,7 @@
         @if (session('ArchiveAdminMessage'))
             <div class="row">
                 <div class="col-12">
-                    <div class="alert alert-warning text-center my-3">
+                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center my-3">
                         {{session('ArchiveAdminMessage')}}
                     </div>
                 </div>
@@ -117,7 +106,7 @@
         <div class="modal-dialog modal-notify modal-danger" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <p class="heading lead">اسم الامتحان</p>
+                    <p class="heading lead">اسم المدير</p>
 
                     <a href="javascript:void(0)" class="close ml-0" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true" class="white-text">&times;</span>

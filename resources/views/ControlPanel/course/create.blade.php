@@ -5,13 +5,13 @@
 @endsection
 
 @section("content")
-    <div class="container pt-4">
+    <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
-                    <!-- Errors -->
+                    {{-- Alert Errors --}}
                     @if ($errors->any())
-                        <div class="alert alert-info m-lg-4 m-3">
+                        <div class="alert alert-danger mx-4 mt-4">
                             <ul class="mb-0 pr-3">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
@@ -20,26 +20,26 @@
                         </div>
                     @endif
 
-                <!-- Session Create Course Message -->
+                    {{-- Session Create Course Message --}}
                     @if (session('CreateCourseMessage'))
-                        <div class="alert alert-info text-center m-lg-4 m-3">
+                        <div class="alert {{(session('TypeMessage') == "Error" ? "alert-danger":"alert-success")}} text-center mx-4 mt-4">
                             {{session('CreateCourseMessage')}}
                         </div>
                     @endif
 
+                    <div class="card-body px-4 border-bottom border-primary">
+                        <form method="post" action="/control-panel/courses">
+                            @csrf
 
-                    <div class="card-body px-lg-5 pt-0 border-bottom border-primary">
-                        <form class="md-form" method="post" action="/control-panel/courses">
-                            {{ csrf_field() }}
-
-                            <div class="md-form">
-                                <label class="w-100" for="name">المادة</label>
+                            <div class="mb-4">
+                                <label for="name">المادة</label>
                                 <input type="text" name="name" id="name" class="form-control" value="{{old("name")}}">
                             </div>
 
-                            <div class="md-form pt-3">
-                                <select class="browser-default custom-select" name="level">
-                                    <option value="" disabled="" selected="">اختر المستوى الدراسي</option>
+                            <div class="mb-4">
+                                <label for="level">اختر المستوى الدراسي</label>
+                                <select class="browser-default custom-select" name="level" id="level">
+                                    <option value="" disabled="" selected="">يرجى اختيار المستوى الدراسي</option>
                                     <option value="{{\App\Enums\Level::BEGINNER}}" {{(old("level") == \App\Enums\Level::BEGINNER ? "selected":"")}}>
                                         {{\App\Enums\Level::get(\App\Enums\Level::BEGINNER)}}
                                     </option>
@@ -64,9 +64,10 @@
                                 </select>
                             </div>
 
-                            <div class="md-form pt-3">
-                                <select class="browser-default custom-select" name="lecturer">
-                                    <option value="" disabled="" selected="">اختر استاذ المادة</option>
+                            <div class="mb-4">
+                                <label for="lecturer">اختر استاذ المادة</label>
+                                <select class="browser-default custom-select" name="lecturer" id="lecturer">
+                                    <option value="" disabled="" selected="">يرجى اختيار استاذ المادة</option>
                                     @forelse($lecturers as $lecturer)
                                         <option value="{{$lecturer->id}}" {{(old("lecturer") == $lecturer->id ? "selected":"")}}>
                                             {{$lecturer->name}}
@@ -77,9 +78,10 @@
                                 </select>
                             </div>
 
-                            <div class="md-form pt-3">
-                                <select class="browser-default custom-select" name="state">
-                                    <option value="" disabled="" selected="">اختر حالة المادة</option>
+                            <div class="mb-4">
+                                <label for="state">اختر حالة المادة</label>
+                                <select class="browser-default custom-select" name="state" id="state">
+                                    <option value="" disabled="" selected="">يرجى اختيار حالة المادة</option>
                                     <option value="{{\App\Enums\CourseState::OPEN}}" {{(old("state") == \App\Enums\CourseState::OPEN ? "selected":"")}}>
                                         {{\App\Enums\CourseState::getState(\App\Enums\CourseState::OPEN)}}
                                     </option>
@@ -89,12 +91,13 @@
                                 </select>
                             </div>
 
-                            <div class="md-form pt-3">
-                                <textarea class="form-control p-2" name="detail" rows="5" placeholder="تفاصيل حول المادة">{{old("detail")}}</textarea>
+                            <div class="mb-5">
+                                <label for="detail">تفاصيل حول المادة</label>
+                                <textarea class="form-control" name="detail" id="detail" rows="5" placeholder="التفاصيل ...">{{old("detail")}}</textarea>
                             </div>
 
-                            <button class="btn btn-outline-secondary btn-block mt-5" type="submit">
-                                <span>حفظ</span>
+                            <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
+                                <span>حفظ المعلومات</span>
                             </button>
                         </form>
                     </div>

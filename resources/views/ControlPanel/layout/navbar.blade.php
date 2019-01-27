@@ -58,7 +58,7 @@
                         <a class="nav-link dropdown-toggle" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span>الاعدادات</span>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right text-center border-top-0 border-right-0 border-left-0 rounded-0 border-bottom border-default" aria-labelledby="navbarDropdown">
+                        <div class="dropdown-menu dropdown-menu-right text-center border-top-0 border-right-0 border-bottom border-left-0 border-primary rounded-0" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}?show=info">
                                 <span>عرض الملف الشخصي</span>
                             </a>

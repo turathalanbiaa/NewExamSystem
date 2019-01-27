@@ -5,7 +5,7 @@
 @endsection
 
 @section("content")
-    <div class="container pt-4">
+    <div class="container">
         <div class="row">
             <div class="col-12">
                 {{-- Nav Tabs --}}
@@ -17,6 +17,7 @@
                             <span>سجل الاحداث</span>
                         </a>
                     </li>
+
                     {{-- Nav Item Profile --}}
                     <li class="nav-item">
                         <a class="nav-link btn-default" data-toggle="tab" href="#profile" role="tab">
@@ -256,12 +257,12 @@
 
                                <div class="p-2"></div>
 
-                               <a href="/control-panel/admins/{{$admin->id}}/edit?type=change-info" class="btn btn-default">
+                               <a href="/control-panel/admins/{{$admin->id}}/edit?type=change-info" class="btn btn-outline-default font-weight-bold">
                                    <i class="fa fa-pencil-alt ml-1"></i>
                                    <span>تعديل الحساب</span>
                                </a>
 
-                               <a href="/control-panel/admins/{{$admin->id}}/edit?type=change-password" class="btn btn-default">
+                               <a href="/control-panel/admins/{{$admin->id}}/edit?type=change-password" class="btn btn-outline-default font-weight-bold">
                                    <i class="fa fa-unlock-alt ml-1"></i>
                                    <span>تغيير كلمة المرور</span>
                                </a>

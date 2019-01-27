@@ -1,133 +1,127 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>{{"سجل احداث-".$lecturer->name}}</title>
+    <title>{{"سجل احداث - ".$lecturer->name}}</title>
 @endsection
 
 @section("content")
-    <div class="container pt-4">
+    <div class="container">
         <div class="row">
             <div class="col-12">
-                <!-- Nav tabs -->
-                <ul class="nav nav-tabs nav-justified shadow secondary-color p-3" role="tablist">
-                    <!-- Nav item events log -->
+                {{-- Nav Tabs --}}
+                <ul class="nav nav-tabs nav-justified shadow default-color p-3" role="tablist">
+                    {{-- Nav Item Events Log --}}
                     <li class="nav-item">
-                        <a class="nav-link btn-secondary active" data-toggle="tab" href="#event-log" role="tab">
+                        <a class="nav-link btn-default active" data-toggle="tab" href="#event-log" role="tab">
                             <i class="fa fa-heart pl-2"></i>
                             <span>سجل الاحداث</span>
                         </a>
                     </li>
-                    <!-- Nav item profile -->
+
+                    {{-- Nav Item Profile --}}
                     <li class="nav-item">
-                        <a class="nav-link btn-secondary" data-toggle="tab" href="#profile" role="tab">
+                        <a class="nav-link btn-default" data-toggle="tab" href="#profile" role="tab">
                             <i class="fa fa-user pl-2"></i>
-                            <span>الملف الشخصي للأستاذ</span>
+                            {{$lecturer->name}}
                         </a>
                     </li>
                 </ul>
 
-                <!-- Tab panels -->
+                {{-- Tab Panels --}}
                 <div class="tab-content">
-                    <!-- Panel events log -->
+                    {{-- Panel Events Log --}}
                     <div class="tab-pane fade in show active" id="event-log" role="tabpanel">
                         <div class="row mt-2">
-                            <!-- Nav tabs  -->
+                            {{-- Nav Tabs --}}
                             <div class="col-md-3">
                                 <ul class="nav flex-column" role="tablist" style="padding: 0 0 0 40px;">
                                     <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-secondary btn-block active" data-toggle="tab" href="#last-event-log" role="tab">
+                                        <a class="nav-link btn btn-default btn-block active" data-toggle="tab" href="#last-event-log" role="tab">
                                             <span>آخر الاحداث</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#lecturers-event-log" role="tab">
+                                        <a class="nav-link btn btn-default btn-block" data-toggle="tab" href="#profile-event-log" role="tab">
                                             <span>الملف الشخصي</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-secondary btn-block" data-toggle="tab" href="#exams-event-log" role="tab">
+                                        <a class="nav-link btn btn-default btn-block" data-toggle="tab" href="#exams-event-log" role="tab">
                                             <span>الامتحانات</span>
                                         </a>
                                     </li>
                                 </ul>
                             </div>
 
-                            <!-- Tab panels -->
+                            {{-- Tab Panels --}}
                             <div class="col-md-9">
                                 <div class="tab-content vertical">
                                     <div class="tab-pane fade in show active" id="last-event-log" role="tabpanel">
                                         <table data-table="dtEventLog" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
-                                            <thead class="secondary-color text-white">
-                                            <tr>
-                                                <th class="th-sm fa d-table-cell">
-                                                    <span>رقم</span>
-                                                </th>
-                                                <th class="th-sm fa d-table-cell">
-                                                    <span>النوع</span>
-                                                </th>
-                                                <th class="th-sm fa d-table-cell">
-                                                    <span>الحدث</span>
-                                                </th>
-                                                <th class="th-sm fa d-table-cell">
-                                                    <span>التاريخ والوقت</span>
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            @php $i=0; @endphp
-                                            @foreach($events as $event)
-                                                <tr data-content="{{$event->id}}">
-                                                    <td>{{++$i}}</td>
-                                                    <td>{{\App\Enums\EventLogType::getType($event->type)}}</td>
-                                                    <td>{{$event->event}}</td>
-                                                    <td>{{$event->time}}</td>
+                                            <thead class="default-color text-white">
+                                                <tr>
+                                                    <th class="th-sm fa d-table-cell">
+                                                        <span>رقم</span>
+                                                    </th>
+                                                    <th class="th-sm fa d-table-cell">
+                                                        <span>الحدث</span>
+                                                    </th>
+                                                    <th class="th-sm fa d-table-cell">
+                                                        <span>التاريخ والوقت</span>
+                                                    </th>
                                                 </tr>
-                                            @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                    <div class="tab-pane fade" id="lecturers-event-log" role="tabpanel">
-                                        <table data-table="dtEventLog" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
-                                            <thead class="secondary-color text-white">
-                                            <tr>
-                                                <th class="th-sm fa d-table-cell">
-                                                    <span>رقم</span>
-                                                </th>
-                                                <th class="th-sm fa d-table-cell">
-                                                    <span>الحدث</span>
-                                                </th>
-                                                <th class="th-sm fa d-table-cell">
-                                                    <span>التاريخ والوقت</span>
-                                                </th>
-                                            </tr>
                                             </thead>
                                             <tbody>
-                                            @php $i=0; @endphp
-                                            @foreach($events as $event)
-                                                @if($event->type == \App\Enums\EventLogType::LECTURER)
-                                                    <tr data-content="{{$event->id}}">
+                                                @php $i=0; @endphp
+                                                @foreach($events as $event)
+                                                    <tr data-event="{{$event->id}}">
                                                         <td>{{++$i}}</td>
                                                         <td>{{$event->event}}</td>
                                                         <td>{{$event->time}}</td>
                                                     </tr>
-                                                @endif
-                                            @endforeach
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="profile-event-log" role="tabpanel">
+                                        <table data-table="dtEventLog" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
+                                            <thead class="default-color text-white">
+                                                <tr>
+                                                    <th class="th-sm fa d-table-cell">
+                                                        <span>رقم</span>
+                                                    </th>
+                                                    <th class="th-sm fa d-table-cell">
+                                                        <span>الحدث</span>
+                                                    </th>
+                                                    <th class="th-sm fa d-table-cell">
+                                                        <span>التاريخ والوقت</span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @php $i=0; @endphp
+                                                @foreach($events as $event)
+                                                    @if($event->type == \App\Enums\EventLogType::LECTURER)
+                                                        <tr data-event="{{$event->id}}">
+                                                            <td>{{++$i}}</td>
+                                                            <td>{{$event->event}}</td>
+                                                            <td>{{$event->time}}</td>
+                                                        </tr>
+                                                    @endif
+                                                @endforeach
                                             </tbody>
                                         </table>
                                     </div>
 
                                     <div class="tab-pane fade" id="exams-event-log" role="tabpanel">
                                         <table data-table="dtEventLog" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
-                                            <thead class="secondary-color text-white">
+                                            <thead class="default-color text-white">
                                             <tr>
                                                 <th class="th-sm fa d-table-cell">
                                                     <span>رقم</span>
-                                                </th>
-                                                <th class="th-sm fa d-table-cell">
-                                                    <span>النوع</span>
                                                 </th>
                                                 <th class="th-sm fa d-table-cell">
                                                     <span>الحدث</span>
@@ -138,17 +132,16 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            @php $i=0; @endphp
-                                            @foreach($events as $event)
-                                                @if(($event->type == \App\Enums\EventLogType::EXAM) || ($event->type == \App\Enums\EventLogType::ROOT_QUESTION) || ($event->type == \App\Enums\EventLogType::QUESTION))
-                                                    <tr data-content="{{$event->id}}">
-                                                        <td>{{++$i}}</td>
-                                                        <td>{{\App\Enums\EventLogType::getType($event->type)}}</td>
-                                                        <td>{{$event->event}}</td>
-                                                        <td>{{$event->time}}</td>
-                                                    </tr>
-                                                @endif
-                                            @endforeach
+                                                @php $i=0; @endphp
+                                                @foreach($events as $event)
+                                                    @if($event->type == \App\Enums\EventLogType::EXAM)
+                                                        <tr data-event="{{$event->id}}">
+                                                            <td>{{++$i}}</td>
+                                                            <td>{{$event->event}}</td>
+                                                            <td>{{$event->time}}</td>
+                                                        </tr>
+                                                    @endif
+                                                @endforeach
                                             </tbody>
                                         </table>
                                     </div>
@@ -157,7 +150,7 @@
                         </div>
                     </div>
 
-                    <!-- Panel profile -->
+                    {{-- Panel Profile --}}
                     <div class="tab-pane fade" id="profile" role="tabpanel">
                         <div class="card rounded-0 py-3 shadow">
                             <div class="card-body">
@@ -176,12 +169,12 @@
 
                                 <div class="p-2"></div>
 
-                                <a href="/control-panel/lecturers/{{$lecturer->id}}/edit?type=change-info" class="btn btn-indigo">
+                                <a href="/control-panel/lecturers/{{$lecturer->id}}/edit?type=change-info" class="btn btn-outline-default font-weight-bold">
                                     <i class="fa fa-pencil-alt ml-1"></i>
                                     <span>تعديل الحساب</span>
                                 </a>
 
-                                <a href="/control-panel/lecturers/{{$lecturer->id}}/edit?type=change-password" class="btn btn-amber">
+                                <a href="/control-panel/lecturers/{{$lecturer->id}}/edit?type=change-password" class="btn btn-outline-default font-weight-bold">
                                     <i class="fa fa-unlock-alt ml-1"></i>
                                     <span>تغيير كلمة المرور</span>
                                 </a>

@@ -5,7 +5,7 @@
 @endsection
 
 @section("content")
-    <div class="container pt-4">
+    <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
@@ -22,7 +22,7 @@
 
                     {{-- Session Create Admin Message --}}
                     @if (session('CreateAdminMessage'))
-                        <div class="alert alert-danger text-center mx-4 mt-4">
+                        <div class="alert {{(session('TypeMessage') == "Error" ? "alert-danger":"alert-success")}} text-center mx-4 mt-4">
                             {{session('CreateAdminMessage')}}
                         </div>
                     @endif

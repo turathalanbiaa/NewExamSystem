@@ -26,6 +26,7 @@ class CourseController extends Controller
      */
     public function index()
     {
+        Auth::check();
         $courses = Course::all();
         return view("ControlPanel.course.index")->with([
             "courses" => $courses
@@ -39,7 +40,8 @@ class CourseController extends Controller
      */
     public function create()
     {
-        $lecturers = Lecturer::all();
+        Auth::check();
+        $lecturers = self::getLecturers();
         return view("ControlPanel.course.create")->with([
             "lecturers" => $lecturers
         ]);
@@ -54,14 +56,11 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        $lecturers = Lecturer::where("state", AccountState::OPEN)
-            ->pluck("id")
-            ->toArray();
-
+        Auth::check();
         $this->validate($request, [
             'name'     => 'required',
             'level'    => 'required|integer|between:1,7',
-            'lecturer' => ['required', Rule::in($lecturers)],
+            'lecturer' => ['required', Rule::in(self::getLecturers()->pluck("id")->toArray())],
             'state'    => 'required|integer|between:1,2',
             'detail'   => 'required'
         ], [
@@ -88,16 +87,20 @@ class CourseController extends Controller
 
         if (!$success)
             return redirect("/control-panel/courses/create")->with([
-                "CreateCourseMessage" => "لم تتم عملية اضافة المادة بنجاح"
+                "CreateCourseMessage" => "لم تتم عملية اضافة المادة بنجاح",
+                "TypeMessage" => "Error"
             ]);
 
+        /**
+         * Keep event log
+         */
         $target = $course->id;
         $type = EventLogType::COURSE;
-        $event = "اضافة مادة جديدة";
+        $event = "اضافة مادة - " . $course->name;
         EventLog::create($target, $type, $event);
 
         return redirect("/control-panel/courses/create")->with([
-            "CreateCourseMessage" => "تمت عملية اضافة المادة بنجاح"
+            "CreateCourseMessage" => "تمت عملية اضافة المادة بنجاح - " . $course->name
         ]);
     }
 
@@ -109,7 +112,8 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
-        return redirect("/control-panel/courses");
+        Auth::check();
+        return "Please, Don't make this again";
     }
 
     /**
@@ -120,7 +124,8 @@ class CourseController extends Controller
      */
     public function edit(Course $course)
     {
-        $lecturers = Lecturer::all();
+        Auth::check();
+        $lecturers = self::getLecturers();
         return view("ControlPanel.course.edit")->with([
             "course"    => $course,
             "lecturers" => $lecturers
@@ -137,10 +142,11 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $course)
     {
+        Auth::check();
         $this->validate($request, [
             'name'     => 'required',
             'level'    => 'required|integer|between:1,7',
-            'lecturer' => ['required', Rule::in(self::getLecturers())],
+            'lecturer' => ['required', Rule::in(self::getLecturers()->pluck("id")->toArray())],
             'state'    => 'required|integer|between:1,2',
             'detail'   => 'required'
         ], [
@@ -165,12 +171,12 @@ class CourseController extends Controller
 
         if (!$success)
             return redirect("/control-panel/courses/$course->id/edit")->with([
-                "UpdateCourseMessage" => "لم يتم تعديل المادة"
+                "UpdateCourseMessage" => "لم يتم تعديل المادة - " . $course->name
             ]);
 
         $target = $course->id;
         $type = EventLogType::COURSE;
-        $event = "تعديل المادة";
+        $event = "تعديل المادة - " . $course->name;
         EventLog::create($target, $type, $event);
 
         return redirect("/control-panel/courses")->with([
@@ -186,57 +192,35 @@ class CourseController extends Controller
      */
     public function destroy(Course $course)
     {
+        Auth::check();
         $course->state = CourseState::CLOSE;
         $success = $course->save();
 
         if (!$success)
             return redirect("/control-panel/courses")->with([
-                "ArchiveCourseMessage" => "لم يتم ارشفة المادة  - " . $course->name
+                "ArchiveCourseMessage" => "لم يتم غلق المادة  - " . $course->name,
+                "TypeMessage" => "Error"
             ]);
 
         $target = $course->id;
         $type = EventLogType::COURSE;
-        $event = "اغلاق المادة";
+        $event = "اغلاق المادة - " . $course->name;
         EventLog::create($target, $type, $event);
 
         return redirect("/control-panel/courses")->with([
-            "ArchiveCourseMessage" => "تم ارشفة المادة - " . $course->name
+            "ArchiveCourseMessage" => "تم غلق المادة - " . $course->name
         ]);
     }
 
     /**
-     * Generation exams for this course
+     * Get the specified lecturers from storage
+     *
+     * @return mixed
      */
-    public function generateExams()
+    private static function getLecturers()
     {
-        $course = Course::findOrFail(Input::get("id"));
-        $exams = Exam::where("course_id", $course->id)->get();
-
-        if (count($exams) == 0)
-        {
-            DB::transaction(function (){
-                $course = Course::find(Input::get("id"));
-                for($i=1; $i<=4; ++$i)
-                {
-                    $exam = new Exam();
-                    $exam->title = $course->name." - ".ExamType::getType($i);
-                    $exam->course_id = $course->id;
-                    $exam->type = $i;
-                    $exam->state = ExamState::CLOSE;
-                    $exam->mark = 0;
-                    $exam->curve = 0;
-                    $exam->date = null;
-                    $exam->save();
-                }
-            });
-
-            return redirect("/control-panel/courses")->with([
-                "GenerateExamsMessage" => "تم انشاء النماذج للمادة  - " . $course->name
-            ]);
-        }
-
-        return redirect("/control-panel/courses")->with([
-            "GenerateExamsMessage" => "تم انشاء هذه النماذج مسبقا للمادة  - " . $course->name
-        ]);
+        return Lecturer::where("state", AccountState::OPEN)
+            ->orderBy("id")
+            ->get();
     }
 }

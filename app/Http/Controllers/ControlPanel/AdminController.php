@@ -79,7 +79,8 @@ class AdminController extends Controller
 
         if (!$success)
             return redirect("/control-panel/admins/create")->with([
-                "CreateAdminMessage" => "لم تتم عملية الاضافة بنجاح"
+                "CreateAdminMessage" => "لم تتم عملية اضافة المدير بنجاح",
+                "TypeMessage" => "Error"
             ]);
 
         /**
@@ -90,8 +91,8 @@ class AdminController extends Controller
         $event = "اضافة حساب مدير - " . $admin->name;
         EventLog::create($target, $type, $event);
 
-        return redirect("/control-panel/admins")->with([
-            "CreateAdminMessage" => "تمت عملية الاضافة بنجاح للمدير - " . $admin->name
+        return redirect("/control-panel/admins/create")->with([
+            "CreateAdminMessage" => "تمت عملية اضافة المدير بنجاح - " . $admin->name
         ]);
     }
 
@@ -166,7 +167,7 @@ class AdminController extends Controller
 
             if (!$success)
                 return redirect("/control-panel/admins/$admin->id/edit?type=change-password")->with([
-                    "UpdateAdminMessage" => "لم يتم تغيير كلمة المرور"
+                    "UpdateAdminMessage" => "لم يتم تغيير كلمة المرور المدير"
                 ]);
 
             /**
@@ -178,7 +179,7 @@ class AdminController extends Controller
             EventLog::create($target, $type, $event);
 
             return redirect("/control-panel/admins")->with([
-                "UpdateAdminMessage" => "تم تغيير كلمة المرور - " . $admin->name
+                "UpdateAdminMessage" => "تم تغيير كلمة المرور المدير - " . $admin->name
             ]);
         }
         /**
@@ -205,7 +206,7 @@ class AdminController extends Controller
 
             if (!$success)
                 return redirect("/control-panel/admins/$admin->id/edit?type=change-info")->with([
-                    "UpdateAdminMessage" => "لم يتم تحديث المعلومات"
+                    "UpdateAdminMessage" => "لم يتم تحديث المعلومات المدير"
                 ]);
 
             /**
@@ -228,7 +229,7 @@ class AdminController extends Controller
             EventLog::create($target, $type, $event);
 
             return redirect("/control-panel/admins")->with([
-                "UpdateAdminMessage" => "تم تحديث المعلومات - " . $admin->name
+                "UpdateAdminMessage" => "تم تحديث المعلومات المدير - " . $admin->name
             ]);
         }
     }
@@ -248,7 +249,8 @@ class AdminController extends Controller
 
         if (!$success)
             return redirect("/control-panel/admins")->with([
-                "ArchiveAdminMessage" => "لم يتم غلق حساب المدير - " . $admin->name
+                "ArchiveAdminMessage" => "لم يتم غلق حساب المدير - " . $admin->name,
+                "TypeMessage" => "Error"
             ]);
 
         /**

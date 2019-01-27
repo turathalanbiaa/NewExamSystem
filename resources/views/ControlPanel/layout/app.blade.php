@@ -26,7 +26,7 @@
     </header>
 
     {{-- Main Content--}}
-    <main style="margin: 60px 0;">
+    <main style="margin: 75px 0;">
         @yield("content")
     </main>
 
