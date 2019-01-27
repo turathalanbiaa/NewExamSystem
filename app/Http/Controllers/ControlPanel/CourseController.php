@@ -41,9 +41,8 @@ class CourseController extends Controller
     public function create()
     {
         Auth::check();
-        $lecturers = self::getLecturers();
         return view("ControlPanel.course.create")->with([
-            "lecturers" => $lecturers
+            "lecturers" => self::getLecturers()
         ]);
     }
 
@@ -125,10 +124,9 @@ class CourseController extends Controller
     public function edit(Course $course)
     {
         Auth::check();
-        $lecturers = self::getLecturers();
         return view("ControlPanel.course.edit")->with([
             "course"    => $course,
-            "lecturers" => $lecturers
+            "lecturers" => self::getLecturers()
         ]);
     }
 
@@ -174,6 +172,9 @@ class CourseController extends Controller
                 "UpdateCourseMessage" => "لم يتم تعديل المادة - " . $course->name
             ]);
 
+        /**
+         * Keep event log
+         */
         $target = $course->id;
         $type = EventLogType::COURSE;
         $event = "تعديل المادة - " . $course->name;
@@ -202,6 +203,9 @@ class CourseController extends Controller
                 "TypeMessage" => "Error"
             ]);
 
+        /**
+         * Keep event log
+         */
         $target = $course->id;
         $type = EventLogType::COURSE;
         $event = "اغلاق المادة - " . $course->name;
@@ -219,8 +223,6 @@ class CourseController extends Controller
      */
     private static function getLecturers()
     {
-        return Lecturer::where("state", AccountState::OPEN)
-            ->orderBy("id")
-            ->get();
+        return Lecturer::all();
     }
 }

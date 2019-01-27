@@ -7,7 +7,6 @@ use App\Enums\CourseState;
 use App\Enums\EventLogType;
 use App\Enums\ExamState;
 use App\Enums\ExamType;
-use App\Models\Admin;
 use App\Models\Course;
 use App\Models\EventLog;
 use App\Models\Exam;
@@ -27,6 +26,8 @@ class ExamController extends Controller
      */
     public function index()
     {
+        Auth::check();
+
         if (session("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)
             $courses = Course::all();
         else
