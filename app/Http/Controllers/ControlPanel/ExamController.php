@@ -311,9 +311,7 @@ class ExamController extends Controller
         Auth::check();
         self::watchExam($exam);
 
-        DB::transaction(function (){
-
-        });
+        DB::transaction(function (){});
     }
 
     /**

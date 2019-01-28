@@ -9,4 +9,6 @@ class Branch extends Model
     protected $table = "branch";
     protected $primaryKey = "id";
     public $timestamps = false;
+
+
 }

@@ -9,7 +9,7 @@
 namespace App\Enums;
 
 
-class EnrollmentState
+class ExamStudentState
 {
     const NOT_FINISHED = 1;
     const FINISHED = 2;
