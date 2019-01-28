@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Enrollment extends Model
+class StudentDocument extends Model
 {
-    protected $table = "enrollment";
+    protected $table = "student_document";
     protected $primaryKey = "id";
     public $timestamps = false;
 }

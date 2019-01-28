@@ -5,27 +5,7 @@
 @endsection
 
 @section("content")
-    <div class="container pt-4">
-        <div class="row mb-3">
-            <div class="col-12">
-                <a href="/control-panel/exams/create" class="btn btn-outline-default waves-effect waves-light">
-                    <i class="fa fa-plus ml-1"></i>
-                    <span>انشاء نموذج امتحاني</span>
-                </a>
-            </div>
-        </div>
-
-        {{-- Session Create Exam Message --}}
-        @if (session('CreateExamMessage'))
-            <div class="row">
-                <div class="col-12">
-                    <div class="alert alert-success text-center">
-                        {{session('CreateExamMessage')}}
-                    </div>
-                </div>
-            </div>
-        @endif
-
+    <div class="container">
         {{-- Session Update Exam Message --}}
         @if (session('UpdateExamMessage'))
             <div class="row">
@@ -41,16 +21,28 @@
         @if (session('UpdateExamStateMessage'))
             <div class="row">
                 <div class="col-12">
-                    <div class="alert alert-success text-center">
+                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
                         {{session('UpdateExamStateMessage')}}
                     </div>
                 </div>
             </div>
         @endif
 
+        {{-- Burron Create--}}
+        <div class="row">
+            <div class="col-12 mb-3">
+                <a href="/control-panel/exams/create" class="btn btn-outline-default font-weight-bold">
+                    <i class="fa fa-plus ml-1"></i>
+                    <span>انشاء نموذج امتحاني</span>
+                </a>
+            </div>
+        </div>
+
+        {{-- Courses --}}
         @foreach($courses as $course)
-            <div class="row mb-3">
-                <div class="col-12">
+            <div class="row">
+                {{-- Course --}}
+                <div class="col-12 mb-3">
                     <h4 class="bg-light p-3" data-toggle="collapse" data-target="#course-exams-{{$course->id}}" aria-expanded="false" aria-controls="collapseExams">
                         <i class="fa fa-bars text-default ml-1"></i>
                         {{$course->name}}
@@ -58,10 +50,12 @@
                         {{\App\Enums\Level::get($course->level)}}
                     </h4>
                 </div>
+                {{-- Exams --}}
                 <div class="col-12 collapse" id="course-exams-{{$course->id}}">
                     <div class="row">
                         @foreach($course->exams as $exam)
                             <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                                {{-- Card Exam --}}
                                 <div class="card shadow h-100">
                                     {{-- Card View --}}
                                     <div class="view shadow mdb-color px-3 py-4">
@@ -73,7 +67,6 @@
                                     {{-- Card Content --}}
                                     <div class="card-body">
                                         <div class="list-group list-group-flush">
-                                            {{--<a href="###" class="list-group-item list-group-item-action">عرض جميع الاسئلة</a>--}}
                                             <a href="/control-panel/exams/{{$exam->id}}/edit" class="list-group-item list-group-item-action">تعديل النموذج الامتحاني</a>
 
                                             @if($exam->state == \App\Enums\ExamState::CLOSE)
@@ -104,7 +97,9 @@
             </div>
         @endforeach
     </div>
+@endsection
 
+@section("extra-content")
     {{-- Open Exam Modal --}}
     <div class="modal fade" id="modelOpenExamState" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-notify modal-success" role="document">
@@ -178,7 +173,7 @@
                         <i class="fa fa-retweet fa-4x mb-3 animated fadeIn"></i>
                         <h2 class="text-warning">هل تريد اعادة فتح الامتحان</h2>
                         <p>ستقوم باعادة فتح الامتحان بعد ان كان الامتحان مغلق لكي يستطيع الطالب الدخول الى القاعة الامتحانية والاجابة على الاسئلة.</p>
-                </div>
+                    </div>
                 </div>
 
                 <div class="modal-footer justify-content-center">
@@ -188,7 +183,7 @@
             </div>
         </div>
     </div>
-    
+
     {{-- Exam State Form --}}
     <form id="examState" method="post" action="">
         @csrf
@@ -233,6 +228,7 @@
 
 @section("script")
     <script>
+        //Fill Exam State Form And Model
         $("[data-action='fillExamStateForm']").click(function () {
             let examId = $(this).data("exam-id");
             let examState = $(this).data("exam-state");
@@ -248,6 +244,8 @@
             $("form#examState").attr("action","/control-panel/exams/" + examId);
             $("form#examState>input[name='state']").attr("value", examState);
         });
+
+        //Fill Delete Exam Form And Model
         $("[data-action='fillDeleteExamForm']").click(function () {
             let examId = $(this).data("exam-id");
             let examTitle = $(this).data("exam-title");

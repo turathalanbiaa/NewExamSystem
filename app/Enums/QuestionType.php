@@ -9,7 +9,7 @@
 namespace App\Enums;
 
 
-class RootQuestionType
+class QuestionType
 {
     const TRUE_OR_FALSE = 1;
     const SINGLE_CHOICE = 2;
