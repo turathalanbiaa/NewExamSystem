@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 
 class ExamController extends Controller
@@ -144,12 +145,22 @@ class ExamController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Exam  $exam
+     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Models\Exam $exam
      * @return \Illuminate\Http\Response
      */
-    public function show(Exam $exam)
+    public function show(Request $request, Exam $exam)
     {
-        //
+        Auth::check();
+        self::watchExam($exam);
+
+        session()->put('PreviousRequest', $request->path());
+        session()->put("CurrentExam", $exam->id);
+        session()->save();
+
+        return view("ControlPanel.exam.show")->with([
+            "exam" => $exam
+        ]);
     }
 
     /**

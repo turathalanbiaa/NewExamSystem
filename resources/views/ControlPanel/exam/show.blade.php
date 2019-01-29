@@ -1,28 +1,17 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>الامتحانات</title>
+    <title>{{$exam->title}}</title>
 @endsection
 
 @section("content")
     <div class="container">
-        {{-- Session Update Exam Message --}}
-        @if (session('UpdateExamMessage'))
-            <div class="row">
-                <div class="col-12">
-                    <div class="alert alert-success text-center">
-                        {{session('UpdateExamMessage')}}
-                    </div>
-                </div>
-            </div>
-        @endif
-
-        {{-- Session Update Exam State Message --}}
-        @if (session('UpdateExamStateMessage'))
+        {{-- Session Message --}}
+        @if (session('Message'))
             <div class="row">
                 <div class="col-12">
                     <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
-                        {{session('UpdateExamStateMessage')}}
+                        {{session('Message')}}
                     </div>
                 </div>
             </div>
@@ -31,70 +20,17 @@
         {{-- Burron Create--}}
         <div class="row">
             <div class="col-12 mb-3">
-                <a href="/control-panel/exams/create" class="btn btn-outline-default font-weight-bold">
+                <a href="/control-panel/questions/create" class="btn btn-outline-default font-weight-bold">
                     <i class="fa fa-plus ml-1"></i>
-                    <span>انشاء نموذج امتحاني</span>
+                    <span>اضافة سؤال</span>
                 </a>
             </div>
         </div>
 
-        {{-- Courses --}}
-        @foreach($courses as $course)
+        {{-- Questions --}}
+        @foreach($exam->questions as $question)
             <div class="row">
-                {{-- Course --}}
-                <div class="col-12 mb-3">
-                    <h4 class="bg-light p-3" data-toggle="collapse" data-target="#course-exams-{{$course->id}}" aria-expanded="false" aria-controls="collapseExams">
-                        <i class="fa fa-bars text-default ml-1"></i>
-                        {{$course->name}}
-                        <span class="text-default">&gt;&gt;&gt;</span>
-                        {{\App\Enums\Level::get($course->level)}}
-                    </h4>
-                </div>
-                {{-- Exams --}}
-                <div class="col-12 collapse" id="course-exams-{{$course->id}}">
-                    <div class="row">
-                        @foreach($course->exams as $exam)
-                            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
-                                {{-- Card Exam --}}
-                                <div class="card shadow h-100">
-                                    {{-- Card View --}}
-                                    <div class="view shadow mdb-color px-3 py-4">
-                                        <h5 class="text-center text-white m-0">
-                                            {{$exam->title}}
-                                        </h5>
-                                    </div>
 
-                                    {{-- Card Content --}}
-                                    <div class="card-body">
-                                        <div class="list-group list-group-flush">
-                                            <a href="/control-panel/exams/{{$exam->id}}" class="list-group-item list-group-item-action">عرض الاسئلة</a>
-                                            <a href="/control-panel/exams/{{$exam->id}}/edit" class="list-group-item list-group-item-action">تعديل النموذج الامتحاني</a>
-
-                                            @if($exam->state == \App\Enums\ExamState::CLOSE)
-                                                <div class="list-group-item">
-                                                    <span>الامتحان مغلق حاليا</span>
-                                                    <button type="button" class="btn btn-success btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="open" data-toggle="modal" data-target="#modelOpenExamState">فتح الامتحان</button>
-                                                </div>
-                                            @elseif($exam->state == \App\Enums\ExamState::OPEN)
-                                                <div class="list-group-item">
-                                                    <span>الامتحان مفتوح حاليا</span>
-                                                    <button type="button" class="btn btn-danger btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="close" data-toggle="modal" data-target="#modelEndExamState">انهاء الامتحان</button>
-                                                </div>
-                                            @else
-                                                <div class="list-group-item">
-                                                    <span>الامتحان منتهي حاليا</span>
-                                                    <button type="button" class="btn btn-warning btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="reopen" data-toggle="modal" data-target="#modelReopenExamState">اعادة فتح الامتحان</button>
-                                                </div>
-                                            @endif
-
-                                            <a href="javascript:void(0)" class="list-group-item list-group-item-action" data-action="fillDeleteExamForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-toggle="modal" data-target="#modelDeleteExam">حذف النموذج الامتحاني</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
             </div>
         @endforeach
     </div>
@@ -228,31 +164,5 @@
 @endsection
 
 @section("script")
-    <script>
-        //Fill Exam State Form And Model
-        $("[data-action='fillExamStateForm']").click(function () {
-            let examId = $(this).data("exam-id");
-            let examState = $(this).data("exam-state");
-            let examTitle = $(this).data("exam-title");
-
-            if (examState === "open")
-                $("#modelOpenExamState .heading.lead").html(examTitle);
-            else if (examState === "close")
-                $("#modelEndExamState .heading.lead").html(examTitle);
-            else if (examState ==="reopen")
-                $("#modelReopenExamState .heading.lead").html(examTitle);
-
-            $("form#examState").attr("action","/control-panel/exams/" + examId);
-            $("form#examState>input[name='state']").attr("value", examState);
-        });
-
-        //Fill Delete Exam Form And Model
-        $("[data-action='fillDeleteExamForm']").click(function () {
-            let examId = $(this).data("exam-id");
-            let examTitle = $(this).data("exam-title");
-
-            $("form#deleteExam").attr("action","/control-panel/exams/" + examId);
-            $("#modelDeleteExam .heading.lead").html(examTitle);
-        });
-    </script>
+    <script></script>
 @endsection
