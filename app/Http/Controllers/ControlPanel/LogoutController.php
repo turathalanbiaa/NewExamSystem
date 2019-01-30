@@ -40,9 +40,8 @@ class LogoutController extends Controller
         session()->remove("EXAM_SYSTEM_ACCOUNT_SESSION");
         session()->save();
 
-        Cookie::forget("EXAM_SYSTEM_ACCOUNT_SESSION");
-        Cookie::forget("EXAM_SYSTEM_ACCOUNT_TYPE");
-
-        return redirect("/control-panel");
+        return redirect("/control-panel/login")
+            ->withCookie(Cookie::forget("EXAM_SYSTEM_ACCOUNT_SESSION"))
+            ->withCookie(Cookie::forget("EXAM_SYSTEM_ACCOUNT_SESSION"));
     }
 }

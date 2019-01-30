@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RootQuestion extends Model
+class Marking extends Model
 {
-    protected $table = "root_question";
+    protected $table = "marking";
     protected $primaryKey = "id";
     public $timestamps = false;
 }

@@ -9,4 +9,9 @@ class Question extends Model
     protected $table = "question";
     protected $primaryKey = "id";
     public $timestamps = false;
+
+    public function branches()
+    {
+        return $this->hasMany("App\Models\Branch", "que_id");
+    }
 }

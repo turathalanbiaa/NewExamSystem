@@ -1,7 +1,7 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>اضافة مدير</title>
+    <title>اضافة سؤال</title>
 @endsection
 
 @section("content")
@@ -20,19 +20,20 @@
                         </div>
                     @endif
 
-                    {{-- Session Create Admin Message --}}
-                    @if (session('CreateAdminMessage'))
+                    {{-- Session Create Question Message --}}
+                    @if (session('CreateQuestionMessage'))
                         <div class="alert {{(session('TypeMessage') == "Error" ? "alert-danger":"alert-success")}} text-center mx-4 mt-4">
-                            {{session('CreateAdminMessage')}}
+                            {{session('CreateQuestionMessage')}}
                         </div>
                     @endif
 
                     <div class="card-body px-4 border-bottom border-primary">
-                        <form method="post" action="/control-panel/admins">
+                        <form method="post" action="/control-panel/questions">
                             @csrf
 
+
                             <div class="mb-4">
-                                <label for="name">الاسم الحقيقي</label>
+                                <label for="name">{{$exam->title}}</label>
                                 <input type="text" name="name" id="name" class="form-control" value="{{old("name")}}">
                             </div>
 

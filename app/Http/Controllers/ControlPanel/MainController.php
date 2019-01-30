@@ -10,6 +10,12 @@ class MainController extends Controller
 {
     public function index()
     {
+        Auth::check();
         return view("ControlPanel.index");
+    }
+
+    public function close()
+    {
+        return view("ControlPanel.close");
     }
 }

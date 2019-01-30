@@ -9,6 +9,7 @@ use App\Models\EventLog;
 use App\Models\Lecturer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
 
@@ -21,6 +22,7 @@ class LecturerController extends Controller
      */
     public function index()
     {
+        Auth::check();
         $lecturers = Lecturer::all();
         return view("ControlPanel.lecturer.index")->with([
             "lecturers" => $lecturers
@@ -34,6 +36,7 @@ class LecturerController extends Controller
      */
     public function create()
     {
+        Auth::check();
         return view("ControlPanel.lecturer.create");
     }
 
@@ -46,6 +49,7 @@ class LecturerController extends Controller
      */
     public function store(Request $request)
     {
+        Auth::check();
         $this->validate($request, [
             'name'                  => 'required',
             'username'              => 'required|unique:lecturer,username',
@@ -76,16 +80,20 @@ class LecturerController extends Controller
 
         if (!$success)
             return redirect("/control-panel/lecturers/create")->with([
-                "CreateLecturerMessage" => "لم تتم عملية الاضافة بنجاح"
+                "CreateLecturerMessage" => "لم تتم عملية الاضافة الاستاذ بنجاح",
+                "TypeMessage" => "Error"
             ]);
 
+        /**
+         * Keep event log
+         */
         $target = $lecturer->id;
         $type = EventLogType::LECTURER;
-        $event = "اضافة حساب جديد";
+        $event = "اضافة حساب استاذ - " . $lecturer->name;
         EventLog::create($target, $type, $event);
 
         return redirect("/control-panel/lecturers/create")->with([
-            "CreateLecturerMessage" => "تمت عملية الاضافة بنجاح"
+            "CreateLecturerMessage" => "تمت عملية الاضافة الاستاذ بنجاح - " . $lecturer->name
         ]);
     }
 
@@ -97,6 +105,7 @@ class LecturerController extends Controller
      */
     public function show(Lecturer $lecturer)
     {
+        Auth::check();
         $events = EventLog::where("account_id", $lecturer->id)
             ->where("account_type",AccountType::LECTURER)
             ->orderBy("id","DESC")
@@ -115,6 +124,7 @@ class LecturerController extends Controller
      */
     public function edit(Lecturer $lecturer)
     {
+        Auth::check();
         return view("ControlPanel.lecturer.edit")->with([
             "lecturer" => $lecturer
         ]);
@@ -130,7 +140,10 @@ class LecturerController extends Controller
      */
     public function update(Request $request, Lecturer $lecturer)
     {
-        //For Change Password
+        Auth::check();
+        /**
+         * For change password
+         */
         if (Input::get("type") == "change-password")
         {
             $this->validate($request, [
@@ -149,19 +162,24 @@ class LecturerController extends Controller
 
             if (!$success)
                 return redirect("/control-panel/lecturers/$lecturer->id/edit?type=change-password")->with([
-                    "UpdateLecturerMessage" => "لم يتم تغيير كلمة المرور"
+                    "UpdateLecturerMessage" => "لم يتم تغيير كلمة المرور الاستاذ"
                 ]);
 
+            /**
+             * Keep event log
+             */
             $target = $lecturer->id;
             $type = EventLogType::LECTURER;
-            $event = "تغيير كلمة المرور";
+            $event = "تغيير كلمة المرور الاستاذ - " . $lecturer->name;
             EventLog::create($target, $type, $event);
 
             return redirect("/control-panel/lecturers")->with([
-                "UpdateLecturerMessage" => "تم تغيير كلمة المرور - " . $lecturer->name
+                "UpdateLecturerMessage" => "تم تغيير كلمة المرور الاستاذ - " . $lecturer->name
             ]);
         }
-        //For Change Info Account
+        /**
+         * For change info account
+         */
         else {
             $this->validate($request, [
                 'name'     => 'required',
@@ -183,16 +201,19 @@ class LecturerController extends Controller
 
             if (!$success)
                 return redirect("/control-panel/lecturers/$lecturer->id/edit?type=change-info")->with([
-                    "UpdateLecturerMessage" => "لم يتم تحديث المعلومات"
+                    "UpdateLecturerMessage" => "لم يتم تحديث المعلومات الاستاذ"
                 ]);
 
+            /**
+             * Keep event log
+             */
             $target = $lecturer->id;
             $type = EventLogType::LECTURER;
-            $event = "تعديل الحساب";
+            $event = "تعديل الحساب الاستاذ - " . $lecturer->name;
             EventLog::create($target, $type, $event);
 
             return redirect("/control-panel/lecturers")->with([
-                "UpdateLecturerMessage" => "تم تحديث المعلومات - " . $lecturer->name
+                "UpdateLecturerMessage" => "تم تحديث المعلومات الاستاذ - " . $lecturer->name
             ]);
         }
     }
@@ -205,21 +226,26 @@ class LecturerController extends Controller
      */
     public function destroy(Lecturer $lecturer)
     {
+        Auth::check();
         $lecturer->state = AccountState::CLOSE;
         $success = $lecturer->save();
 
         if (!$success)
             return redirect("/control-panel/lecturers")->with([
-                "ArchiveLecturerMessage" => "لم يتم غلق حساب - " . $lecturer->name
+                "ArchiveLecturerMessage" => "لم يتم غلق حساب الاستاذ - " . $lecturer->name,
+                "TypeMessage" => "Error"
             ]);
 
+        /**
+         * Keep event log
+         */
         $target = $lecturer->id;
         $type = EventLogType::LECTURER;
-        $event = "اغلاق الحساب";
+        $event = "اغلاق الحساب الاستاذ - " . $lecturer->name;
         EventLog::create($target, $type, $event);
 
         return redirect("/control-panel/lecturers")->with([
-            "ArchiveLecturerMessage" => "تم غلق حساب - " . $lecturer->name
+            "ArchiveLecturerMessage" => "تم غلق حساب الاستاذ - " . $lecturer->name
         ]);
     }
 }

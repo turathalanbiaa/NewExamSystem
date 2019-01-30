@@ -5,44 +5,54 @@
 @endsection
 
 @section("content")
-    <div class="container pt-3">
-        <div class="row pb-3">
-            <div class="col-12">
-                <a href="/control-panel/courses/create" class="btn btn-outline-secondary">
-                    <i class="fa fa-plus ml-1"></i>
-                    <span>اضافة مادة</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- Session Update Course Message -->
+    <div class="container">
+        {{-- Session Update Course Message --}}
         @if (session('UpdateCourseMessage'))
             <div class="row">
                 <div class="col-12">
-                    <div class="alert alert-info text-center">
+                    <div class="alert alert-success text-center">
                         {{session('UpdateCourseMessage')}}
                     </div>
                 </div>
             </div>
         @endif
 
-        <!-- Session Archive Course Message -->
+        {{-- Session Archive Course Message --}}
         @if (session('ArchiveCourseMessage'))
             <div class="row">
                 <div class="col-12">
-                    <div class="alert alert-info text-center">
+                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
                         {{session('ArchiveCourseMessage')}}
                     </div>
                 </div>
             </div>
         @endif
 
+        {{-- Button Create --}}
+        <div class="row">
+            <div class="col-12">
+                <a href="/control-panel/courses/create" class="btn btn-outline-default font-weight-bold">
+                    <i class="fa fa-plus ml-1"></i>
+                    <span>اضافة مادة</span>
+                </a>
+            </div>
+        </div>
+
+        {{-- Divider --}}
+        <div class="row">
+            <div class="col-12">
+                <div class="divider-new my-3">
+                    <span class="px-3">المواد الدراسية</span>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             @foreach($courses as $course)
-                <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                    <!-- Card -->
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-5">
+                    {{-- Card Course --}}
                     <div class="card shadow h-100">
-                        <!-- Card view -->
+                        {{-- Card View --}}
                         <div class="view shadow mdb-color px-3 py-4">
                             <h5 class="text-center text-white mb-3">
                                 <a href="javascript:void(0)" class="text-white">{{$course->name}}</a>
@@ -52,7 +62,7 @@
                             </p>
                         </div>
 
-                        <!-- Card content -->
+                        {{-- Card Content --}}
                         <div class="card-body" style="padding-bottom: 75px;">
                             <h5>
                                 <i class="fa fa-user-graduate"></i>
@@ -66,27 +76,82 @@
                                 <hr>
 
                                 <div class="btn-group w-100">
-                                    <a class="btn btn-sm btn-outline-secondary w-50 ml-1 mr-0" href="/control-panel/courses/{{$course->id}}/edit">
+                                    <a class="btn btn-sm btn-outline-default font-weight-bold w-50 ml-1 mr-0" href="/control-panel/courses/{{$course->id}}/edit" rel="tooltip" title="تحرير المادة">
                                         <i class="fa fa-edit ml-1"></i>
                                         <span>تعديل المادة</span>
                                     </a>
-                                    <button class="btn btn-sm btn-outline-secondary w-50 ml-0 mr-1" type="button" onclick="$('#form-{{$course->id}}').submit();">
-                                        <i class="fa fa-file-archive ml-1"></i>
-                                        <span>ارشفة المادة</span>
-                                    </button>
 
-                                    <!-- Form-Hidden for archive course -->
-                                    <form id="form-{{$course->id}}" class="d-none" method="post" action="/control-panel/courses/{{$course->id}}">
-                                        @method("DELETE")
-                                        @csrf
-                                    </form>
+                                    @if($course->state == \App\Enums\CourseState::OPEN)
+                                        <a class="btn btn-sm btn-outline-default font-weight-bold w-50 ml-0 mr-1" href="#modelArchiveCourse" rel="tooltip" title="ارشفة المادة" data-toggle="modal" data-action="fillArchiveCourseForm" data-course-id="{{$course->id}}" data-course-name="{{$course->name}}">
+                                            <i class="fa fa-file-archive ml-1"></i>
+                                            <span>ارشفة المادة</span>
+                                        </a>
+                                    @else
+                                        <button class="btn btn-sm btn-outline-default font-weight-bold w-50 ml-0 mr-1" rel="tooltip" title="هذه المادة مغلقه">
+                                            <i class="fa fa-file-archive ml-1"></i>
+                                            <span>ارشفة المادة</span>
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Card -->
                 </div>
             @endforeach
         </div>
     </div>
+@endsection
+
+@section("extra-content")
+    {{-- Archive Course Modal --}}
+    <div class="modal fade" id="modelArchiveCourse" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notify modal-danger" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="heading lead">اسم المادة</p>
+
+                    <a href="javascript:void(0)" class="close ml-0" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="white-text">&times;</span>
+                    </a>
+                </div>
+
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fa fa-lock fa-4x mb-3 animated fadeIn"></i>
+                        <h2 class="text-danger">هل تريد ارشفة المادة</h2>
+                        <p>بعد ارشفة المادة، سوف لن تظهر هذه المادة للاستاذ.</p>
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-danger font-weight-bold" onclick="$('form#archiveCourse').submit();">ارشفة المادة</button>
+                    <button type="button" class="btn btn-outline-danger font-weight-bold" data-dismiss="modal">لا شكرا</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Archive Course Form --}}
+    <form id="archiveCourse" method="post" action="">
+        @csrf
+        @method("DELETE")
+    </form>
+@endsection
+
+@section("script")
+    <script>
+        // Tooltips Initialization
+        $('[rel="tooltip"]').tooltip();
+
+        // Fill Modal & Form
+        $("[data-action='fillArchiveCourseForm']").click(function () {
+            //For Fill Modal
+            let courseName = $(this).data("course-name");
+            $("#modelArchiveCourse .heading.lead").html(courseName);
+
+            //For Fill Form
+            let courseId = $(this).data("course-id");
+            $("form#archiveCourse").attr("action","/control-panel/courses/" + courseId);
+        });
+    </script>
 @endsection

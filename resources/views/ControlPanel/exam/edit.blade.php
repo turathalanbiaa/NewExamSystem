@@ -26,7 +26,7 @@
                         </ul>
                     </div>
 
-                    {{-- Errors --}}
+                    {{-- Alert Errors --}}
                     @if ($errors->any())
                         <div class="alert alert-danger mx-4 mt-4">
                             <ul class="mb-0 pr-3">
@@ -64,7 +64,7 @@
                                 <input type="date" name="date" id="date" class="form-control" value="{{$exam->date}}">
                             </div>
 
-                            <button class="btn btn-outline-default btn-block mb-4" type="submit">
+                            <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
                                 <span>حفظ التغييرات على النموذج الامتحاني</span>
                             </button>
                         </form>
