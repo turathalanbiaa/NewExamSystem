@@ -11,11 +11,6 @@ class HomeController extends Controller
     {
         return view("Website/index");
     }
-    public function studentAuth()
-    {
-        session(['id' => 1]);
-        return redirect('/');
-    }
     public function info()
     {
         return view("Website/info");
