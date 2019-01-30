@@ -31,7 +31,7 @@ class StudentAuthController extends Controller
             }
             $student->exams()->attach($examsIds->collapse());
             Cookie::queue(Cookie::forever('remember_me', $remember_token));
-            Session::put('newExamsChecked',true);
+            session('newExamsChecked',true);
             return redirect('/');
         }
         else
