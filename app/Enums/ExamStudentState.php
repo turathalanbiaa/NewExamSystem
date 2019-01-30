@@ -16,8 +16,8 @@ class ExamStudentState
 
     public static function getState($key) {
         switch ($key) {
-            case 1: return "غير منتهي"; break;
-            case 2: return "منتهي"; break;
+            case self::NOT_FINISHED: return "غير منتهي"; break;
+            case self::FINISHED: return "منتهي"; break;
         }
 
         return "";

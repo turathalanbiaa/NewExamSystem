@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\EventLogType;
+use App\Models\EventLog;
 use App\Models\Exam;
 use App\Models\Question;
 use Illuminate\Http\Request;
@@ -39,12 +41,62 @@ class QuestionController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
     {
-        //
+        Auth::check();
+        $exam = self::getCurrentExam();
+        $remainingScore = $exam->fake_mark - $exam->questions()->sum("score");
+        $noOfBranch = Input::get("noOfBranch");
+        $this->validate($request, [
+            'title'              => ['required'],
+            'type'               => ['required', 'integer', 'between:1,4'],
+            'score'              => ['required', 'integer', "between:1,$remainingScore"],
+            'noOfBranch'         => ['required', 'integer', 'min:1'],
+            'noOfBranchRequired' => ($noOfBranch >= 1)? "required|integer|min:1|between:1,$noOfBranch":"",
+        ], [
+            'title.required'              => 'يرجى ملئ عنوان السؤال.',
+            'type.required'               => 'يرجى أختيار نوع السؤال.',
+            'type.integer'                => 'نوع السؤال غير مقبولة.',
+            'type.between'                => 'نوع السؤال من 1 الى 4.',
+            'score.required'              => 'يرجى وضع درجة السؤال',
+            'score.integer'               => 'درجة السؤال غير مقبولة.',
+            'score.between'               => 'درجة السؤال اكبر من صفر واقل من درجة الامتحان المتبقية.',
+            'noOfBranch.required'         => 'يرجى ذكر عدد النقاط.',
+            'noOfBranch.integer'          => 'عدد النقاط غير مقبول.',
+            'noOfBranch.min'              => 'يجب ان يحتوي السؤال على نقطة واحدة على الاقل.',
+            'noOfBranchRequired.required' => 'يرجى ذكر عدد النقاط المطلوبة.',
+            'noOfBranchRequired.integer'  => 'عدد النقاط المطلوبة غير مقبول.',
+            'noOfBranchRequired.min'      => 'يجب ان يحتوي السؤال على نقطة واحدة مطلوبة على الاقل.',
+            'noOfBranchRequired.between'  => 'يجب ان تكون عدد النقاط المطلوبة اقل من او تساوي عدد النقاط.',
+        ]);
+
+        $question = new Question();
+        $question->title = Input::get("title");
+        $question->type = Input::get("type");
+        $question->score = Input::get("score");
+        $question->no_of_branch = Input::get("noOfBranch");
+        $question->no_of_beanch_req = Input::get("noOfBranchRequired");
+        $success = $question->save();
+
+        if (!$success)
+            return redirect("control-panel/questions/create")->with([
+                "CreateQuestionMessage" => "لم يتم اضافة السؤال بنجاح."
+            ]);
+
+        //Keep event log
+        $target = $question->id;
+        $type = EventLogType::QUESTION;
+        $event = "اضافة سؤال لامتحان - " . $exam->title;
+        EventLog::create($target, $type, $event);
+
+        return redirect("control-panel/branches/create")->with([
+            "CreateQuestionMessage" => "تمت اضافة السؤال بنجاح."
+        ]);
+
     }
 
     /**

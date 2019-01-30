@@ -17,9 +17,9 @@ class ExamState
 
     public static function getState($key) {
         switch ($key) {
-            case 1: return "مغلق"; break;
-            case 2: return "مفتوح"; break;
-            case 3: return "منتهي"; break;
+            case self::CLOSE: return "مغلق"; break;
+            case self::OPEN: return "مفتوح"; break;
+            case self::END: return "منتهي"; break;
         }
 
         return "";

@@ -16,8 +16,8 @@ class CourseState
 
     public static function getState($key) {
         switch ($key) {
-            case 1: return "مفتوح"; break;
-            case 2: return "مغلق";  break;
+            case self::OPEN: return "مفتوح"; break;
+            case self::CLOSE: return "مغلق";  break;
         }
 
         return "";
