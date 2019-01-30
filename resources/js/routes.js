@@ -1,17 +1,17 @@
-import Page1 from "./components/Page1";
-import Page2 from "./components/Page2";
+import Exams from "./components/Exams";
+import Questions from "./components/Questions";
 
 export const routes= [
     {
         path: '/',
         components: {
-          Page1
+            Exams
         }
 
     },
     {
-        path: '/page2/:id',
-        component: Page2,
+        path: '/Questions/:id',
+        component: Questions,
     },
 
 ];

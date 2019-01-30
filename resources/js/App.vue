@@ -49,7 +49,7 @@
 
         </v-toolbar>
         <v-content>
-            <router-view name="Page1"></router-view>
+            <router-view name="Exams"></router-view>
             <router-view></router-view>
         </v-content>
     </v-app>
