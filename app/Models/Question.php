@@ -14,4 +14,9 @@ class Question extends Model
     {
         return $this->hasMany("App\Models\Branch", "que_id");
     }
+
+    public function exam()
+    {
+        return $this->belongsTo("App\Models\Exam", "exam_id", "id");
+    }
 }

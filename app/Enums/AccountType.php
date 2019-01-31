@@ -17,8 +17,8 @@ class AccountType
 
     public static function getType($key) {
         switch ($key) {
-            case 1: return "مدير"; break;
-            case 2: return "استاذ"; break;
+            case self::MANAGER: return "مدير"; break;
+            case self::LECTURER: return "استاذ"; break;
         }
 
         return "";

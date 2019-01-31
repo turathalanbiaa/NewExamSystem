@@ -15,4 +15,17 @@ class QuestionType
     const SINGLE_CHOICE = 2;
     const FILL_BLANK = 3;
     const EXPLAIN = 4;
+
+    public static function getType($key)
+    {
+        switch ($key)
+        {
+            case self::TRUE_OR_FALSE: return "صح او خطأ"; break;
+            case self::SINGLE_CHOICE: return "اختيارات"; break;
+            case self::FILL_BLANK: return "فراغات"; break;
+            case self::EXPLAIN: return "تعاريف او شرح"; break;
+        }
+
+        return "";
+    }
 }

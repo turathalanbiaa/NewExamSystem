@@ -26,13 +26,6 @@
                 </a>
             </div>
         </div>
-
-        {{-- Questions --}}
-        @foreach($exam->questions as $question)
-            <div class="row">
-
-            </div>
-        @endforeach
     </div>
 @endsection
 

@@ -43,12 +43,12 @@
             <div class="row">
                 {{-- Course --}}
                 <div class="col-12 mb-3">
-                    <h4 class="bg-light p-3" data-toggle="collapse" data-target="#course-exams-{{$course->id}}" aria-expanded="false" aria-controls="collapseExams">
+                    <h5 class="bg-light p-3" data-toggle="collapse" data-target="#course-exams-{{$course->id}}" aria-expanded="false" aria-controls="collapseExams">
                         <i class="fa fa-bars text-default ml-1"></i>
                         {{$course->name}}
                         <span class="text-default">&gt;&gt;&gt;</span>
                         {{\App\Enums\Level::get($course->level)}}
-                    </h4>
+                    </h5>
                 </div>
                 {{-- Exams --}}
                 <div class="col-12 collapse" id="course-exams-{{$course->id}}">
