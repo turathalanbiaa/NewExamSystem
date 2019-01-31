@@ -1,5 +1,5 @@
 import Exams from "./components/Exams";
-import Questions from "./components/Questions";
+import Exam from "./components/Exam";
 
 export const routes= [
     {
@@ -10,8 +10,8 @@ export const routes= [
 
     },
     {
-        path: '/Questions/:id',
-        component: Questions,
+        path: '/Exam/:id',
+        component: Exam,
     },
 
 ];

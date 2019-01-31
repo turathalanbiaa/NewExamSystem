@@ -8,6 +8,6 @@
 Route::get('/', 'Website\HomeController@index')->middleware('StudentAuth');
 Route::get('/student-auth', 'Website\StudentAuthController@studentAuth');
 Route::get('/info', 'Website\HomeController@info');
-Route::get('/student/get-student-exam', 'Website\StudentExamController@index');
-
+Route::get('/get-exams', 'Website\StudentExamController@exams');
+Route::get('/get-exam', 'Website\StudentExamController@exam');
 

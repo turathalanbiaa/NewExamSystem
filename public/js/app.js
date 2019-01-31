@@ -51094,10 +51094,10 @@ if (inBrowser && window.Vue) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return routes; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Exams__ = __webpack_require__(74);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Exams__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Exams___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_Exams__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_Questions__ = __webpack_require__(79);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_Questions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_Questions__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_Exam__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_Exam___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_Exam__);
 
 
 
@@ -51108,21 +51108,1037 @@ var routes = [{
     }
 
 }, {
-    path: '/Questions/:id',
-    component: __WEBPACK_IMPORTED_MODULE_1__components_Questions___default.a
+    path: '/Exam/:id',
+    component: __WEBPACK_IMPORTED_MODULE_1__components_Exam___default.a
 }];
 
 /***/ }),
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */,
-/* 58 */,
-/* 59 */,
-/* 60 */,
+/* 51 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(52)
+}
+var normalizeComponent = __webpack_require__(5)
+/* script */
+var __vue_script__ = __webpack_require__(54)
+/* template */
+var __vue_template__ = __webpack_require__(55)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-62c6ea4e"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/js/components/Exams.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-62c6ea4e", Component.options)
+  } else {
+    hotAPI.reload("data-v-62c6ea4e", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(53);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(4)("e0711e28", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-62c6ea4e\",\"scoped\":true,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Exams.vue", function() {
+     var newContent = require("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-62c6ea4e\",\"scoped\":true,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Exams.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(2)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 54 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    data: function data() {
+        return {
+            examList: []
+
+        };
+    },
+    mounted: function mounted() {
+        console.log('mounted');
+        this.initData();
+    },
+
+    methods: {
+        initData: function initData() {
+            var _this = this;
+
+            axios.get('get-exams').then(function (_ref) {
+                var data = _ref.data;
+
+                _this.examList = data;
+                console.log(data);
+            }).catch(function (resp) {
+                console.log(resp);
+            });
+        }
+    }
+});
+
+/***/ }),
+/* 55 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "v-container",
+    { attrs: { fluid: "", "grid-list-lg": "" } },
+    [
+      _c(
+        "v-layout",
+        { attrs: { row: "", wrap: "" } },
+        _vm._l(_vm.examList, function(exam) {
+          return _c(
+            "v-flex",
+            {
+              key: exam.id,
+              attrs: { xl12: "", lg12: "", md12: "", sm12: "", xs12: "" }
+            },
+            [
+              _c(
+                "v-card",
+                [
+                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
+                    _c("h3", { staticClass: "title mb-0" }, [
+                      _vm._v(_vm._s(exam.title))
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("v-card-text", [
+                    _c("h3", { staticClass: "subheading" }, [
+                      _vm._v("الدرجه " + _vm._s(exam.mark))
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          staticClass: "mb-2",
+                          attrs: {
+                            to: /Exam/ + exam.id,
+                            round: "",
+                            color: "primary",
+                            dark: ""
+                          }
+                        },
+                        [
+                          _vm._v("بدء\n                    "),
+                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
+                            _vm._v("launch")
+                          ])
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        }),
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-62c6ea4e", module.exports)
+  }
+}
+
+/***/ }),
+/* 56 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(57)
+}
+var normalizeComponent = __webpack_require__(5)
+/* script */
+var __vue_script__ = __webpack_require__(59)
+/* template */
+var __vue_template__ = __webpack_require__(60)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-1710078a"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/js/components/Exam.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1710078a", Component.options)
+  } else {
+    hotAPI.reload("data-v-1710078a", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(58);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(4)("0eecc7f3", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1710078a\",\"scoped\":true,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Exam.vue", function() {
+     var newContent = require("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1710078a\",\"scoped\":true,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Exam.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 58 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(2)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 59 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    data: function data() {
+        return {
+            page: 1,
+            dialog: false,
+            snackbar: false,
+            snackbarText: '',
+            color: '',
+            questionId: null,
+            answer: null,
+            questionsList: [{
+                name: 'سوال1',
+                value: 'خوفو'
+            }, {
+                name: 'سوال2',
+                value: 'خطأ'
+            }]
+        };
+    },
+    mounted: function mounted() {
+        console.log('id' + this.$route.params.id);
+        this.initData();
+    },
+
+    methods: {
+        saveAnswer: function saveAnswer(id) {
+            if (id !== this.questionId) {
+                this.color = 'error';
+                this.snackbarText = 'يجب الاجابة على السوال او تغيير الاجابة';
+                this.snackbar = true;
+                return;
+            } else {
+                console.log("id " + this.questionId);
+                console.log("answer " + this.answer);
+                this.color = 'success';
+                this.snackbarText = 'تم الحفظ بنجاح';
+                this.snackbar = true;
+                this.questionId = null;
+                this.answer = null;
+            }
+        },
+        getValue: function getValue(v, id) {
+            console.log("Id ", id);
+            console.log("Value ", v);
+
+            this.questionId = id;
+            this.answer = v;
+        },
+        onPageChange: function onPageChange() {
+            console.log('page clicked');
+        },
+        initData: function initData() {
+            var _this = this;
+
+            axios.get('get-exam', { params: { id: this.$route.params.id } }).then(function (_ref) {
+                var data = _ref.data;
+
+                //this.questionsList=data;
+
+                console.log(_this.questionsList[0].value);
+            }).catch(function (resp) {
+                console.log(resp);
+            });
+        }
+    }
+});
+
+/***/ }),
+/* 60 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "v-container",
+    { attrs: { fluid: "", "grid-list-lg": "" } },
+    [
+      _c("p", { staticClass: "text-lg-right headline" }, [
+        _vm._v(" امتحان اسئلة دينيه عامه الشهر الاول ")
+      ]),
+      _vm._v(" "),
+      _c(
+        "v-layout",
+        { attrs: { row: "", wrap: "" } },
+        [
+          _c(
+            "v-flex",
+            { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } },
+            [
+              _c(
+                "v-card",
+                [
+                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
+                    _c("h3", { staticClass: "title mb-0" }, [
+                      _vm._v("من أول ملك فرعوني آمن بالتوحيد ؟")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _c(
+                        "v-radio-group",
+                        {
+                          attrs: { column: "" },
+                          model: {
+                            value: _vm.questionsList[0].value,
+                            callback: function($$v) {
+                              _vm.$set(_vm.questionsList[0], "value", $$v)
+                            },
+                            expression: "questionsList[0].value"
+                          }
+                        },
+                        [
+                          _c("v-radio", {
+                            attrs: {
+                              label: "اخناتون",
+                              value: "اخناتون",
+                              checked: ""
+                            },
+                            on: {
+                              change: function($event) {
+                                _vm.getValue("value1", 1)
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("v-radio", {
+                            attrs: {
+                              label: "توت عنغ امون",
+                              value: "توت عنغ امون"
+                            },
+                            on: {
+                              change: function($event) {
+                                _vm.getValue("value2", 1)
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("v-radio", {
+                            attrs: { label: "خوفو", value: "خوفو" },
+                            on: {
+                              change: function($event) {
+                                _vm.getValue("value3", 1)
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("v-radio", {
+                            attrs: { label: "خفرع", value: "خفرع" },
+                            on: {
+                              change: function($event) {
+                                _vm.getValue("value4", 1)
+                              }
+                            }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          staticClass: "mb-2",
+                          attrs: { color: "success", dark: "" },
+                          on: {
+                            click: function($event) {
+                              _vm.saveAnswer(1)
+                            }
+                          }
+                        },
+                        [
+                          _vm._v("حفظ\n                            "),
+                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
+                            _vm._v("save")
+                          ])
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-flex",
+            { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } },
+            [
+              _c(
+                "v-card",
+                [
+                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
+                    _c("h3", { staticClass: "title mb-0" }, [
+                      _vm._v("أول قاضي في البصرة ابو مريم الحنفي؟")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _c(
+                        "v-radio-group",
+                        {
+                          attrs: { column: "" },
+                          model: {
+                            value: _vm.questionsList[1].value,
+                            callback: function($$v) {
+                              _vm.$set(_vm.questionsList[1], "value", $$v)
+                            },
+                            expression: "questionsList[1].value"
+                          }
+                        },
+                        [
+                          _c("v-radio", {
+                            attrs: { label: "صح", value: "صح" },
+                            on: {
+                              change: function($event) {
+                                _vm.getValue("value1", 2)
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("v-radio", {
+                            attrs: { label: "خطأ", value: "خطأ" },
+                            on: {
+                              change: function($event) {
+                                _vm.getValue("value2", 2)
+                              }
+                            }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          staticClass: "mb-2",
+                          attrs: { color: "success", dark: "" },
+                          on: {
+                            click: function($event) {
+                              _vm.saveAnswer(2)
+                            }
+                          }
+                        },
+                        [
+                          _vm._v("حفظ\n                        "),
+                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
+                            _vm._v("save")
+                          ])
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-flex",
+            { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } },
+            [
+              _c(
+                "v-card",
+                [
+                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
+                    _c("h3", { staticClass: "title mb-0" }, [
+                      _vm._v("أول جبل وضع في الأرض ؟")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _c("v-text-field", {
+                        attrs: {
+                          "single-line": "",
+                          outline: "",
+                          value: _vm.questionsList[1].name
+                        },
+                        on: {
+                          input: function($event) {
+                            _vm.getValue($event, 3)
+                          }
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          staticClass: "mb-2",
+                          attrs: { color: "success", dark: "" },
+                          on: {
+                            click: function($event) {
+                              _vm.saveAnswer(3)
+                            }
+                          }
+                        },
+                        [
+                          _vm._v("حفظ\n                        "),
+                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
+                            _vm._v("save")
+                          ])
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-flex",
+            { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } },
+            [
+              _c(
+                "v-card",
+                [
+                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
+                    _c("h3", { staticClass: "title mb-0" }, [
+                      _vm._v("اشرح العمره")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _c("v-textarea", {
+                        attrs: {
+                          outline: "",
+                          value: _vm.questionsList[1].name
+                        },
+                        on: {
+                          input: function($event) {
+                            _vm.getValue($event, 4)
+                          }
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          staticClass: "mb-2",
+                          attrs: { color: "success", dark: "" },
+                          on: {
+                            click: function($event) {
+                              _vm.saveAnswer(4)
+                            }
+                          }
+                        },
+                        [
+                          _vm._v("حفظ\n                        "),
+                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
+                            _vm._v("save")
+                          ])
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-snackbar",
+            {
+              attrs: { color: _vm.color, bottom: "", timeout: 6000 },
+              model: {
+                value: _vm.snackbar,
+                callback: function($$v) {
+                  _vm.snackbar = $$v
+                },
+                expression: "snackbar"
+              }
+            },
+            [_vm._v("\n            " + _vm._s(_vm.snackbarText) + "\n        ")]
+          ),
+          _vm._v(" "),
+          _c("v-flex", { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } }, [
+            _c(
+              "div",
+              { staticClass: "text-xs-center" },
+              [
+                _c(
+                  "v-dialog",
+                  {
+                    attrs: { persistent: "", "max-width": "290" },
+                    model: {
+                      value: _vm.dialog,
+                      callback: function($$v) {
+                        _vm.dialog = $$v
+                      },
+                      expression: "dialog"
+                    }
+                  },
+                  [
+                    _c(
+                      "v-btn",
+                      {
+                        attrs: {
+                          slot: "activator",
+                          color: "red",
+                          block: "",
+                          dark: ""
+                        },
+                        slot: "activator"
+                      },
+                      [
+                        _vm._v(
+                          "\n                    أنهاء الأمتحان\n                "
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-card",
+                      [
+                        _c(
+                          "v-card-title",
+                          {
+                            staticClass: "title red  white--text",
+                            attrs: { "primary-title": "" }
+                          },
+                          [
+                            _vm._v(
+                              "\n                        العقائد\n                    "
+                            )
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c("v-card-text", [
+                          _vm._v(
+                            "\n                        هل انت متأكد\n                    "
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "v-card-actions",
+                          [
+                            _c(
+                              "v-btn",
+                              {
+                                attrs: { color: "info darken-1", flat: "" },
+                                on: {
+                                  click: function($event) {
+                                    _vm.dialog = false
+                                  }
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                            نعم\n                        "
+                                )
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "v-btn",
+                              {
+                                attrs: { color: "info darken-1", flat: "" },
+                                on: {
+                                  click: function($event) {
+                                    _vm.dialog = false
+                                  }
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                            لا\n                        "
+                                )
+                              ]
+                            )
+                          ],
+                          1
+                        )
+                      ],
+                      1
+                    )
+                  ],
+                  1
+                )
+              ],
+              1
+            )
+          ])
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-1710078a", module.exports)
+  }
+}
+
+/***/ }),
 /* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -74219,1007 +75235,6 @@ module.exports = "/fonts/vendor/material-design-icons-icondist/MaterialIcons-Reg
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 73 */,
-/* 74 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(75)
-}
-var normalizeComponent = __webpack_require__(5)
-/* script */
-var __vue_script__ = __webpack_require__(77)
-/* template */
-var __vue_template__ = __webpack_require__(78)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-62c6ea4e"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources/js/components/Exams.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-62c6ea4e", Component.options)
-  } else {
-    hotAPI.reload("data-v-62c6ea4e", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 75 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(76);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(4)("e0711e28", content, false, {});
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-62c6ea4e\",\"scoped\":true,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Exams.vue", function() {
-     var newContent = require("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-62c6ea4e\",\"scoped\":true,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Exams.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 76 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(2)(false);
-// imports
-
-
-// module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 77 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    name: "Page2",
-    data: function data() {
-        return {
-            exam_list: []
-
-        };
-    },
-    mounted: function mounted() {
-        console.log('mounted');
-        this.initData();
-    },
-
-    methods: {
-        initData: function initData() {
-            var _this = this;
-
-            axios.get('student/get-student-exam').then(function (_ref) {
-                var data = _ref.data;
-
-                _this.exam_list = data;
-                console.log(data);
-            }).catch(function (resp) {
-                console.log(resp);
-            });
-        }
-    }
-});
-
-/***/ }),
-/* 78 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "v-container",
-    { attrs: { fluid: "", "grid-list-lg": "" } },
-    [
-      _c(
-        "v-layout",
-        { attrs: { row: "", wrap: "" } },
-        _vm._l(_vm.exam_list, function(exam) {
-          return _c(
-            "v-flex",
-            {
-              key: exam.id,
-              attrs: { xl12: "", lg12: "", md12: "", sm12: "", xs12: "" }
-            },
-            [
-              _c(
-                "v-card",
-                [
-                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
-                    _c("h3", { staticClass: "title mb-0" }, [
-                      _vm._v(_vm._s(exam.title))
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("v-card-text", [
-                    _c("h3", { staticClass: "subheading" }, [
-                      _vm._v("الدرجه " + _vm._s(exam.mark))
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "v-card-actions",
-                    [
-                      _c(
-                        "v-btn",
-                        {
-                          staticClass: "mb-2",
-                          attrs: {
-                            to: /Questions/ + exam.id,
-                            round: "",
-                            color: "primary",
-                            dark: ""
-                          }
-                        },
-                        [
-                          _vm._v("بدء\n                    "),
-                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
-                            _vm._v("launch")
-                          ])
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          )
-        }),
-        1
-      )
-    ],
-    1
-  )
-}
-var staticRenderFns = []
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-62c6ea4e", module.exports)
-  }
-}
-
-/***/ }),
-/* 79 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(80)
-}
-var normalizeComponent = __webpack_require__(5)
-/* script */
-var __vue_script__ = __webpack_require__(82)
-/* template */
-var __vue_template__ = __webpack_require__(83)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-1d47061c"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources/js/components/Questions.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-1d47061c", Component.options)
-  } else {
-    hotAPI.reload("data-v-1d47061c", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 80 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(81);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(4)("5e94a2a8", content, false, {});
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1d47061c\",\"scoped\":true,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Questions.vue", function() {
-     var newContent = require("!!../../../node_modules/css-loader/index.js!../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1d47061c\",\"scoped\":true,\"hasInlineConfig\":true}!../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Questions.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 81 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(2)(false);
-// imports
-
-
-// module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 82 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    name: "Page1",
-    data: function data() {
-        return {
-            page: 1,
-            dialog: false,
-            namesThatRhyme: [],
-            snackbar: false,
-            snackbarText: '',
-            color: '',
-            questionId: null,
-            answer: null
-        };
-    },
-    mounted: function mounted() {
-        console.log(this.items);
-    },
-
-    methods: {
-        saveAnswer: function saveAnswer(id) {
-            if (id !== this.questionId) {
-                this.color = 'error';
-                this.snackbarText = 'يجب الاجابة على السوال او تغيير الاجابة';
-                this.snackbar = true;
-                return;
-            } else {
-                console.log("id " + this.questionId);
-                console.log("answer " + this.answer);
-                this.color = 'success';
-                this.snackbarText = 'تم الحفظ بنجاح';
-                this.snackbar = true;
-                this.questionId = null;
-                this.answer = null;
-            }
-        },
-        getAnswer: function getAnswer(e, id) {
-            console.log("Id ", id);
-            console.log("Value ", e);
-
-            this.questionId = id;
-            this.answer = e;
-        },
-        onPageChange: function onPageChange() {
-            console.log('page clicked');
-        },
-        initData: function initData() {
-            var _this = this;
-
-            axios.get('api/map', { params: { lang: this.$i18n.locale } }).then(function (_ref) {
-                var data = _ref.data;
-
-                _this.markers = data.data;
-            }).catch(function (resp) {
-                console.log(resp);
-            });
-        }
-    }
-});
-
-/***/ }),
-/* 83 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "v-container",
-    { attrs: { fluid: "", "grid-list-lg": "" } },
-    [
-      _c("p", { staticClass: "text-lg-right headline" }, [
-        _vm._v(" امتحان اسئلة دينيه عامه الشهر الاول ")
-      ]),
-      _c("div", [_vm._v("Id " + _vm._s(_vm.$route.params.id))]),
-      _c("p"),
-      _vm._v(" "),
-      _c(
-        "v-layout",
-        { attrs: { row: "", wrap: "" } },
-        [
-          _c(
-            "v-flex",
-            { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } },
-            [
-              _c(
-                "v-card",
-                [
-                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
-                    _c("h3", { staticClass: "title mb-0" }, [
-                      _vm._v("من أول ملك فرعوني آمن بالتوحيد ؟")
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "v-card-text",
-                    [
-                      _c(
-                        "v-radio-group",
-                        { attrs: { column: "" } },
-                        [
-                          _c("v-radio", {
-                            attrs: { label: "اخناتون", value: "اخناتون" },
-                            on: {
-                              change: function($event) {
-                                _vm.getAnswer($event, 1)
-                              }
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c("v-radio", {
-                            attrs: {
-                              label: "توت عنغ امون",
-                              value: "توت عنغ امون"
-                            },
-                            on: {
-                              change: function($event) {
-                                _vm.getAnswer($event, 1)
-                              }
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c("v-radio", {
-                            attrs: { label: "خوفو", value: "خوفو" },
-                            on: {
-                              change: function($event) {
-                                _vm.getAnswer($event, 1)
-                              }
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c("v-radio", {
-                            attrs: { label: "خفرع", value: "خفرع" },
-                            on: {
-                              change: function($event) {
-                                _vm.getAnswer($event, 1)
-                              }
-                            }
-                          })
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-card-actions",
-                    [
-                      _c(
-                        "v-btn",
-                        {
-                          staticClass: "mb-2",
-                          attrs: { round: "", color: "success", dark: "" },
-                          on: {
-                            click: function($event) {
-                              _vm.saveAnswer(1)
-                            }
-                          }
-                        },
-                        [
-                          _vm._v("حفظ\n                            "),
-                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
-                            _vm._v("save")
-                          ])
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "v-flex",
-            { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } },
-            [
-              _c(
-                "v-card",
-                [
-                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
-                    _c("h3", { staticClass: "title mb-0" }, [
-                      _vm._v("أول قاضي في البصرة ابو مريم الحنفي؟")
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "v-card-text",
-                    [
-                      _c(
-                        "v-radio-group",
-                        { attrs: { column: "" } },
-                        [
-                          _c("v-radio", {
-                            attrs: { label: "صح", value: "صح" },
-                            on: {
-                              change: function($event) {
-                                _vm.getAnswer($event, 2)
-                              }
-                            },
-                            model: {
-                              value: _vm.namesThatRhyme,
-                              callback: function($$v) {
-                                _vm.namesThatRhyme = $$v
-                              },
-                              expression: "namesThatRhyme"
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c("v-radio", {
-                            attrs: { label: "خطأ", value: "خطأ" },
-                            on: {
-                              change: function($event) {
-                                _vm.getAnswer($event, 2)
-                              }
-                            }
-                          })
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-card-actions",
-                    [
-                      _c(
-                        "v-btn",
-                        {
-                          staticClass: "mb-2",
-                          attrs: { round: "", color: "success", dark: "" },
-                          on: {
-                            click: function($event) {
-                              _vm.saveAnswer(2)
-                            }
-                          }
-                        },
-                        [
-                          _vm._v("حفظ\n                        "),
-                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
-                            _vm._v("save")
-                          ])
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "v-flex",
-            { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } },
-            [
-              _c(
-                "v-card",
-                [
-                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
-                    _c("h3", { staticClass: "title mb-0" }, [
-                      _vm._v("أول جبل وضع في الأرض ؟")
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "v-card-text",
-                    [
-                      _c("v-text-field", {
-                        attrs: {
-                          "single-line": "",
-                          outline: "",
-                          value: "Answer"
-                        },
-                        on: {
-                          input: function($event) {
-                            _vm.getAnswer($event, 3)
-                          }
-                        }
-                      })
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-card-actions",
-                    [
-                      _c(
-                        "v-btn",
-                        {
-                          staticClass: "mb-2",
-                          attrs: { round: "", color: "success", dark: "" },
-                          on: {
-                            click: function($event) {
-                              _vm.saveAnswer(3)
-                            }
-                          }
-                        },
-                        [
-                          _vm._v("حفظ\n                        "),
-                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
-                            _vm._v("save")
-                          ])
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "v-flex",
-            { attrs: { xs12: "", sm12: "", md12: "", lg12: "" } },
-            [
-              _c(
-                "v-card",
-                [
-                  _c("v-card-title", { attrs: { "primary-title": "" } }, [
-                    _c("h3", { staticClass: "title mb-0" }, [
-                      _vm._v("اشرح العمره")
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "v-card-text",
-                    [
-                      _c("v-textarea", {
-                        attrs: { outline: "", value: "Answer" },
-                        on: {
-                          input: function($event) {
-                            _vm.getAnswer($event, 4)
-                          }
-                        }
-                      })
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-card-actions",
-                    [
-                      _c(
-                        "v-btn",
-                        {
-                          staticClass: "mb-2",
-                          attrs: { round: "", color: "success", dark: "" },
-                          on: {
-                            click: function($event) {
-                              _vm.saveAnswer(4)
-                            }
-                          }
-                        },
-                        [
-                          _vm._v("حفظ\n                        "),
-                          _c("v-icon", { attrs: { dark: "", left: "" } }, [
-                            _vm._v("save")
-                          ])
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "v-snackbar",
-            {
-              attrs: { color: _vm.color, bottom: "", timeout: 6000 },
-              model: {
-                value: _vm.snackbar,
-                callback: function($$v) {
-                  _vm.snackbar = $$v
-                },
-                expression: "snackbar"
-              }
-            },
-            [_vm._v("\n            " + _vm._s(_vm.snackbarText) + "\n        ")]
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "text-xs-center" },
-            [
-              _c(
-                "v-dialog",
-                {
-                  attrs: { persistent: "", "max-width": "290" },
-                  model: {
-                    value: _vm.dialog,
-                    callback: function($$v) {
-                      _vm.dialog = $$v
-                    },
-                    expression: "dialog"
-                  }
-                },
-                [
-                  _c(
-                    "v-btn",
-                    {
-                      attrs: {
-                        slot: "activator",
-                        color: "red",
-                        round: "",
-                        dark: ""
-                      },
-                      slot: "activator"
-                    },
-                    [
-                      _vm._v(
-                        "\n                    أنهاء الأمتحان\n                "
-                      )
-                    ]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-card",
-                    [
-                      _c(
-                        "v-card-title",
-                        {
-                          staticClass: "title red  white--text",
-                          attrs: { "primary-title": "" }
-                        },
-                        [
-                          _vm._v(
-                            "\n                        العقائد\n                    "
-                          )
-                        ]
-                      ),
-                      _vm._v(" "),
-                      _c("v-card-text", [
-                        _vm._v(
-                          "\n                        هل انت متأكد\n                    "
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "v-card-actions",
-                        [
-                          _c(
-                            "v-btn",
-                            {
-                              attrs: { color: "info darken-1", flat: "" },
-                              on: {
-                                click: function($event) {
-                                  _vm.dialog = false
-                                }
-                              }
-                            },
-                            [
-                              _vm._v(
-                                "\n                            نعم\n                        "
-                              )
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "v-btn",
-                            {
-                              attrs: { color: "info darken-1", flat: "" },
-                              on: {
-                                click: function($event) {
-                                  _vm.dialog = false
-                                }
-                              }
-                            },
-                            [
-                              _vm._v(
-                                "\n                            لا\n                        "
-                              )
-                            ]
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          )
-        ],
-        1
-      )
-    ],
-    1
-  )
-}
-var staticRenderFns = []
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-1d47061c", module.exports)
-  }
-}
 
 /***/ })
 /******/ ]);
