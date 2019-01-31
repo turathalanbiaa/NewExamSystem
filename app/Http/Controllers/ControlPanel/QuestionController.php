@@ -75,11 +75,12 @@ class QuestionController extends Controller
         ]);
 
         $question = new Question();
+        $question->exam_id = $exam->id;
         $question->title = Input::get("title");
         $question->type = Input::get("type");
         $question->score = Input::get("score");
         $question->no_of_branch = Input::get("noOfBranch");
-        $question->no_of_beanch_req = Input::get("noOfBranchRequired");
+        $question->no_of_branch_req = Input::get("noOfBranchRequired");
         $success = $question->save();
 
         if (!$success)
@@ -93,10 +94,9 @@ class QuestionController extends Controller
         $event = "اضافة سؤال لامتحان - " . $exam->title;
         EventLog::create($target, $type, $event);
 
-        return redirect("control-panel/branches/create")->with([
+        return redirect("control-panel/branches?question=$question->id")->with([
             "CreateQuestionMessage" => "تمت اضافة السؤال بنجاح."
         ]);
-
     }
 
     /**

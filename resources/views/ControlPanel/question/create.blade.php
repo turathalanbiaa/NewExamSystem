@@ -68,7 +68,12 @@
                             <span>عدد النقاط.</span>
                         </li>
 
-                        <li>Empty ...</li>
+                        <li>
+                            <span>اذا كانت </span>
+                            <span class="font-weight-bold">درجة الامتحان المتبقية تساوي صفر، </span>
+                            <span> فلا يمكنك اضافة </span>
+                            <span class="font-weight-bold">سؤال جديد.</span>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -76,6 +81,11 @@
             {{-- Create Question --}}
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
+                    {{-- Card View --}}
+                    <div class="view shadow mdb-color px-3 py-4">
+                        <h5 class="text-center text-white m-0">اضافة سؤال جديد</h5>
+                    </div>
+
                     {{-- Alert Errors --}}
                     @if ($errors->any())
                         <div class="alert alert-danger mx-4 mt-4">
@@ -87,59 +97,64 @@
                         </div>
                     @endif
 
-                    {{-- Card View --}}
-                    <div class="view shadow mdb-color px-3 py-4">
-                        <h5 class="text-center text-white m-0">اضافة سؤال جديد</h5>
-                    </div>
-
                     {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
-                        <form method="post" action="/control-panel/questions">
-                            @csrf
-
-                            <div class="mb-4">
-                                <label for="title">عنوان</label>
-                                <input type="text" name="title" id="title" class="form-control" value="{{old("title")}}">
+                        @if(($exam->fake_mark - $exam->questions()->sum("score"))== 0)
+                            <div class="text-center py-5">
+                                <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
+                                <h4 class="text-warning">
+                                    <span>لا يمكنك اضافة سؤال جديد لان </span>
+                                    <span class="font-weight-bold">درجة الامتحان المتبقية تساوي صفر</span>
+                                </h4>
                             </div>
+                        @else
+                            <form method="post" action="/control-panel/questions">
+                                @csrf
 
-                            <div class="mb-4">
-                                <label for="type">اختر نوع السؤال</label>
-                                <select class="browser-default custom-select" name="type" id="type">
-                                    <option value="" disabled="" selected="">يرجى اختيار نوع السؤال</option>
-                                    <option value="{{\App\Enums\QuestionType::TRUE_OR_FALSE}}" {{(old("type") == \App\Enums\QuestionType::TRUE_OR_FALSE ? "selected":"")}}>
-                                        {{\App\Enums\QuestionType::getType(\App\Enums\QuestionType::TRUE_OR_FALSE)}}
-                                    </option>
-                                    <option value="{{\App\Enums\QuestionType::SINGLE_CHOICE}}" {{(old("type") == \App\Enums\QuestionType::SINGLE_CHOICE ? "selected":"")}}>
-                                        {{\App\Enums\QuestionType::getType(\App\Enums\QuestionType::SINGLE_CHOICE)}}
-                                    </option>
-                                    <option value="{{\App\Enums\QuestionType::FILL_BLANK}}" {{(old("type") == \App\Enums\QuestionType::FILL_BLANK ? "selected":"")}}>
-                                        {{\App\Enums\QuestionType::getType(\App\Enums\QuestionType::FILL_BLANK)}}
-                                    </option>
-                                    <option value="{{\App\Enums\QuestionType::EXPLAIN}}" {{(old("type") == \App\Enums\QuestionType::EXPLAIN ? "selected":"")}}>
-                                        {{\App\Enums\QuestionType::getType(\App\Enums\QuestionType::EXPLAIN)}}
-                                    </option>
-                                </select>
-                            </div>
+                                <div class="mb-4">
+                                    <label for="title">عنوان</label>
+                                    <input type="text" name="title" id="title" class="form-control" value="{{old("title")}}">
+                                </div>
 
-                            <div class="mb-4">
-                                <label for="score">الدرجة</label>
-                                <input type="number" name="score" id="score" class="form-control" value="{{old("score")}}">
-                            </div>
+                                <div class="mb-4">
+                                    <label for="type">اختر نوع السؤال</label>
+                                    <select class="browser-default custom-select" name="type" id="type">
+                                        <option value="" disabled="" selected="">يرجى اختيار نوع السؤال</option>
+                                        <option value="{{\App\Enums\QuestionType::TRUE_OR_FALSE}}" {{(old("type") == \App\Enums\QuestionType::TRUE_OR_FALSE ? "selected":"")}}>
+                                            {{\App\Enums\QuestionType::getType(\App\Enums\QuestionType::TRUE_OR_FALSE)}}
+                                        </option>
+                                        <option value="{{\App\Enums\QuestionType::SINGLE_CHOICE}}" {{(old("type") == \App\Enums\QuestionType::SINGLE_CHOICE ? "selected":"")}}>
+                                            {{\App\Enums\QuestionType::getType(\App\Enums\QuestionType::SINGLE_CHOICE)}}
+                                        </option>
+                                        <option value="{{\App\Enums\QuestionType::FILL_BLANK}}" {{(old("type") == \App\Enums\QuestionType::FILL_BLANK ? "selected":"")}}>
+                                            {{\App\Enums\QuestionType::getType(\App\Enums\QuestionType::FILL_BLANK)}}
+                                        </option>
+                                        <option value="{{\App\Enums\QuestionType::EXPLAIN}}" {{(old("type") == \App\Enums\QuestionType::EXPLAIN ? "selected":"")}}>
+                                            {{\App\Enums\QuestionType::getType(\App\Enums\QuestionType::EXPLAIN)}}
+                                        </option>
+                                    </select>
+                                </div>
 
-                            <div class="mb-4">
-                                <label for="noOfBranch">عدد النقاط</label>
-                                <input type="number" name="noOfBranch" id="noOfBranch" class="form-control" value="{{old("noOfBranch", 1)}}">
-                            </div>
+                                <div class="mb-4">
+                                    <label for="score">الدرجة</label>
+                                    <input type="number" name="score" id="score" class="form-control" value="{{old("score", 0)}}">
+                                </div>
 
-                            <div class="mb-5">
-                                <label for="noOfBranchRequired">عدد النقاط المطلوبة</label>
-                                <input type="number" name="noOfBranchRequired" id="noOfBranchRequired" class="form-control" value="{{old("noOfBranchRequired", 1)}}">
-                            </div>
+                                <div class="mb-4">
+                                    <label for="noOfBranch">عدد النقاط</label>
+                                    <input type="number" name="noOfBranch" id="noOfBranch" class="form-control" value="{{old("noOfBranch", 1)}}">
+                                </div>
 
-                            <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
-                                <span>حفظ المعلومات</span>
-                            </button>
-                        </form>
+                                <div class="mb-5">
+                                    <label for="noOfBranchRequired">عدد النقاط المطلوبة</label>
+                                    <input type="number" name="noOfBranchRequired" id="noOfBranchRequired" class="form-control" value="{{old("noOfBranchRequired", 1)}}">
+                                </div>
+
+                                <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
+                                    <span>حفظ المعلومات</span>
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             </div>

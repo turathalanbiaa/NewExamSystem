@@ -18,3 +18,4 @@ Route::resource('control-panel/lecturers', 'ControlPanel\LecturerController');
 Route::resource('control-panel/courses', 'ControlPanel\CourseController');
 Route::resource('control-panel/exams', 'ControlPanel\ExamController');
 Route::resource('control-panel/questions', 'ControlPanel\QuestionController');
+Route::resource('control-panel/branches', 'ControlPanel\BranchController');
