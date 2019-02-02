@@ -12,7 +12,7 @@ class Question extends Model
 
     public function branches()
     {
-        return $this->hasMany("App\Models\Branch", "que_id");
+        return $this->hasMany("App\Models\Branch");
     }
 
     public function exam()

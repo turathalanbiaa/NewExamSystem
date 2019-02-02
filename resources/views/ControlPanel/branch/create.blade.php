@@ -6,7 +6,37 @@
 
 @section("content")
     <div class="container">
-        <div class="row justify-content-center">
+        <div class="row">
+            {{-- Info --}}
+            <div class="col-lg-4">
+                {{-- Branch Alert Info --}}
+                <div class="alert alert-info">
+                    <h5 class="text-center pb-2 border-bottom border-primary">بعض المعلومات عن اضافة نقطة</h5>
+                    <ul class="mb-0 pr-3">
+                        <li>
+                            <span>اذا كان نوع السؤال </span>
+                            <span class="font-weight-bold">صح او خطأ </span>
+                            <span>فهنا يمكنك اضافة عنوان (النص) النقطة واختيار الاجابة الصحيحة.</span>
+                        </li>
+
+                        <li>
+                            <span>اذا كان نوع السؤال </span>
+                            <span class="font-weight-bold">اخيارات </span>
+                            <span>فهنا يمكنك اضافة عنوان (النص) النقطة والاختيارات واختيار الاجابة الصحيحة، </span>
+                            <span class="font-weight-bold">علما ان اول ثلاث اختيارات مطلوبة.</span>
+                        </li>
+
+                        <li>
+                            <span>اذا كان نوع السؤال </span>
+                            <span class="font-weight-bold">فراغات او تعاريف او شرح الخ... </span>
+                            <span>فهنا يمكنك اضافة عنوان (النص) النقطة فقط، </span>
+                            <span class="font-weight-bold">علما انه يمكنك اضافة الاجابة الصحيحة لكي يتسنى لك الاستفادة منها عند التصحيح اليدوي.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            {{-- Create Branch --}}
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Card View --}}
@@ -46,7 +76,7 @@
                             <input type="hidden" name="question" value="{{$question->id}}">
 
                             <div class="mb-4">
-                                <label for="title">عنوان</label>
+                                <label for="title">عنوان (النص)</label>
                                 <input type="text" name="title" id="title" class="form-control" value="{{old("title")}}">
                             </div>
 
@@ -82,7 +112,7 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="option-4">الاختيار الرابع</label>
+                                            <label for="option-4">الاختيار الرابع (اختياري)</label>
                                             <input type="text" name="option-4" id="option-4" class="form-control" value="{{old("option-4")}}" data-action="change">
                                         </div>
                                     </div>
@@ -93,6 +123,20 @@
                                     <select class="browser-default custom-select" name="correctOption" id="correctOption">
                                         <option value="" disabled="" selected="">يرجى اختيار الاجابة الصحيحة</option>
                                     </select>
+                                </div>
+                            @endif
+
+                            @if($question->type == \App\Enums\QuestionType::FILL_BLANK)
+                                <div class="mb-4">
+                                    <label for="correctOption">الاجابة الصحيحة (اختياري)</label>
+                                    <input type="text" name="correctOption" id="correctOption" class="form-control" value="{{old("correctOption")}}">
+                                </div>
+                            @endif
+
+                            @if($question->type == \App\Enums\QuestionType::EXPLAIN)
+                                <div class="mb-4">
+                                    <label for="correctOption">الاجابة الصحيحة (اختياري)</label>
+                                    <textarea rows="5" name="correctOption" id="correctOption" class="form-control">{{old("correctOption")}}</textarea>
                                 </div>
                             @endif
 
@@ -109,22 +153,51 @@
 
 @section("script")
     <script>
-        // Tooltips Initialization
-        $('[rel="tooltip"]').tooltip();
+        $(document).ready(function () {
+            // Tooltips Initialization
+            $('[rel="tooltip"]').tooltip();
 
-        //Change Options
-        $("input[data-action='change']").change(function () {
-            let correctOptionSelect = $("select#correctOption");
-            let valueOption = $(this).attr("id");
-            let valueDisplay = $(this).val();
-            let newOption = '<option class="' + valueOption + '" value="' + valueOption + '">' + valueDisplay + '</option>';
-            if ($("select#correctOption > option."+valueOption+"").val() == valueOption)
-                $("select#correctOption > option."+valueOption+"").html(valueDisplay);
-            else
-                correctOptionSelect.append(newOption);
+            //Change Options
+            $("input[data-action='change']").change(function () {
+                insertOption($(this));
+            });
+
+            //Fill Select
+            for (let i=1;i<=4;i++)
+            {
+                let currentInput = $("input#option-"+i);
+                if (currentInput.val() != "")
+                    insertOption(currentInput);
+
+                //Selected Option
+                let selectOption = $("select#correctOption > option." + currentInput.attr("id"));
+                if (selectOption.val() == '{{old("correctOption")}}')
+                    selectOption.attr("selected", "selected")
+            }
+
+            //Insert Or Update Option
+            function insertOption(currentInput)
+            {
+                let select = $("select#correctOption");
+                let selectOption = $("select#correctOption > option." + currentInput.attr("id"));
+
+                //Update Option
+                if (selectOption.attr("class") === currentInput.attr("id"))
+                {
+                    //Delete Option
+                    if (currentInput.val() == "")
+                        selectOption.remove();
+
+                    //Update Option
+                    selectOption.html(currentInput.val());
+                }
+                //Create New Option
+                else
+                {
+                    let newOption = '<option class="' + currentInput.attr("id") + '" value="' + currentInput.attr("id") + '">' + currentInput.val() + '</option>';
+                    select.append(newOption);
+                }
+            }
         });
-
-        //Fill Correct Option Select
-
     </script>
 @endsection
