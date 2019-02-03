@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\EventLogType;
 use App\Enums\QuestionType;
 use App\Models\Branch;
+use App\Models\EventLog;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -54,6 +56,12 @@ class BranchController extends Controller
     {
         Auth::check();
         $question = Question::findOrFail(Input::get("question"));
+
+        if (count($question->branches) == $question->no_of_branch)
+            return redirect("control-panel/branches/create?question=$question->id")->with([
+                "CreateBranchMessage" => "تحذير، لا يمكنك اضافة نقطة الى السؤال الحالي.",
+                "TypeMessage" => "Error"
+            ]);
 
         switch ($question->type)
         {
@@ -114,6 +122,10 @@ class BranchController extends Controller
                 $options = null;
                 $correctOption = Input::get("correctOption", null);
                 break;
+
+            default:
+                $options = null;
+                $correctOption = null;
         }
 
         $branch = new Branch();
@@ -125,7 +137,21 @@ class BranchController extends Controller
         $branch->re_correct = 0; //Default 0
         $success = $branch->save();
 
-        dd("O.K.");
+        if (!$success)
+            return redirect("control-panel/branches/create?question=$question->id")->with([
+                "CreateBranchMessage" => "لم يتم اضافة النقطة الى السؤال بنجاح.",
+                "TypeMessage" => "Error"
+            ]);
+
+        //Store event log
+        $target = $branch->id;
+        $type = EventLogType::BRANCH;
+        $event = "اضافة نقطة الى السؤال - " . $question->title;
+        EventLog::create($target, $type, $event);
+
+        return redirect("control-panel/branches/create?question=$question->id")->with([
+            "CreateBranchMessage" => "تمت اضافة النقطة الى السؤال الحالي بنجاح."
+        ]);
     }
 
     /**

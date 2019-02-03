@@ -44,10 +44,10 @@
                         <h5 class="text-right text-white m-0">
                             <span>اضافة نقطه الى السؤال: </span>
                             <span>{{$question->title}}</span>
-                            <span class="badge badge-default float-left" rel="tooltip" title="عدد النقاط المرفوعه">
-                                <span>{{count($question->branches)}}</span>
+                            <span class="badge badge-default float-left">
+                                <span rel="tooltip" title="عدد النقاط المرفوعه">{{count($question->branches)}}</span>
                                 <span>/</span>
-                                <span>{{$question->no_of_branch}}</span>
+                                <span rel="tooltip" title="عدد النقاط المطلوبة">{{$question->no_of_branch}}</span>
                             </span>
                         </h5>
                     </div>
@@ -71,79 +71,86 @@
                     @endif
 
                     <div class="card-body px-4 border-bottom border-primary">
-                        <form method="post" action="/control-panel/branches">
-                            @csrf
-                            <input type="hidden" name="question" value="{{$question->id}}">
-
-                            <div class="mb-4">
-                                <label for="title">عنوان (النص)</label>
-                                <input type="text" name="title" id="title" class="form-control" value="{{old("title")}}">
+                        @if(count($question->branches) == $question->no_of_branch)
+                            <div class="text-center py-5">
+                                <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
+                                <h4>لا يمكنك اضافة نقطة الى السؤال الحالي لان عدد النقاط المرفوعة تساوي عدد النقاط المطلوبة</h4>
                             </div>
+                        @else
+                            <form method="post" action="/control-panel/branches">
+                                @csrf
+                                <input type="hidden" name="question" value="{{$question->id}}">
 
-                            @if($question->type == \App\Enums\QuestionType::TRUE_OR_FALSE)
-                                <div class="mb-5">
-                                    <label for="correctOption">اختر الاجابة الصحيحة</label>
-                                    <select class="browser-default custom-select" name="correctOption" id="correctOption">
-                                        <option value="" disabled="" selected="">يرجى اختيار الاجابة الصحيحة</option>
-                                        <option value="صح" {{(old("correctOption") == "صح" ? "selected":"")}}> صح </option>
-                                        <option value="خطأ" {{(old("correctOption") == "خطأ" ? "selected":"")}}> خطأ </option>
-                                    </select>
-                                </div>
-                            @endif
-
-                            @if($question->type == \App\Enums\QuestionType::SINGLE_CHOICE)
                                 <div class="mb-4">
-                                    <p class="font-weight-bold">الاختيارات</p>
+                                    <label for="title">عنوان (النص)</label>
+                                    <input type="text" name="title" id="title" class="form-control" value="{{old("title")}}">
+                                </div>
 
-                                    <div class="mr-3">
-                                        <div class="mb-3">
-                                            <label for="option-1">الاختيار الاول</label>
-                                            <input type="text" name="option-1" id="option-1" class="form-control" value="{{old("option-1")}}" data-action="change">
-                                        </div>
+                                @if($question->type == \App\Enums\QuestionType::TRUE_OR_FALSE)
+                                    <div class="mb-5">
+                                        <label for="correctOption">اختر الاجابة الصحيحة</label>
+                                        <select class="browser-default custom-select" name="correctOption" id="correctOption">
+                                            <option value="" disabled="" selected="">يرجى اختيار الاجابة الصحيحة</option>
+                                            <option value="صح" {{(old("correctOption") == "صح" ? "selected":"")}}> صح </option>
+                                            <option value="خطأ" {{(old("correctOption") == "خطأ" ? "selected":"")}}> خطأ </option>
+                                        </select>
+                                    </div>
+                                @endif
 
-                                        <div class="mb-3">
-                                            <label for="option-2">الاختيار الثاني</label>
-                                            <input type="text" name="option-2" id="option-2" class="form-control" value="{{old("option-2")}}" data-action="change">
-                                        </div>
+                                @if($question->type == \App\Enums\QuestionType::SINGLE_CHOICE)
+                                    <div class="mb-4">
+                                        <p class="font-weight-bold">الاختيارات</p>
 
-                                        <div class="mb-3">
-                                            <label for="option-3">الاختيار الثالث</label>
-                                            <input type="text" name="option-3" id="option-3" class="form-control" value="{{old("option-3")}}" data-action="change">
-                                        </div>
+                                        <div class="mr-3">
+                                            <div class="mb-3">
+                                                <label for="option-1">الاختيار الاول</label>
+                                                <input type="text" name="option-1" id="option-1" class="form-control" value="{{old("option-1")}}" data-action="change">
+                                            </div>
 
-                                        <div class="mb-3">
-                                            <label for="option-4">الاختيار الرابع (اختياري)</label>
-                                            <input type="text" name="option-4" id="option-4" class="form-control" value="{{old("option-4")}}" data-action="change">
+                                            <div class="mb-3">
+                                                <label for="option-2">الاختيار الثاني</label>
+                                                <input type="text" name="option-2" id="option-2" class="form-control" value="{{old("option-2")}}" data-action="change">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="option-3">الاختيار الثالث</label>
+                                                <input type="text" name="option-3" id="option-3" class="form-control" value="{{old("option-3")}}" data-action="change">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="option-4">الاختيار الرابع (اختياري)</label>
+                                                <input type="text" name="option-4" id="option-4" class="form-control" value="{{old("option-4")}}" data-action="change">
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="mb-5">
-                                    <label for="correctOption">اختر الاجابة الصحيحة</label>
-                                    <select class="browser-default custom-select" name="correctOption" id="correctOption">
-                                        <option value="" disabled="" selected="">يرجى اختيار الاجابة الصحيحة</option>
-                                    </select>
-                                </div>
-                            @endif
+                                    <div class="mb-5">
+                                        <label for="correctOption">اختر الاجابة الصحيحة</label>
+                                        <select class="browser-default custom-select" name="correctOption" id="correctOption">
+                                            <option value="" disabled="" selected="">يرجى اختيار الاجابة الصحيحة</option>
+                                        </select>
+                                    </div>
+                                @endif
 
-                            @if($question->type == \App\Enums\QuestionType::FILL_BLANK)
-                                <div class="mb-4">
-                                    <label for="correctOption">الاجابة الصحيحة (اختياري)</label>
-                                    <input type="text" name="correctOption" id="correctOption" class="form-control" value="{{old("correctOption")}}">
-                                </div>
-                            @endif
+                                @if($question->type == \App\Enums\QuestionType::FILL_BLANK)
+                                    <div class="mb-5">
+                                        <label for="correctOption">الاجابة الصحيحة (اختياري)</label>
+                                        <input type="text" name="correctOption" id="correctOption" class="form-control" value="{{old("correctOption")}}">
+                                    </div>
+                                @endif
 
-                            @if($question->type == \App\Enums\QuestionType::EXPLAIN)
-                                <div class="mb-4">
-                                    <label for="correctOption">الاجابة الصحيحة (اختياري)</label>
-                                    <textarea rows="5" name="correctOption" id="correctOption" class="form-control">{{old("correctOption")}}</textarea>
-                                </div>
-                            @endif
+                                @if($question->type == \App\Enums\QuestionType::EXPLAIN)
+                                    <div class="mb-5">
+                                        <label for="correctOption">الاجابة الصحيحة (اختياري)</label>
+                                        <textarea rows="5" name="correctOption" id="correctOption" class="form-control">{{old("correctOption")}}</textarea>
+                                    </div>
+                                @endif
 
-                            <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
-                                <span>حفظ المعلومات</span>
-                            </button>
-                        </form>
+                                <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
+                                    <span>حفظ المعلومات</span>
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             </div>

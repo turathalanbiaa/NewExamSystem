@@ -50,10 +50,11 @@
                         {{\App\Enums\Level::get($course->level)}}
                     </h5>
                 </div>
+
                 {{-- Exams --}}
                 <div class="col-12 collapse" id="course-exams-{{$course->id}}">
                     <div class="row">
-                        @foreach($course->exams as $exam)
+                        @forelse($course->exams as $exam)
                             <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
                                 {{-- Card Exam --}}
                                 <div class="card shadow h-100">
@@ -78,7 +79,7 @@
                                             @elseif($exam->state == \App\Enums\ExamState::OPEN)
                                                 <div class="list-group-item">
                                                     <span>الامتحان مفتوح حاليا</span>
-                                                    <button type="button" class="btn btn-danger btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="close" data-toggle="modal" data-target="#modelEndExamState">انهاء الامتحان</button>
+                                                    <button type="button" class="btn btn-danger btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="end" data-toggle="modal" data-target="#modelEndExamState">انهاء الامتحان</button>
                                                 </div>
                                             @else
                                                 <div class="list-group-item">
@@ -92,7 +93,13 @@
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                        @empty
+                            <div class="col-12">
+                                <div class="alert alert-info text-center">
+                                    <h4>هذه المادة لاتمتلك اي امتحان</h4>
+                                </div>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
             </div>
@@ -144,13 +151,13 @@
                 <div class="modal-body">
                     <div class="text-center">
                         <i class="fa fa-lock fa-4x mb-3 animated fadeIn"></i>
-                        <h2 class="text-danger">هل تريد غلق الامتحان</h2>
-                        <p>بعد غلق الامتحان، لا يستطيع الطالب الدخول الى القاعة الامتحانية والاجابة على الاسئلة.</p>
+                        <h2 class="text-danger">هل تريد انهاء الامتحان</h2>
+                        <p>بعد انهاء الامتحان، لا يستطيع الطالب الدخول الى القاعة الامتحانية والاجابة على الاسئلة.</p>
                     </div>
                 </div>
 
                 <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-danger" onclick="$('form#examState').submit();">غلق الامتحان</button>
+                    <button type="button" class="btn btn-danger" onclick="$('form#examState').submit();">انهاء الامتحان</button>
                     <button type="button" class="btn btn-outline-danger" data-dismiss="modal">لا شكرا</button>
                 </div>
             </div>
@@ -173,7 +180,7 @@
                     <div class="text-center">
                         <i class="fa fa-retweet fa-4x mb-3 animated fadeIn"></i>
                         <h2 class="text-warning">هل تريد اعادة فتح الامتحان</h2>
-                        <p>ستقوم باعادة فتح الامتحان بعد ان كان الامتحان مغلق لكي يستطيع الطالب الدخول الى القاعة الامتحانية والاجابة على الاسئلة.</p>
+                        <p>بعد اعادة فتح الامتحان يستطيع الطالب الدخول الى القاعة الامتحانية والاجابة على الاسئلة.</p>
                     </div>
                 </div>
 
@@ -229,30 +236,32 @@
 
 @section("script")
     <script>
-        //Fill Exam State Form And Model
-        $("[data-action='fillExamStateForm']").click(function () {
-            let examId = $(this).data("exam-id");
-            let examState = $(this).data("exam-state");
-            let examTitle = $(this).data("exam-title");
+        $(document).ready(function () {
+            //Fill Exam State Form And Model
+            $("[data-action='fillExamStateForm']").click(function () {
+                let examId = $(this).data("exam-id");
+                let examState = $(this).data("exam-state");
+                let examTitle = $(this).data("exam-title");
 
-            if (examState === "open")
-                $("#modelOpenExamState .heading.lead").html(examTitle);
-            else if (examState === "close")
-                $("#modelEndExamState .heading.lead").html(examTitle);
-            else if (examState ==="reopen")
-                $("#modelReopenExamState .heading.lead").html(examTitle);
+                if (examState === "open")
+                    $("#modelOpenExamState .heading.lead").html(examTitle);
+                else if (examState === "close")
+                    $("#modelEndExamState .heading.lead").html(examTitle);
+                else if (examState ==="reopen")
+                    $("#modelReopenExamState .heading.lead").html(examTitle);
 
-            $("form#examState").attr("action","/control-panel/exams/" + examId);
-            $("form#examState>input[name='state']").attr("value", examState);
-        });
+                $("form#examState").attr("action","/control-panel/exams/" + examId);
+                $("form#examState>input[name='state']").attr("value", examState);
+            });
 
-        //Fill Delete Exam Form And Model
-        $("[data-action='fillDeleteExamForm']").click(function () {
-            let examId = $(this).data("exam-id");
-            let examTitle = $(this).data("exam-title");
+            //Fill Delete Exam Form And Model
+            $("[data-action='fillDeleteExamForm']").click(function () {
+                let examId = $(this).data("exam-id");
+                let examTitle = $(this).data("exam-title");
 
-            $("form#deleteExam").attr("action","/control-panel/exams/" + examId);
-            $("#modelDeleteExam .heading.lead").html(examTitle);
+                $("form#deleteExam").attr("action","/control-panel/exams/" + examId);
+                $("#modelDeleteExam .heading.lead").html(examTitle);
+            });
         });
     </script>
 @endsection

@@ -16,32 +16,6 @@
 
             {{-- Info --}}
             <div class="col-lg-4">
-                {{-- Exam Alert Info --}}
-                <div class="alert alert-info">
-                    <h5 class="text-center pb-2 border-bottom border-primary">بعض المعلومات عن الامتحان</h5>
-                    <ul class="mb-0 pr-3">
-                        <li>
-                            <span>درجة الامتحان الحقيقية </span>
-                            <span class="badge badge-success"> {{$exam->real_mark}} </span>
-                            <span>.</span>
-                        </li>
-
-                        <li>
-                            <span>درجة الامتحان من </span>
-                            <span class="badge badge-success"> {{$exam->fake_mark}} </span>
-                            <span> والدرجة المتبقية </span>
-                            <span class="badge badge-danger"> {{$exam->fake_mark - $exam->questions()->sum("score")}} </span>
-                            <span>.</span>
-                        </li>
-
-                        <li>
-                            <span>عدد الاسئلة الموضوعة </span>
-                            <span class="badge badge-success"> {{count($exam->questions)}} </span>
-                            <span>.</span>
-                        </li>
-                    </ul>
-                </div>
-
                 {{-- Question Alert Info --}}
                 <div class="alert alert-info">
                     <h5 class="text-center pb-2 border-bottom border-primary">التعليمات حول اضافة السؤال</h5>
@@ -76,6 +50,41 @@
                         </li>
                     </ul>
                 </div>
+
+                {{-- Exam Alert Info --}}
+                <div class="alert alert-info">
+                    <h5 class="text-center pb-2 border-bottom border-primary">بعض المعلومات عن الامتحان</h5>
+                    <ul class="mb-0 pr-3">
+                        <li>
+                            <span>درجة الامتحان الحقيقية </span>
+                            <span class="badge badge-success"> {{$exam->real_score}} </span>
+                            <span>.</span>
+                        </li>
+
+                        <li>
+                            <span>درجة الامتحان من </span>
+                            <span class="badge badge-success"> {{$exam->fake_score}} </span>
+                            <span> والدرجة المتبقية </span>
+                            <span class="badge badge-danger"> {{$exam->fake_score - $exam->questions()->sum("score")}} </span>
+                            <span>.</span>
+                        </li>
+
+                        <li>
+                            <span>عدد الاسئلة الموضوعة </span>
+                            <span class="badge badge-success"> {{count($exam->questions)}} </span>
+                            <span>.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                {{-- Question Type Alert Info --}}
+                <div class="alert alert-info">
+                    <h5 class="text-center pb-2 border-bottom border-primary">التصحيح اليدوي والالكتروني</h5>
+                    <ul class="mb-0 pr-3">
+                        <li>يكون التصحيح الكتروني اذا كان نوع السؤال صح او خطأ او اختيارات.</li>
+                        <li>يكون التصحيح يدوي اذا كان نوع السؤال فراغات او تعاريف او شرح.</li>
+                    </ul>
+                </div>
             </div>
 
             {{-- Create Question --}}
@@ -99,17 +108,15 @@
 
                     {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
-                        @if(($exam->fake_mark - $exam->questions()->sum("score"))== 0)
+                        @if(($exam->fake_score - $exam->questions()->sum("score"))== 0)
                             <div class="text-center py-5">
                                 <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
-                                <h4 class="text-warning">
-                                    <span>لا يمكنك اضافة سؤال جديد لان </span>
-                                    <span class="font-weight-bold">درجة الامتحان المتبقية تساوي صفر</span>
-                                </h4>
+                                <h4>لا يمكنك اضافة سؤال جديد لان درجة الامتحان المتبقية تساوي صفر</h4>
                             </div>
                         @else
                             <form method="post" action="/control-panel/questions">
                                 @csrf
+                                <input type="hidden" name="exam" value="{{$exam->id}}">
 
                                 <div class="mb-4">
                                     <label for="title">عنوان</label>

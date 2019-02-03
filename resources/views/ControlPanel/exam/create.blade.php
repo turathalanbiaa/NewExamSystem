@@ -6,26 +6,30 @@
 
 @section("content")
     <div class="container">
-        <div class="row justify-content-center">
+        <div class="row">
+            {{-- Info --}}
+            <div class="col-lg-4">
+                {{-- Exam Alert Info --}}
+                <div class="alert alert-info">
+                    <h5 class="text-center pb-2 border-bottom border-primary">طريفة توزيع الدرجة حسب نوع الامتحان</h5>
+                    <ul class="mb-0 pr-3">
+                        <li>مجموع درجة امتحان الشهر الاول وامتحان الشهر الثاني يساوي (25) درجة.</li>
+                        <li>يمكنك وضع درجة امتحان الشهر الاول.</li>
+                        <li>لا يمكنك انشاء النموذج الامتحاني لشهر الثاني الا بعد انشاء النموذج الامتحاني لشهر الاول.</li>
+                        <li>لا يمكنك انشاء النموذج الامتحاني لشهر الثاني اذا كانت درجة امتحان الشهر الاول 25 درجة.</li>
+                        <li>
+                            <span>توضع درجة امتحان الشهر الثاني تلقائيا وذلك حسب المعادلة التالية،</span><br>
+                            <span class="font-weight-bold">درجة امتحان الشهر الثاني = 25 - درجة امتحان الشهر الاول</span>
+                        </li>
+                        <li>درجة الامتحان النهائي هي (60) درجة، سواء كان الامتحان النهائي دور اول او دور ثاني.</li>
+                        <li>لا يمكنك انشاء النموذج الامتحاني لنهائي الدور الثاني الا بعد انشاء النموذج الامتحاني لنهائي الدور الاول.</li>
+                    </ul>
+                </div>
+            </div>
+
+            {{-- Create Exam --}}
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
-                    {{-- Alert Info About Method of distribution Mark OF Exam --}}
-                    <div class="alert alert-info mx-4 mt-4">
-                        <h5 class="text-center pb-2 border-bottom border-primary">طريفة توزيع الدرجة حسب الامتحان</h5>
-                        <ul class="mb-0 pr-3">
-                            <li>مجموع درجة امتحان الشهر الاول وامتحان الشهر الثاني يساوي (25) درجة.</li>
-                            <li>يمكنك وضع درجة امتحان الشهر الاول.</li>
-                            <li>لا يمكنك انشاء النموذج الامتحاني لشهر الثاني الا بعد انشاء النموذج الامتحاني لشهر الاول.</li>
-                            <li>لا يمكنك انشاء النموذج الامتحاني لشهر الثاني اذا كانت درجة امتحان الشهر الاول 25 درجة.</li>
-                            <li>
-                                <span>توضع درجة امتحان الشهر الثاني تلقائيا وذلك حسب المعادلة التالية،</span><br>
-                                <span class="font-weight-bold">درجة امتحان الشهر الثاني = 25 - درجة امتحان الشهر الاول</span>
-                            </li>
-                            <li>درجة الامتحان النهائي هي (60) درجة، سواء كان الامتحان النهائي دور اول او دور ثاني.</li>
-                            <li>لا يمكنك انشاء النموذج الامتحاني لنهائي الدور الثاني الا بعد انشاء النموذج الامتحاني لنهائي الدور الاول.</li>
-                        </ul>
-                    </div>
-
                     {{-- Alert Errors --}}
                     @if ($errors->any())
                         <div class="alert alert-danger mx-4 mt-4">
@@ -44,6 +48,7 @@
                         </div>
                     @endif
 
+                    {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
                         <form method="post" action="/control-panel/exams">
                             @csrf
@@ -87,8 +92,8 @@
                             </div>
 
                             <div class="mb-4">
-                                <label for="mark">درجة الامتحان</label>
-                                <input type="number" name="mark" id="mark" class="form-control" value="{{old("mark", 0)}}">
+                                <label for="score">درجة الامتحان</label>
+                                <input type="number" name="score" id="score" class="form-control" value="{{old("score", 0)}}">
                             </div>
 
                             <div class="mb-5">
@@ -112,18 +117,11 @@
         $(document).ready(function(){
             $("select#type").change(function(){
                 if (($(this).val() == '{{\App\Enums\ExamType::FINAL_FIRST_ROLE}}') || ($(this).val() == '{{\App\Enums\ExamType::FINAL_SECOND_ROLE}}'))
-                {
-                    $("input#mark").val("60").attr("readonly","readonly");
-                }
+                    $("input#score").val("60").attr("readonly","readonly");
                 else if ($(this).val() == '{{\App\Enums\ExamType::SECOND_MONTH}}')
-                {
-                    $("input#mark").val("25").attr("readonly","readonly");
-                }
+                    $("input#score").val("25").attr("readonly","readonly");
                 else
-                {
-                    $("input#mark").val("0").removeAttr("readonly");
-                }
-
+                    $("input#score").val("0").removeAttr("readonly");
             });
         });
     </script>

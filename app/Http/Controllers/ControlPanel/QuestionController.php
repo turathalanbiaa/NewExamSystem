@@ -9,8 +9,6 @@ use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Route;
-use phpDocumentor\Reflection\Types\Self_;
 
 class QuestionController extends Controller
 {
@@ -33,8 +31,9 @@ class QuestionController extends Controller
     public function create(Request $request)
     {
         Auth::check();
+        $exam = Exam::findOrFail(Input::get("exam"));
         return view("ControlPanel.question.create")->with([
-            "exam" => self::getCurrentExam()
+            "exam" => $exam
         ]);
     }
 
@@ -48,8 +47,8 @@ class QuestionController extends Controller
     public function store(Request $request)
     {
         Auth::check();
-        $exam = self::getCurrentExam();
-        $remainingScore = $exam->fake_mark - $exam->questions()->sum("score");
+        $exam = Exam::findOrFail(Input::get("exam"));
+        $remainingScore = $exam->fake_score - $exam->questions()->sum("score");
         $noOfBranch = Input::get("noOfBranch");
         $this->validate($request, [
             'title'              => ['required'],
@@ -142,18 +141,5 @@ class QuestionController extends Controller
     public function destroy(Question $question)
     {
         //
-    }
-
-
-    /**
-     * Get current exam if exists
-     * Or redirect to index page of exams
-     */
-    private static function getCurrentExam()
-    {
-        if (session()->has("PreviousRequest") && session()->has("CurrentExam") && session()->get("PreviousRequest") == "control-panel/exams/" . session()->get("CurrentExam"))
-            return Exam::findOrFail(session()->get("CurrentExam"));
-        else
-            return abort(302, '', ['Location' => "/control-panel/exams"]);
     }
 }

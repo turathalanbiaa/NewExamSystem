@@ -10,12 +10,10 @@ use App\Enums\ExamType;
 use App\Models\Course;
 use App\Models\EventLog;
 use App\Models\Exam;
-use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 
 class ExamController extends Controller
@@ -59,7 +57,7 @@ class ExamController extends Controller
             'course' => ['required', Rule::in(self::getCoursesOpen()->pluck("id")->toArray())],
             'type'   => ['required', 'integer', 'between:1,4', Rule::notIn(self::getExamTypes(Input::get("course")))],
             'title'  => ['required'],
-            'mark'   => ['required', 'integer', ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
+            'score'   => ['required', 'integer', ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
             'date'   => ['required', 'date', 'after_or_equal:today']
         ], [
             'course.required'      => 'يرجى اختيار المادة',
@@ -69,18 +67,16 @@ class ExamController extends Controller
             'type.between'         => 'نوع الامتحان من 1 الى 4.',
             'type.not_in'          => 'تم انشاء هذا النموذج الامتحاني مسبقا، لهذه المادة في هذا النوع من الامتحان.',
             'title.required'       => 'يرجى ملىء عنوان الامتحان.',
-            'mark.required'        => 'يرجى ملىء درجة الامتحان.',
-            'mark.integer'         => 'درجة الامتحان غير مقبولة.',
-            'mark.between'         => ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'درجة الامتحان من 25.' : 'درجة الامتحان من 60.',
+            'score.required'       => 'يرجى ملىء درجة الامتحان.',
+            'score.integer'        => 'درجة الامتحان غير مقبولة.',
+            'score.between'        => ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'درجة الامتحان من 25.' : 'درجة الامتحان من 60.',
             'date.required'        => 'يرجى ملىء تاريخ الامتحان.',
             'date.date'            => 'تاريخ الامتحان غير مقبولة.',
             'date.after_or_equal'  => 'تاريخ الامتحان يجب ان يكون من اليوم فصاعدا.'
         ]);
 
-        /**
-         * Generate mark for exam.
-         */
-        $mark = Input::get("mark");
+        //Generate score for exam
+        $score = Input::get("score");
         if (Input::get("type") == ExamType::SECOND_MONTH)
         {
             $firstMonth = Exam::where("course_id", Input::get("course"))
@@ -92,12 +88,12 @@ class ExamController extends Controller
                     "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لشهر الثاني الا بعد انشاء النموذج الامتحاني لشهر الاول."
                 ]);
 
-            if ($firstMonth->real_mark == 25)
+            if ($firstMonth->real_score == 25)
                 return redirect("/control-panel/exams/create")->with([
                     "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لشهر الثاني لان درجة امتحان الشهر الاول 25 درجة."
                 ]);
 
-            $mark = 25 - $firstMonth->real_mark;
+            $score = 25 - $firstMonth->real_score;
         }
 
         if (Input::get("type") == ExamType::FINAL_SECOND_ROLE)
@@ -112,13 +108,14 @@ class ExamController extends Controller
                 ]);
         }
 
+        //Add new Exam
         $exam = new Exam();
         $exam->title = Input::get("title");
         $exam->course_id = Input::get("course");
         $exam->type = Input::get("type");
         $exam->state = ExamState::CLOSE;
-        $exam->real_mark = $mark;
-        $exam->fake_mark = 100; //Default Value 100
+        $exam->real_score = $score;
+        $exam->fake_score = 100; //Default Value 100
         $exam->curve = 0;       //Default Value 0
         $exam->date = Input::get("date");
         $success = $exam->save();
@@ -129,9 +126,7 @@ class ExamController extends Controller
                 "TypeMessage" => "Error"
             ]);
 
-        /**
-         * Keep event log.
-         */
+        //Store event log
         $target = $exam->id;
         $type = EventLogType::EXAM;
         $event = "انشاء نموذج امتحاني - " . $exam->title;
@@ -153,11 +148,6 @@ class ExamController extends Controller
     {
         Auth::check();
         self::watchExam($exam);
-
-        session()->put('PreviousRequest', $request->path());
-        session()->put("CurrentExam", $exam->id);
-        session()->save();
-
         return view("ControlPanel.exam.show")->with([
             "exam" => $exam
         ]);
@@ -174,7 +164,7 @@ class ExamController extends Controller
         Auth::check();
         self::watchExam($exam);
         return view("ControlPanel.exam.edit")->with([
-            "exam"    => $exam
+            "exam" => $exam
         ]);
     }
 
@@ -191,9 +181,7 @@ class ExamController extends Controller
         Auth::check();
         self::watchExam($exam);
 
-        /**
-         * Update state for exam
-         */
+        //Update state for exam
         if (Input::get("state"))
         {
             switch (Input::get("state"))
@@ -223,9 +211,7 @@ class ExamController extends Controller
                     "TypeMessage" => "Error"
                 ]);
 
-            /**
-             * Keep event log
-             */
+            //Store event log
             $target = $exam->id;
             $type = EventLogType::EXAM;
             EventLog::create($target, $type, $event);
@@ -235,40 +221,36 @@ class ExamController extends Controller
             ]);
         }
 
-        /**
-         * General Update
-         */
+        //General Update
         $this->validate($request, [
-            'title'  => ['required'],
-            'mark'   => ['required', 'integer', (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
-            'date'   => ['required', 'date']
+            'title' => ['required'],
+            'score' => ['required', 'integer', (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
+            'date'  => ['required', 'date']
         ], [
-            'title.required'       => 'يرجى ملىء عنوان الامتحان.',
-            'mark.required'        => 'يرجى ملىء درجة الامتحان.',
-            'mark.integer'         => 'درجة الامتحان غير مقبولة.',
-            'mark.between'         => (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'درجة الامتحان من 25.' : 'درجة الامتحان من 60.',
-            'date.required'        => 'يرجى ملىء تاريخ الامتحان.',
-            'date.date'            => 'تاريخ الامتحان غير مقبولة.',
+            'title.required' => 'يرجى ملىء عنوان الامتحان.',
+            'score.required' => 'يرجى ملىء درجة الامتحان.',
+            'score.integer'  => 'درجة الامتحان غير مقبولة.',
+            'score.between'  => (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'درجة الامتحان من 25.' : 'درجة الامتحان من 60.',
+            'date.required'  => 'يرجى ملىء تاريخ الامتحان.',
+            'date.date'      => 'تاريخ الامتحان غير مقبولة.',
         ]);
 
-        /**
-         * Update mark for exam
-         */
-        $mark = Input::get("mark");
+        //Update exam
+        $score = Input::get("score");
         if ($exam->type == ExamType::FIRST_MONTH)
         {
             $secondMonthExam = Exam::where("course_id", $exam->course_id)
                 ->where("type", ExamType::SECOND_MONTH)
                 ->first();
 
-            if (($mark == 25) && ($secondMonthExam))
+            if (($score == 25) && ($secondMonthExam))
                 redirect("/control-panel/exams/$exam->id/edit")->with([
                     "UpdateExamMessage" => "لا يمكنك وضع (25 درجة) لامتحان الشهر الاول  لهذه المادة لانها تملك امتحان شهر ثاني."
                 ]);
 
             if ($secondMonthExam)
             {
-                $secondMonthExam->real_mark = 25 - $mark;
+                $secondMonthExam->real_score = 25 - $score;
                 $secondMonthExam->save();
             }
         }
@@ -279,17 +261,17 @@ class ExamController extends Controller
                 ->where("type", ExamType::FIRST_MONTH)
                 ->first();
 
-            if ($mark == 25)
+            if ($score == 25)
                 redirect("/control-panel/exams/$exam->id/edit")->with([
                     "UpdateExamMessage" => "لا يمكنك وضع (25 درجة) لامتحان الشهر الثاني."
                 ]);
 
-            $firstMonthExam->real_mark = 25 - $mark;
+            $firstMonthExam->real_score = 25 - $score;
             $firstMonthExam->save();
         }
 
         $exam->title = Input::get("title");
-        $exam->real_mark = $mark;
+        $exam->real_mark = $score;
         $exam->date = Input::get("date");
         $success = $exam->save();
 
@@ -298,9 +280,7 @@ class ExamController extends Controller
                 "UpdateExamMessage" => "لم يتم نعديل النموذج الامتحاني - " . $exam->title
             ]);
 
-        /**
-         * Keep event log
-         */
+        //Store event log
         $target = $exam->id;
         $type = EventLogType::EXAM;
         $event = "تعديل النموذج الامتحاني " . $exam->title;
