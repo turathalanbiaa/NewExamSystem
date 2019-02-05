@@ -51,6 +51,31 @@
                     </ul>
                 </div>
 
+                {{-- Question With One Branch Alert Info --}}
+                <div class="alert alert-info">
+                    <h5 class="text-center pb-2 border-bottom border-primary">اضافة سؤال يحتوي على نقطة واحدة</h5>
+                    <ul class="mb-0 pr-3">
+                        <li>
+                            <span>مثلاً السؤال: </span>
+                            <span class="font-weight-bold">ما الفرق بين اصول الدين وفروع الدين؟</span>
+                        </li>
+                        <li>فيمكنك ذلك عن طريق اتباع الخطوات التالية.</li>
+                        <ul class="pr-2">
+                            <li>
+                                <span>اضافة </span>
+                                <span class="font-weight-bold">ما الفرق بين </span>
+                                <span>في عنوان السؤال.</span>
+                            </li>
+
+                            <li>
+                                <span>اضافة </span>
+                                <span class="font-weight-bold">اصول الدين وفروع الدين؟ </span>
+                                <span>في عنوان النقطة.</span>
+                            </li>
+                        </ul>
+                    </ul>
+                </div>
+
                 {{-- Exam Alert Info --}}
                 <div class="alert alert-info">
                     <h5 class="text-center pb-2 border-bottom border-primary">بعض المعلومات عن الامتحان</h5>

@@ -45,7 +45,7 @@
                             <span>اضافة نقطه الى السؤال: </span>
                             <span>{{$question->title}}</span>
                             <span class="badge badge-default float-left">
-                                <span rel="tooltip" title="عدد النقاط المرفوعه">{{count($question->branches)}}</span>
+                                <span rel="tooltip" title="عدد النقاط المرفوعه">{{$question->branches->count()}}</span>
                                 <span>/</span>
                                 <span rel="tooltip" title="عدد النقاط المطلوبة">{{$question->no_of_branch}}</span>
                             </span>
@@ -65,13 +65,14 @@
 
                     {{-- Session Create Branch Message --}}
                     @if (session('CreateBranchMessage'))
-                        <div class="alert {{(session('TypeMessage') == "Error" ? "alert-danger":"alert-success")}} text-center mx-4 mt-4">
+                        <div class="alert alert-success text-center mx-4 mt-4">
                             {{session('CreateBranchMessage')}}
                         </div>
                     @endif
 
+                    {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
-                        @if(count($question->branches) == $question->no_of_branch)
+                        @if($question->branches->count() == $question->no_of_branch)
                             <div class="text-center py-5">
                                 <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
                                 <h4>لا يمكنك اضافة نقطة الى السؤال الحالي لان عدد النقاط المرفوعة تساوي عدد النقاط المطلوبة</h4>

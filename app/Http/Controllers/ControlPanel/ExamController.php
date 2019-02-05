@@ -187,6 +187,7 @@ class ExamController extends Controller
             switch (Input::get("state"))
             {
                 case "open":
+//                    $exam->questions()->sum("score");
                     $exam->state = ExamState::OPEN;
                     $event = "فتح النموذج الامتحاني - " . $exam->title;
                     break;
@@ -221,7 +222,30 @@ class ExamController extends Controller
             ]);
         }
 
-        //General Update
+        //Update curve for exam
+        if (Input::get("curve"))
+        {
+            $exam->curve = (Input::get("curve") > 10) ? 10:Input::get("curve");
+            $success = $exam->save();
+
+            if (!$success)
+                return redirect("/control-panel/exams/$exam->id")->with([
+                    "UpdateExamCurveMessage" => "لم يتم اضافة الكيرف للامتحان الحالي",
+                    "TypeMessage"       => "Error"
+                ]);
+
+            //Store event log
+            $target = $exam->id;
+            $type = EventLogType::EXAM;
+            $event = "اضافة كيرف لامتحان - " . $exam->title;
+            EventLog::create($target, $type, $event);
+
+            return redirect("/control-panel/exams/$exam->id")->with([
+                "UpdateExamCurveMessage" => "تم اضافة الكيرف للامتحان الحالي"
+            ]);
+        }
+
+        //General update for exam
         $this->validate($request, [
             'title' => ['required'],
             'score' => ['required', 'integer', (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
@@ -235,7 +259,6 @@ class ExamController extends Controller
             'date.date'      => 'تاريخ الامتحان غير مقبولة.',
         ]);
 
-        //Update exam
         $score = Input::get("score");
         if ($exam->type == ExamType::FIRST_MONTH)
         {
@@ -271,7 +294,7 @@ class ExamController extends Controller
         }
 
         $exam->title = Input::get("title");
-        $exam->real_mark = $score;
+        $exam->real_score = $score;
         $exam->date = Input::get("date");
         $success = $exam->save();
 
@@ -287,7 +310,7 @@ class ExamController extends Controller
         EventLog::create($target, $type, $event);
 
         return redirect("/control-panel/exams")->with([
-            "UpdateExamMessage" => "تم تعديل النموذج الامتحاني - " . $exam->title
+            "UpdateExamMessage" => "تم تعديل النموذج الامتحاني " . $exam->title
         ]);
     }
 
@@ -323,7 +346,7 @@ class ExamController extends Controller
      *
      * @param $exam
      */
-    private static function watchExam($exam)
+    public static function watchExam($exam)
     {
         if(!in_array($exam->course_id, self::getCoursesOpen()->pluck("id")->toArray()))
             abort(404);

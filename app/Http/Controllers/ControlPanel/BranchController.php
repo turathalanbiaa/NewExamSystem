@@ -21,14 +21,7 @@ class BranchController extends Controller
      */
     public function index()
     {
-        Auth::check();
-        $currentQuestion = Question::findOrFail(Input::get("question"));
-        $questions = Question::where("exam_id",$currentQuestion->exam_id)
-            ->get();
-        return view("ControlPanel.branch.index")->with([
-            "currentQuestion" => $currentQuestion,
-            "questions" => $questions
-        ]);
+     //
     }
 
     /**
@@ -40,6 +33,7 @@ class BranchController extends Controller
     {
         Auth::check();
         $question = Question::findOrFail(Input::get("question"));
+        ExamController::watchExam($question->exam);
         return view("ControlPanel.branch.create")->with([
             "question" => $question
         ]);
@@ -56,8 +50,8 @@ class BranchController extends Controller
     {
         Auth::check();
         $question = Question::findOrFail(Input::get("question"));
-
-        if (count($question->branches) == $question->no_of_branch)
+        ExamController::watchExam($question->exam);
+        if ($question->branches->count() == $question->no_of_branch)
             return redirect("control-panel/branches/create?question=$question->id")->with([
                 "CreateBranchMessage" => "تحذير، لا يمكنك اضافة نقطة الى السؤال الحالي.",
                 "TypeMessage" => "Error"
@@ -149,9 +143,14 @@ class BranchController extends Controller
         $event = "اضافة نقطة الى السؤال - " . $question->title;
         EventLog::create($target, $type, $event);
 
-        return redirect("control-panel/branches/create?question=$question->id")->with([
-            "CreateBranchMessage" => "تمت اضافة النقطة الى السؤال الحالي بنجاح."
-        ]);
+        if (($question->branches()->count()+1) == $question->no_of_branch)
+            return redirect("control-panel/questions/$question->id")->with([
+                "CreateBranchMessage" => "تمت اضافة جميع النقاط الى السؤال الحالي بنجاح."
+            ]);
+        else
+            return redirect("control-panel/branches/create?question=$question->id")->with([
+                "CreateBranchMessage" => "تمت اضافة النقطة الى السؤال الحالي بنجاح."
+            ]);
     }
 
     /**

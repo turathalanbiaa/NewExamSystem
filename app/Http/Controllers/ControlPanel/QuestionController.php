@@ -32,6 +32,7 @@ class QuestionController extends Controller
     {
         Auth::check();
         $exam = Exam::findOrFail(Input::get("exam"));
+        ExamController::watchExam($exam);
         return view("ControlPanel.question.create")->with([
             "exam" => $exam
         ]);
@@ -48,6 +49,7 @@ class QuestionController extends Controller
     {
         Auth::check();
         $exam = Exam::findOrFail(Input::get("exam"));
+        ExamController::watchExam($exam);
         $remainingScore = $exam->fake_score - $exam->questions()->sum("score");
         $noOfBranch = Input::get("noOfBranch");
         $this->validate($request, [
@@ -93,7 +95,7 @@ class QuestionController extends Controller
         $event = "اضافة سؤال لامتحان - " . $exam->title;
         EventLog::create($target, $type, $event);
 
-        return redirect("control-panel/branches?question=$question->id")->with([
+        return redirect("control-panel/questions/$question->id")->with([
             "CreateQuestionMessage" => "تمت اضافة السؤال بنجاح."
         ]);
     }
@@ -106,7 +108,11 @@ class QuestionController extends Controller
      */
     public function show(Question $question)
     {
-        //
+        Auth::check();
+        ExamController::watchExam($question->exam);
+        return view("ControlPanel.question.show")->with([
+            "currentQuestion" => $question
+        ]);
     }
 
     /**
