@@ -187,7 +187,6 @@ class ExamController extends Controller
             switch (Input::get("state"))
             {
                 case "open":
-//                    $exam->questions()->sum("score");
                     $exam->state = ExamState::OPEN;
                     $event = "فتح النموذج الامتحاني - " . $exam->title;
                     break;

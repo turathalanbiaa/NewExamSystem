@@ -172,7 +172,7 @@ class BranchController extends Controller
      */
     public function edit(Branch $branch)
     {
-        //
+        dd("Edit");
     }
 
     /**

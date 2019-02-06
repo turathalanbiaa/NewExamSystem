@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ControlPanel;
 
 use App\Enums\EventLogType;
+use App\Enums\ExamState;
 use App\Models\EventLog;
 use App\Models\Exam;
 use App\Models\Question;
@@ -123,19 +124,62 @@ class QuestionController extends Controller
      */
     public function edit(Question $question)
     {
-        //
+        Auth::check();
+        $exam = $question->exam;
+        ExamController::watchExam($exam);
+        return view("ControlPanel.question.edit")->with([
+            "exam"     => $exam,
+            "question" => $question
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Question  $question
+     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Models\Question $question
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function update(Request $request, Question $question)
     {
-        //
+        Auth::check();
+        $exam = $question->exam;
+        ExamController::watchExam($exam);
+        $remainingScore = $exam->fake_score - $exam->questions()->sum("score") + $question->score;
+        $noOfBranch = Input::get("noOfBranch");
+
+        if ($exam->state == ExamState::CLOSE)
+        {
+            $this->validate($request, [
+                'title'              => ['required'],
+                'score'              => ['required', 'integer', "between:1,$remainingScore"],
+                'noOfBranch'         => ['required', 'integer', 'min:1'],
+                'noOfBranchRequired' => ($noOfBranch >= 1)? "required|integer|min:1|between:1,$noOfBranch":"",
+            ], [
+                'title.required'              => 'يرجى ملئ عنوان السؤال.',
+                'score.required'              => 'يرجى وضع درجة السؤال',
+                'score.integer'               => 'درجة السؤال غير مقبولة.',
+                'score.between'               => 'درجة السؤال اكبر من صفر واقل من درجة الامتحان المتبقية.',
+                'noOfBranch.required'         => 'يرجى ذكر عدد النقاط.',
+                'noOfBranch.integer'          => 'عدد النقاط غير مقبول.',
+                'noOfBranch.min'              => 'يجب ان يحتوي السؤال على نقطة واحدة على الاقل.',
+                'noOfBranchRequired.required' => 'يرجى ذكر عدد النقاط المطلوبة.',
+                'noOfBranchRequired.integer'  => 'عدد النقاط المطلوبة غير مقبول.',
+                'noOfBranchRequired.min'      => 'يجب ان يحتوي السؤال على نقطة واحدة مطلوبة على الاقل.',
+                'noOfBranchRequired.between'  => 'يجب ان تكون عدد النقاط المطلوبة اقل من او تساوي عدد النقاط.',
+            ]);
+
+
+        }
+        elseif ($exam->state == ExamState::OPEN)
+        {
+
+        }
+        else
+        {
+
+        }
     }
 
     /**

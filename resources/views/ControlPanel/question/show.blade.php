@@ -67,7 +67,14 @@
                 <div class="card">
                     {{-- Card View --}}
                     <div class="view shadow mdb-color px-3 py-3">
-                        <h5 class="text-center text-white m-0">السؤال الحالي</h5>
+                        <h5 class="text-center text-white m-0">
+                            <span>السؤال الحالي</span>
+                            <span class="badge badge-default float-left">
+                                <span rel="tooltip" title="عدد النقاط المطلوبة">{{$currentQuestion->no_of_branch_req}}</span>
+                                <span>/</span>
+                                <span rel="tooltip" title="عدد النقاط">{{$currentQuestion->no_of_branch}}</span>
+                            </span>
+                        </h5>
                     </div>
 
                     {{-- Card Body --}}
@@ -75,7 +82,7 @@
                         {{-- Title --}}
                         <h5>
                             {{$currentQuestion->title}}
-                            <span class="float-left">{{"( " . $question->score . " درجة" . " )"}}</span>
+                            <span class="float-left">{{"( " . $currentQuestion->score . " درجة" . " )"}}</span>
                         </h5>
 
                         {{-- Branches --}}
@@ -83,20 +90,38 @@
                             @if ($loop->first)
                                 <ol>
                                     @endif
-                                    <li>{{$branch->title}}</li>
-                                    @if($currentQuestion->type == \App\Enums\QuestionType::SINGLE_CHOICE)
-                                        @foreach(json_decode($branch->options) as $option)
-                                            @if($loop->first)
-                                                {{"( " . $option . " ، "}}
-                                                @continue
-                                            @endif
-                                            @if($loop->last)
-                                                {{$option . " )."}}
-                                                @break
-                                            @endif
-                                            {{$option . " ، "}}
-                                        @endforeach
-                                    @endif
+                                    {{-- Branch --}}
+                                    <li class="mb-3">
+                                        {{-- Title --}}
+                                        <span>{{$branch->title}}</span>
+                                        <span class="mr-2">
+                                            <a href="/control-panel/branches/{{$branch->id}}/edit" class="text-decoration text-default ml-1" rel="tooltip" title="تحرير النقطة">تحرير</a>
+                                            <a href="#delete-branch" class="text-decoration text-default mr-1" rel="tooltip" title="حذف النقطة">حذف</a>
+                                        </span><br>
+
+                                        {{-- Options --}}
+                                        @if($currentQuestion->type == \App\Enums\QuestionType::SINGLE_CHOICE)
+                                            <span>
+                                                @foreach(json_decode($branch->options) as $option)
+                                                    @if($loop->first)
+                                                        {{"( " . $option . " ، "}}
+                                                        @continue
+                                                    @endif
+                                                    @if($loop->last)
+                                                        {{$option . " )."}}
+                                                        @break
+                                                    @endif
+                                                    {{$option . " ، "}}
+                                                @endforeach
+                                            </span><br>
+                                        @endif
+
+                                        {{-- Correct Option --}}
+                                        <span>
+                                            <span class="text-danger">الجواب: </span>
+                                            {{(!is_null($branch->correct_option)?$branch->correct_option:"لا يوجد جواب") . "."}}
+                                        </span>
+                                    </li>
                                     @if ($loop->last)
                                         @if(count($currentQuestion->branches) != $currentQuestion->no_of_branch)
                                             <div class="alert alert-info text-center mt-2">
@@ -116,11 +141,11 @@
                             <i class="fa fa-plus ml-1"></i>
                             <span>اضافة سؤال</span>
                         </a>
-                        <a class="btn btn-outline-warning font-weight-bold" href="/control-panel/questions">
+                        <a class="btn btn-outline-warning font-weight-bold" href="/control-panel/questions/{{$currentQuestion->id}}/edit">
                             <i class="fa fa-edit ml-1"></i>
                             <span>تعديل السؤال</span>
                         </a>
-                        <a class="btn btn-outline-danger font-weight-bold" href="/control-panel/questions">
+                        <a class="btn btn-outline-danger font-weight-bold" href="#delete-question">
                             <i class="fa fa-trash ml-1"></i>
                             <span>حذف السؤال</span>
                         </a>
@@ -129,4 +154,13 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section("script")
+    <script>
+        $(document).ready(function () {
+            // Tooltips Initialization
+            $('[rel="tooltip"]').tooltip()
+        });
+    </script>
 @endsection
