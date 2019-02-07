@@ -7,10 +7,10 @@
 @section("content")
     <div class="container">
         <div class="row">
-            {{-- Heading --}}
+            {{-- Exam --}}
             <div class="col-12">
                 <div class="view shadow mdb-color px-3 py-4 mb-3">
-                    <h5 class="text-center text-white m-0">{{$exam->title}}</h5>
+                    <a class="h5 d-block text-center text-white m-0" href="/control-panel/exams/{{$exam->id}}">{{$exam->title}}</a>
                 </div>
             </div>
 

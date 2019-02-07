@@ -4,11 +4,15 @@ namespace App\Http\Controllers\ControlPanel;
 
 use App\Enums\EventLogType;
 use App\Enums\ExamState;
+use App\Models\Answer;
+use App\Models\Branch;
 use App\Models\EventLog;
 use App\Models\Exam;
+use App\Models\Marking;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 
 class QuestionController extends Controller
@@ -147,10 +151,10 @@ class QuestionController extends Controller
         $exam = $question->exam;
         ExamController::watchExam($exam);
         $remainingScore = $exam->fake_score - $exam->questions()->sum("score") + $question->score;
-        $noOfBranch = Input::get("noOfBranch");
 
         if ($exam->state == ExamState::CLOSE)
         {
+            $noOfBranch = Input::get("noOfBranch");
             $this->validate($request, [
                 'title'              => ['required'],
                 'score'              => ['required', 'integer', "between:1,$remainingScore"],
@@ -170,15 +174,84 @@ class QuestionController extends Controller
                 'noOfBranchRequired.between'  => 'يجب ان تكون عدد النقاط المطلوبة اقل من او تساوي عدد النقاط.',
             ]);
 
+            $exception = DB::transaction(function () use ($question) {
+                //Update question
+                $question->title = Input::get("title");
+                $question->score = Input::get("score");
+                $question->no_of_branch = Input::get("noOfBranch");
+                $question->no_of_branch_req = Input::get("noOfBranchRequired");
+                $question->save();
 
+                //Update branches score
+                Branch::where('question_id', $question->id)
+                    ->update(array('score' => ($question->score / $question->no_of_branch_req)));
+
+                //Store event log
+                $target = $question->id;
+                $type = EventLogType::QUESTION;
+                $event = "تعديل السؤال - " . $question->title . " والامتحان مغلق";
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("control-panel/questions/$question->id")->with([
+                    "UpdateQuestionMessage" => "تم تعديل السؤال الحالي."
+                ]);
+            else
+                return redirect("control-panel/questions/$question->id/edit")->with([
+                    "UpdateQuestionMessage" => "لم يتم تعديل السؤال الحالي."
+                ]);
         }
         elseif ($exam->state == ExamState::OPEN)
         {
-
+            return redirect("control-panel/questions/$question->id/edit")->with([
+                "UpdateQuestionMessage" => "لا يمكنك تعديل السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح."
+            ]);
         }
         else
         {
+            $noOfBranch = $question->no_of_branch;
+            $this->validate($request, [
+                'title'              => ['required'],
+                'score'              => ['required', 'integer', "between:1,$remainingScore"],
+                'noOfBranchRequired' => ($noOfBranch >= 1)? "required|integer|min:1|between:1,$noOfBranch":"",
+            ], [
+                'title.required'              => 'يرجى ملئ عنوان السؤال.',
+                'score.required'              => 'يرجى وضع درجة السؤال',
+                'score.integer'               => 'درجة السؤال غير مقبولة.',
+                'score.between'               => 'درجة السؤال اكبر من صفر واقل من درجة الامتحان المتبقية.',
+                'noOfBranchRequired.required' => 'يرجى ذكر عدد النقاط المطلوبة.',
+                'noOfBranchRequired.integer'  => 'عدد النقاط المطلوبة غير مقبول.',
+                'noOfBranchRequired.min'      => 'يجب ان يحتوي السؤال على نقطة واحدة مطلوبة على الاقل.',
+                'noOfBranchRequired.between'  => 'يجب ان تكون عدد النقاط المطلوبة اقل من او تساوي عدد النقاط.',
+            ]);
 
+            $exception = DB::transaction(function () use ($question) {
+                //Update question
+                $question->title = Input::get("title");
+                $question->score = Input::get("score");
+                $question->no_of_branch_req = Input::get("noOfBranchRequired");
+                $question->save();
+
+                //Update branches score
+                Branch::where('question_id', $question->id)
+                    ->update(array('score' => ($question->score / $question->no_of_branch_req)));
+
+                //Store event log
+                $target = $question->id;
+                $type = EventLogType::QUESTION;
+                $event = "تعديل السؤال - " . $question->title . " والامتحان منتهي";
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("control-panel/questions/$question->id")->with([
+                    "UpdateQuestionMessage" => "تم تعديل السؤال الحالي."
+                ]);
+            else
+                return redirect("control-panel/questions/$question->id/edit")->with([
+                    "UpdateQuestionMessage" => "لم يتم تعديل السؤال الحالي."
+                ]);
         }
     }
 
@@ -190,6 +263,77 @@ class QuestionController extends Controller
      */
     public function destroy(Question $question)
     {
-        //
+        Auth::check();
+        $exam = $question->exam;
+        ExamController::watchExam($exam);
+
+        if ($exam->state == ExamState::CLOSE)
+        {
+            $exception = DB::transaction(function () use ($question) {
+                //Delete branches
+                Branch::where('question_id', $question->id)
+                    ->delete();
+
+                //Delete question
+                $question->delete();
+
+                //Store event log
+                $target = $question->id;
+                $type = EventLogType::QUESTION;
+                $event = "حذف السؤال - " . $question->title . " والامتحان مغلق";
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("/control-panel/exams/$exam->id")->with([
+                    "DeleteQuestionMessage" => "تم حذف السؤال."
+                ]);
+            else
+                return redirect("/control-panel/questions/$question->id")->with([
+                    "DeleteQuestionMessage" => "لم يتم حذف السؤال."
+                ]);
+        }
+        elseif ($exam->state == ExamState::OPEN)
+        {
+            return redirect("/control-panel/questions/$question->id")->with([
+                "DeleteQuestionMessage" => "لا يمكنك حذف السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح."
+            ]);
+        }
+        else
+        {
+            $exception = DB::transaction(function () use ($question) {
+                $branchesIds = $question->branches()->pluck("id")->toArray();
+
+                //Delete marking for each branch
+                Marking::whereIn("branch_id", $branchesIds)
+                    ->delete();
+
+                //Delete answer for each branch
+                Answer::whereIn("branch_id", $branchesIds)
+                    ->delete();
+
+                //Delete branches
+                Branch::where('question_id', $question->id)
+                    ->delete();
+
+                //Delete question
+                $question->delete();
+
+                //Store event log
+                $target = $question->id;
+                $type = EventLogType::QUESTION;
+                $event = "حذف السؤال - " . $question->title . " والامتحان منتهي";
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("/control-panel/exams/$exam->id")->with([
+                    "DeleteQuestionMessage" => "تم حذف السؤال."
+                ]);
+            else
+                return redirect("/control-panel/questions/$question->id")->with([
+                    "DeleteQuestionMessage" => "لم يتم حذف السؤال."
+                ]);
+        }
     }
 }

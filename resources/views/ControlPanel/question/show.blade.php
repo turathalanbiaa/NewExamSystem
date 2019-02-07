@@ -6,6 +6,28 @@
 
 @section("content")
     <div class="container">
+        {{-- Session Update Question Message --}}
+        @if (session('UpdateQuestionMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-success text-center">
+                        {{session('UpdateQuestionMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Session Delete Question Message --}}
+        @if (session('DeleteQuestionMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger text-center">
+                        {{session('DeleteQuestionMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Session Create Branch Message --}}
         @if (session('CreateBranchMessage'))
             <div class="row">
@@ -28,6 +50,13 @@
         </div>
 
         <div class="row">
+            {{-- Exam --}}
+            <div class="col-12">
+                <div class="view shadow mdb-color px-3 py-4 mb-3">
+                    <a class="h5 text-center text-white d-block m-0" href="/control-panel/exams/{{$currentQuestion->exam->id}}">{{$currentQuestion->exam->title}}</a>
+                </div>
+            </div>
+
             {{-- Questions --}}
             <div class="col-lg-4">
                 <div class="row">
@@ -66,7 +95,7 @@
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Card View --}}
-                    <div class="view shadow mdb-color px-3 py-3">
+                    <div class="view shadow mdb-color px-3 py-4">
                         <h5 class="text-center text-white m-0">
                             <span>السؤال الحالي</span>
                             <span class="badge badge-default float-left">
@@ -143,9 +172,9 @@
                         </a>
                         <a class="btn btn-outline-warning font-weight-bold" href="/control-panel/questions/{{$currentQuestion->id}}/edit">
                             <i class="fa fa-edit ml-1"></i>
-                            <span>تعديل السؤال</span>
+                            <span>تحرير السؤال</span>
                         </a>
-                        <a class="btn btn-outline-danger font-weight-bold" href="#delete-question">
+                        <a class="btn btn-outline-danger font-weight-bold" href="#modelDeleteQuestion" data-toggle="modal">
                             <i class="fa fa-trash ml-1"></i>
                             <span>حذف السؤال</span>
                         </a>
@@ -154,6 +183,48 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section("extra-content")
+    {{-- Delete Question Modal --}}
+    <div class="modal fade" id="modelDeleteQuestion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notify modal-danger" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="heading lead">حذف السؤال الحالي</p>
+
+                    <a href="javascript:void(0)" class="close ml-0" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="white-text">&times;</span>
+                    </a>
+                </div>
+
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fa fa-trash-alt fa-4x mb-3 animated fadeIn"></i>
+                        <h2 class="text-danger">هل تريد حذف السؤال</h2>
+                        @if($currentQuestion->exam->state == \App\Enums\ExamState::CLOSE)
+                            <p>بعد حذف السؤال سوف يتم مسح جميع النقاط التابعه لهذا السؤال.</p>
+                        @elseif($currentQuestion->exam->state == \App\Enums\ExamState::OPEN)
+                            <p>بعد حذف السؤال سوف يتم مسح جميع النقاط التابعه لهذا السؤال.</p>
+                        @else
+                            <p>بعد حذف السؤال سوف يتم مسح جميع النقاط التابعه لهذا السؤال وجميع اجابات الطلبة على هذا السؤال.</p>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-danger" onclick="$('form#deleteQuestion').submit();">حذف السؤال</button>
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">لا شكرا</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Delete Question Form--}}
+    <form id="deleteQuestion" method="post" action="/control-panel/questions/{{$currentQuestion->id}}">
+        @csrf
+        @method("DELETE")
+    </form>
 @endsection
 
 @section("script")

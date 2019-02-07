@@ -6,11 +6,27 @@
 
 @section("content")
     <div class="container">
+        {{-- Session Update Question Message --}}
+        @if (session('UpdateQuestionMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger text-center">
+                        {{session('UpdateQuestionMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <div class="row">
-            {{-- Heading --}}
+            {{-- Exam --}}
             <div class="col-12">
                 <div class="view shadow mdb-color px-3 py-4 mb-3">
-                    <h5 class="text-center text-white m-0">{{$exam->title}}</h5>
+                    <a class="h5 text-center text-white d-block m-0" href="/control-panel/exams/{{$exam->id}}">
+                        <span>{{$exam->title}}</span>
+                        <span class="text-default"> ---- </span>
+                        <span>الامتحان حاليا </span>
+                        <span>{{\App\Enums\ExamState::getState($exam->state)}}</span>
+                    </a>
                 </div>
             </div>
 
@@ -41,6 +57,10 @@
                             <span class="font-weight-bold">يساوي </span>
                             <span>عدد النقاط.</span>
                         </li>
+
+                        <li>لا يمكنك تعديل السؤال اذا كان الامتحان التابع له هذا السؤال مفتوح.</li>
+
+                        <li>اذا كان الامتحان منتهي فلا يمكنك تغيير عدد النقاط.</li>
                     </ul>
                 </div>
 
@@ -116,36 +136,75 @@
                     @endif
 
                     {{-- Card Body --}}
-                    <div class="card-body px-4 border-bottom border-primary">
-                        <form method="post" action="/control-panel/questions/{{$question->id}}">
-                            @csrf
-                            @method("PUT")
+                    @if($question->exam->state == \App\Enums\ExamState::CLOSE)
+                        <div class="card-body px-4 border-bottom border-primary">
+                            <form method="post" action="/control-panel/questions/{{$question->id}}">
+                                @csrf
+                                @method("PUT")
 
-                            <div class="mb-4">
-                                <label for="title">عنوان</label>
-                                <input type="text" name="title" id="title" class="form-control" value="{{$question->title}}">
-                            </div>
+                                <div class="mb-4">
+                                    <label for="title">عنوان</label>
+                                    <input type="text" name="title" id="title" class="form-control" value="{{$question->title}}">
+                                </div>
 
-                            <div class="mb-4">
-                                <label for="score">الدرجة</label>
-                                <input type="number" name="score" id="score" class="form-control" value="{{$question->score}}">
-                            </div>
+                                <div class="mb-4">
+                                    <label for="score">الدرجة</label>
+                                    <input type="number" name="score" id="score" class="form-control" value="{{$question->score}}">
+                                </div>
 
-                            <div class="mb-4">
-                                <label for="noOfBranch">عدد النقاط</label>
-                                <input type="number" name="noOfBranch" id="noOfBranch" class="form-control" value="{{$question->no_of_branch}}">
-                            </div>
+                                <div class="mb-4">
+                                    <label for="noOfBranch">عدد النقاط</label>
+                                    <input type="number" name="noOfBranch" id="noOfBranch" class="form-control" value="{{$question->no_of_branch}}">
+                                </div>
 
-                            <div class="mb-5">
-                                <label for="noOfBranchRequired">عدد النقاط المطلوبة</label>
-                                <input type="number" name="noOfBranchRequired" id="noOfBranchRequired" class="form-control" value="{{$question->no_of_branch_req}}">
-                            </div>
+                                <div class="mb-5">
+                                    <label for="noOfBranchRequired">عدد النقاط المطلوبة</label>
+                                    <input type="number" name="noOfBranchRequired" id="noOfBranchRequired" class="form-control" value="{{$question->no_of_branch_req}}">
+                                </div>
 
-                            <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
-                                <span>حفظ المعلومات</span>
-                            </button>
-                        </form>
-                    </div>
+                                <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
+                                    <span>حفظ المعلومات</span>
+                                </button>
+                            </form>
+                        </div>
+                    @elseif($question->exam->state == \App\Enums\ExamState::OPEN)
+                        <div class="text-center py-5">
+                            <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
+                            <h4>لا يمكنك تعديل السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح</h4>
+                        </div>
+                    @else
+                        <div class="card-body px-4 border-bottom border-primary">
+                            <form method="post" action="/control-panel/questions/{{$question->id}}">
+                                @csrf
+                                @method("PUT")
+
+                                <div class="mb-4">
+                                    <label for="title">عنوان</label>
+                                    <input type="text" name="title" id="title" class="form-control" value="{{$question->title}}">
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="score">الدرجة</label>
+                                    <input type="number" name="score" id="score" class="form-control" value="{{$question->score}}">
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="noOfBranch">عدد النقاط</label>
+                                    <input type="number" name="noOfBranch" id="noOfBranch" class="form-control" value="{{$question->no_of_branch}}" readonly>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label for="noOfBranchRequired">عدد النقاط المطلوبة</label>
+                                    <input type="number" name="noOfBranchRequired" id="noOfBranchRequired" class="form-control" value="{{$question->no_of_branch_req}}">
+                                </div>
+
+                                <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
+                                    <span>حفظ المعلومات</span>
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+
                 </div>
             </div>
         </div>

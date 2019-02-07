@@ -17,6 +17,17 @@
             </div>
         @endif
 
+        {{-- Session Delete Question Message --}}
+        @if (session('DeleteQuestionMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-success text-center">
+                        {{session('DeleteQuestionMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Burron Create--}}
         <div class="row">
             <div class="col-12 mb-3">
