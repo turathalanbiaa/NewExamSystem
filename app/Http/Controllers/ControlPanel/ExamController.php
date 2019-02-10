@@ -108,7 +108,7 @@ class ExamController extends Controller
                 ]);
         }
 
-        //Add new Exam
+        //Add new exam
         $exam = new Exam();
         $exam->title = Input::get("title");
         $exam->course_id = Input::get("course");
@@ -129,11 +129,11 @@ class ExamController extends Controller
         //Store event log
         $target = $exam->id;
         $type = EventLogType::EXAM;
-        $event = "انشاء نموذج امتحاني - " . $exam->title;
+        $event = "انشاء النموذج الامتحاني " . $exam->title;
         EventLog::create($target, $type, $event);
 
         return redirect("/control-panel/exams/create")->with([
-            "CreateExamMessage" => "تم انشاء النموذج الامتحاني - " . $exam->title
+            "CreateExamMessage" => "تم انشاء النموذج الامتحاني " . $exam->title
         ]);
     }
 
