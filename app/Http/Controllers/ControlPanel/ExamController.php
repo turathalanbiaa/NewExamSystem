@@ -85,12 +85,12 @@ class ExamController extends Controller
 
             if (!$firstMonth)
                 return redirect("/control-panel/exams/create")->with([
-                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لشهر الثاني الا بعد انشاء النموذج الامتحاني لشهر الاول."
+                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لشهر الثاني الا بعد انشاء النموذج الامتحاني لشهر الاول"
                 ]);
 
             if ($firstMonth->real_score == 25)
                 return redirect("/control-panel/exams/create")->with([
-                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لشهر الثاني لان درجة امتحان الشهر الاول 25 درجة."
+                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لشهر الثاني لان درجة امتحان الشهر الاول 25 درجة"
                 ]);
 
             $score = 25 - $firstMonth->real_score;
@@ -104,7 +104,7 @@ class ExamController extends Controller
 
             if (!$finalFirstRole)
                 return redirect("/control-panel/exams/create")->with([
-                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لنهائي الدور الثاني الا بعد انشاء النموذج الامتحاني لنهائي الدور الاول."
+                    "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لنهائي الدور الثاني الا بعد انشاء النموذج الامتحاني لنهائي الدور الاول"
                 ]);
         }
 
@@ -122,7 +122,7 @@ class ExamController extends Controller
 
         if (!$success)
             return redirect("/control-panel/exams/create")->with([
-                "CreateExamMessage" => "لم يتم انشاء النموذج الامتحاني.",
+                "CreateExamMessage" => "لم يتم انشاء النموذج الامتحاني",
                 "TypeMessage" => "Error"
             ]);
 
@@ -187,27 +187,28 @@ class ExamController extends Controller
             switch (Input::get("state"))
             {
                 case "open":
+                    dd(self::complete($exam));
                     $exam->state = ExamState::OPEN;
-                    $event = "فتح النموذج الامتحاني - " . $exam->title;
+                    $event = "فتح النموذج الامتحاني " . $exam->title;
                     break;
                 case "end":
                     $exam->state = ExamState::END;
-                    $event = "انهاء النموذج الامتحاني - " . $exam->title;
+                    $event = "انهاء النموذج الامتحاني " . $exam->title;
                     break;
                 case "reopen":
                     $exam->state = ExamState::OPEN;
-                    $event = "اعادة فتح النموذج الامتحاني - " . $exam->title;
+                    $event = "اعادة فتح النموذج الامتحاني " . $exam->title;
                     break;
                 default:
                     $exam->state = ExamState::CLOSE;
-                    $event = "غلق النموذج الامتحاني - " . $exam->title . " بسبب تلاعب المستخدم بالبيانات";
+                    $event = "غلق النموذج الامتحاني " . $exam->title . " بسبب تلاعب المستخدم بالبيانات";
             }
 
             $success = $exam->save();
 
             if (!$success)
                 return redirect("/control-panel/exams")->with([
-                    "UpdateExamStateMessage" => "لم يتم تغيير حالة النموذج الامتحاني - " . $exam->title,
+                    "UpdateExamStateMessage" => "لم يتم تغيير حالة النموذج الامتحاني " . $exam->title,
                     "TypeMessage" => "Error"
                 ]);
 
@@ -236,7 +237,7 @@ class ExamController extends Controller
             //Store event log
             $target = $exam->id;
             $type = EventLogType::EXAM;
-            $event = "اضافة كيرف لامتحان - " . $exam->title;
+            $event = "اضافة كيرف لامتحان " . $exam->title;
             EventLog::create($target, $type, $event);
 
             return redirect("/control-panel/exams/$exam->id")->with([
@@ -245,72 +246,77 @@ class ExamController extends Controller
         }
 
         //General update for exam
-        $this->validate($request, [
-            'title' => ['required'],
-            'score' => ['required', 'integer', (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
-            'date'  => ['required', 'date']
-        ], [
-            'title.required' => 'يرجى ملىء عنوان الامتحان.',
-            'score.required' => 'يرجى ملىء درجة الامتحان.',
-            'score.integer'  => 'درجة الامتحان غير مقبولة.',
-            'score.between'  => (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'درجة الامتحان من 25.' : 'درجة الامتحان من 60.',
-            'date.required'  => 'يرجى ملىء تاريخ الامتحان.',
-            'date.date'      => 'تاريخ الامتحان غير مقبولة.',
-        ]);
-
-        $score = Input::get("score");
-        if ($exam->type == ExamType::FIRST_MONTH)
+        if (Input::get("general"))
         {
-            $secondMonthExam = Exam::where("course_id", $exam->course_id)
-                ->where("type", ExamType::SECOND_MONTH)
-                ->first();
-
-            if (($score == 25) && ($secondMonthExam))
-                redirect("/control-panel/exams/$exam->id/edit")->with([
-                    "UpdateExamMessage" => "لا يمكنك وضع (25 درجة) لامتحان الشهر الاول  لهذه المادة لانها تملك امتحان شهر ثاني."
-                ]);
-
-            if ($secondMonthExam)
-            {
-                $secondMonthExam->real_score = 25 - $score;
-                $secondMonthExam->save();
-            }
-        }
-
-        if ($exam->type == ExamType::SECOND_MONTH)
-        {
-            $firstMonthExam = Exam::where("course_id", $exam->course_id)
-                ->where("type", ExamType::FIRST_MONTH)
-                ->first();
-
-            if ($score == 25)
-                redirect("/control-panel/exams/$exam->id/edit")->with([
-                    "UpdateExamMessage" => "لا يمكنك وضع (25 درجة) لامتحان الشهر الثاني."
-                ]);
-
-            $firstMonthExam->real_score = 25 - $score;
-            $firstMonthExam->save();
-        }
-
-        $exam->title = Input::get("title");
-        $exam->real_score = $score;
-        $exam->date = Input::get("date");
-        $success = $exam->save();
-
-        if (!$success)
-            return redirect("/control-panel/exams/$exam->id/edit")->with([
-                "UpdateExamMessage" => "لم يتم نعديل النموذج الامتحاني - " . $exam->title
+            $this->validate($request, [
+                'title' => ['required'],
+                'score' => ['required', 'integer', (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
+                'date'  => ['required', 'date']
+            ], [
+                'title.required' => 'يرجى ملىء عنوان الامتحان.',
+                'score.required' => 'يرجى ملىء درجة الامتحان.',
+                'score.integer'  => 'درجة الامتحان غير مقبولة.',
+                'score.between'  => (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'درجة الامتحان من 25.' : 'درجة الامتحان من 60.',
+                'date.required'  => 'يرجى ملىء تاريخ الامتحان.',
+                'date.date'      => 'تاريخ الامتحان غير مقبولة.',
             ]);
 
-        //Store event log
-        $target = $exam->id;
-        $type = EventLogType::EXAM;
-        $event = "تعديل النموذج الامتحاني " . $exam->title;
-        EventLog::create($target, $type, $event);
+            $score = Input::get("score");
+            if ($exam->type == ExamType::FIRST_MONTH)
+            {
+                $secondMonthExam = Exam::where("course_id", $exam->course_id)
+                    ->where("type", ExamType::SECOND_MONTH)
+                    ->first();
 
-        return redirect("/control-panel/exams")->with([
-            "UpdateExamMessage" => "تم تعديل النموذج الامتحاني " . $exam->title
-        ]);
+                if (($score == 25) && ($secondMonthExam))
+                    redirect("/control-panel/exams/$exam->id/edit")->with([
+                        "UpdateExamMessage" => "لا يمكنك وضع (25 درجة) لامتحان الشهر الاول  لهذه المادة لانها تملك امتحان شهر ثاني"
+                    ]);
+
+                if ($secondMonthExam)
+                {
+                    $secondMonthExam->real_score = 25 - $score;
+                    $secondMonthExam->save();
+                }
+            }
+
+            if ($exam->type == ExamType::SECOND_MONTH)
+            {
+                $firstMonthExam = Exam::where("course_id", $exam->course_id)
+                    ->where("type", ExamType::FIRST_MONTH)
+                    ->first();
+
+                if ($score == 25)
+                    redirect("/control-panel/exams/$exam->id/edit")->with([
+                        "UpdateExamMessage" => "لا يمكنك وضع (25 درجة) لامتحان الشهر الثاني"
+                    ]);
+
+                $firstMonthExam->real_score = 25 - $score;
+                $firstMonthExam->save();
+            }
+
+            $exam->title = Input::get("title");
+            $exam->real_score = $score;
+            $exam->date = Input::get("date");
+            $success = $exam->save();
+
+            if (!$success)
+                return redirect("/control-panel/exams/$exam->id/edit")->with([
+                    "UpdateExamMessage" => "لم يتم نعديل النموذج الامتحاني " . $exam->title
+                ]);
+
+            //Store event log
+            $target = $exam->id;
+            $type = EventLogType::EXAM;
+            $event = "تعديل النموذج الامتحاني " . $exam->title;
+            EventLog::create($target, $type, $event);
+
+            return redirect("/control-panel/exams")->with([
+                "UpdateExamMessage" => "تم تعديل النموذج الامتحاني " . $exam->title
+            ]);
+        }
+
+        return "No Think";
     }
 
     /**
@@ -323,8 +329,9 @@ class ExamController extends Controller
     {
         Auth::check();
         self::watchExam($exam);
+        $exception = DB::transaction(function (){
 
-        DB::transaction(function (){});
+        });
     }
 
     /**
@@ -379,5 +386,21 @@ class ExamController extends Controller
                 ->where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
                 ->get()
             ;
+    }
+
+    private static function complete($exam)
+    {
+        //check question
+        $score = $exam->questions()->sum("score");
+
+        if ($exam->fake_score != $score)
+            return false;
+
+        //check question
+        foreach ($exam->questions as $question)
+            if ($question->no_of_branch != $question->branches()->count())
+                return false;
+
+            return true;
     }
 }

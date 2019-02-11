@@ -7,6 +7,13 @@
 @section("content")
     <div class="container">
         <div class="row">
+            {{-- Heading --}}
+            <div class="col-12 mb-3">
+                <div class="view shadow mdb-color p-3">
+                    <h5 class="text-center text-white m-0">انشاء نموذج امتحاني</h5>
+                </div>
+            </div>
+
             {{-- Info --}}
             <div class="col-lg-4">
                 {{-- Exam Alert Info --}}

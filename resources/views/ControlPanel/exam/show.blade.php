@@ -57,22 +57,22 @@
                             <div class="card-body border-bottom border-default">
                                 <ul class="list-group list-group-flush pr-0">
                                     <li class="list-group-item">
-                                        <span>المادة:- </span>
+                                        <span>المادة: </span>
                                         {{$exam->course->name}}
                                     </li>
 
                                     <li class="list-group-item">
-                                        <span>الاستاذ:- </span>
+                                        <span>الاستاذ: </span>
                                         {{$exam->course->lecturer->name}}
                                     </li>
 
                                     <li class="list-group-item">
-                                        <span>الدرجة:- </span>
+                                        <span>الدرجة: </span>
                                         {{$exam->real_score}}
                                     </li>
 
                                     <li class="list-group-item">
-                                        <span>الكيرف:- </span>
+                                        <span>الكيرف: </span>
                                         {{$exam->curve}}
                                     </li>
                                 </ul>
@@ -128,17 +128,17 @@
                         <div class="card">
                             <div class="card-body border-bottom border-default">
                                 {{-- Alert Info --}}
-                                <div class="alert alert-info">
+                                <div class="alert alert-info mb-0">
                                     <h5 class="text-center pb-2 border-bottom border-primary">اضافة الكيرف</h5>
                                     <ul class="mb-0 pr-3">
                                         <li>يعطى الكيرف على الامتحان النهائي فقط سواء كان الامتحان دور اول او ثاني.</li>
-                                        <li>يفضل ان يكون الكيرف اقل من او تساوي (10 درجات).</li>
+                                        <li>درجة الكيرف اقل من او تساوي (10 درجات).</li>
                                     </ul>
                                 </div>
 
-                                {{-- Form --}}
+                                {{-- Form Curve --}}
                                 @if(($exam->type == \App\Enums\ExamType::FINAL_FIRST_ROLE) || ($exam->type == \App\Enums\ExamType::FINAL_SECOND_ROLE))
-                                    <form method="post" action="/control-panel/exams/{{$exam->id}}">
+                                    <form class="mt-3" method="post" action="/control-panel/exams/{{$exam->id}}">
                                         @method("PUT")
                                         @csrf
                                         <div class="mb-3">
@@ -192,7 +192,7 @@
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Heading --}}
-                    <div class="view shadow mdb-color px-3 py-4">
+                    <div class="view shadow mdb-color p-3">
                         <h5 class="text-center text-white m-0">{{$exam->title}}</h5>
                     </div>
 
