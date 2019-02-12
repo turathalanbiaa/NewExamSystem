@@ -10,6 +10,8 @@ use App\Enums\ExamType;
 use App\Models\Course;
 use App\Models\EventLog;
 use App\Models\Exam;
+use App\Models\ExamStudent;
+use App\Models\StudentDocument;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -187,7 +189,11 @@ class ExamController extends Controller
             switch (Input::get("state"))
             {
                 case "open":
-                    dd(self::complete($exam));
+                    if (!self::complete($exam))
+                        return redirect("/control-panel/exams")->with([
+                            "UpdateExamStateMessage" => "لا يمكن فتح النموذج الامتحاني " . $exam->title . " لان رفع الاسئلة لم يكتمل",
+                            "TypeMessage" => "Error"
+                        ]);
                     $exam->state = ExamState::OPEN;
                     $event = "فتح النموذج الامتحاني " . $exam->title;
                     break;
@@ -196,6 +202,11 @@ class ExamController extends Controller
                     $event = "انهاء النموذج الامتحاني " . $exam->title;
                     break;
                 case "reopen":
+                    if (!self::complete($exam))
+                        return redirect("/control-panel/exams")->with([
+                            "UpdateExamStateMessage" => "لا يمكن اعادة فتح النموذج الامتحاني " . $exam->title . " لان رفع الاسئلة لم يكتمل",
+                            "TypeMessage" => "Error"
+                        ]);
                     $exam->state = ExamState::OPEN;
                     $event = "اعادة فتح النموذج الامتحاني " . $exam->title;
                     break;
@@ -237,7 +248,7 @@ class ExamController extends Controller
             //Store event log
             $target = $exam->id;
             $type = EventLogType::EXAM;
-            $event = "اضافة كيرف لامتحان " . $exam->title;
+            $event = "اضافة كيرف للنموذج الامتحاني " . $exam->title;
             EventLog::create($target, $type, $event);
 
             return redirect("/control-panel/exams/$exam->id")->with([
@@ -316,7 +327,7 @@ class ExamController extends Controller
             ]);
         }
 
-        return "No Think";
+        return abort(404);
     }
 
     /**
@@ -329,9 +340,53 @@ class ExamController extends Controller
     {
         Auth::check();
         self::watchExam($exam);
-        $exception = DB::transaction(function (){
+        if ($exam->state == ExamState::OPEN)
+            return redirect("/control-panel/exams")->with([
+                "DeleteExamMessage" => "لا يمكنك حذف النوذج الامتحاني " . $exam->title . " لان الامتحان جاري",
+                "TypeMessage" => "Error"
+            ]);
 
+        $exception = DB::transaction(function () use ($exam) {
+            foreach ($exam->questions as $question)
+            {
+                foreach ($question->branches as $branch)
+                {
+                    $branch->answers()->delete();
+                    $branch->delete();
+                }
+                $question->delete();
+            }
+
+            foreach ($exam->studentEnrolled as $studentEnroll)
+            {
+                StudentDocument::where('student_id', $studentEnroll->student_id)
+                    ->where("course_id", $exam->course_id)
+                    ->update(
+                        $exam->type == ExamType::FIRST_MONTH?["first_month_score" => 0]:
+                        $exam->type == ExamType::SECOND_MONTH?["second_month_score" => 0]:
+                        $exam->type == ExamType::FINAL_FIRST_ROLE?["final_first_score" => 0]:["final_second_score" => 0]
+                    );
+            }
+
+            $exam->studentEnrolled()->delete();
+            $exam->delete();
+
+            //Store event log
+            $target = $exam->id;
+            $type = EventLogType::EXAM;
+            $event = "حذف النموذج الامتحاني " . $exam->title;
+            EventLog::create($target, $type, $event);
         });
+
+        if (is_null($exception))
+            return redirect("/control-panel/exams")->with([
+                "DeleteExamMessage" => "تم حذف النموذج الامتحاني  " . $exam->title
+            ]);
+        else
+            return redirect("/control-panel/exams")->with([
+                "DeleteExamMessage" => "لم يتم حذف النموذج الامتحاني  " .$exam->title,
+                "TypeMessage" => "Error"
+            ]);
     }
 
     /**
@@ -388,6 +443,12 @@ class ExamController extends Controller
             ;
     }
 
+    /**
+     * Check questions and branches is created
+     *
+     * @param $exam
+     * @return bool
+     */
     private static function complete($exam)
     {
         //check question

@@ -143,7 +143,7 @@ class BranchController extends Controller
         $event = "اضافة نقطة الى السؤال - " . $question->title;
         EventLog::create($target, $type, $event);
 
-        if (($question->branches()->count()+1) == $question->no_of_branch)
+        if ($question->branches()->count() == $question->no_of_branch)
             return redirect("control-panel/questions/$question->id")->with([
                 "CreateBranchMessage" => "تمت اضافة جميع النقاط الى السؤال الحالي بنجاح."
             ]);

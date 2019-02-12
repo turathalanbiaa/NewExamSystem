@@ -101,6 +101,7 @@
                                             @endif
                                             <a href="/control-panel/questions/{{$question->id}}" class="list-group-item list-group-item-action">
                                                 {{$question->title}}
+                                                <span class="badge badge-default float-left">{{$question->score . " درجة"}}</span>
                                             </a>
                                             @if ($loop->last)
                                         </div>
@@ -174,6 +175,7 @@
                                             @if(($question->type == \App\Enums\QuestionType::FILL_BLANK) || ($question->type == \App\Enums\QuestionType::EXPLAIN))
                                                 <a href="/control-panel/questions/{{$question->id}}" class="list-group-item list-group-item-action">
                                                     {{$question->title}}
+                                                    <span class="badge badge-default float-left">{{$question->score . " درجة"}}</span>
                                                 </a>
                                             @endif
                                             @if ($loop->last)
@@ -192,7 +194,7 @@
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Heading --}}
-                    <div class="view shadow mdb-color p-3">
+                    <div class="view shadow mdb-color px-3 py-4">
                         <h5 class="text-center text-white m-0">{{$exam->title}}</h5>
                     </div>
 

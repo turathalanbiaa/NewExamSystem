@@ -9,7 +9,7 @@
         <div class="row">
             {{-- Heading --}}
             <div class="col-12 mb-3">
-                <div class="view shadow mdb-color p-3">
+                <div class="view shadow mdb-color px-3 py-4">
                     <h5 class="text-center text-white m-0">تعديل النموذج الامتحاني</h5>
                 </div>
             </div>
