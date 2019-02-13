@@ -7,7 +7,18 @@
 @section("content")
     <div class="container">
         <div class="row">
-            {{-- Exam --}}
+            {{-- Session Create  َQuestion Message --}}
+            @if (session('CreateQuestionMessage'))
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-danger text-center">
+                            {{session('CreateQuestionMessage')}}
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Heading --}}
             <div class="col-12">
                 <div class="view shadow mdb-color px-3 py-4 mb-3">
                     <a class="h5 d-block text-center text-white m-0" href="/control-panel/exams/{{$exam->id}}">{{$exam->title}}</a>
@@ -41,30 +52,37 @@
                             <span class="font-weight-bold">يساوي </span>
                             <span>عدد النقاط.</span>
                         </li>
+
+                        <li>
+                            <span>لايمكن ان تكون </span>
+                            <span class="font-weight-bold">درجة السؤال اكبر من درجة الامتحان المتبقية</span>
+                            <span>.</span>
+                        </li>
                     </ul>
                 </div>
 
                 {{-- Question With One Branch Alert Info --}}
                 <div class="alert alert-info">
-                    <h5 class="text-center pb-2 border-bottom border-primary">اضافة سؤال يحتوي على نقطة واحدة</h5>
+                    <h5 class="text-center pb-2 border-bottom border-primary">اضافة سؤال لا يحتوي على نقاط</h5>
                     <ul class="mb-0 pr-3">
                         <li>
-                            <span>مثلاً السؤال: </span>
-                            <span class="font-weight-bold">ما الفرق بين اصول الدين وفروع الدين؟</span>
+                            <span>مثلا السؤال هو</span>
+                            <span class="font-weight-bold">مالفرق بين اصول الدين وفروع الدين؟</span>
                         </li>
                         <li>فيمكنك ذلك عن طريق اتباع الخطوات التالية.</li>
                         <ul class="pr-2">
                             <li>
-                                <span>اضافة </span>
-                                <span class="font-weight-bold">ما الفرق بين </span>
-                                <span>في عنوان السؤال.</span>
+                                <span>اضافة سؤال جديد عنوانه </span>
+                                <span class="font-weight-bold">مالفرق بين </span>
+                                <span>ووضع عدد لنقاط وعدد النقاط المطلوبة تساوي واحد.</span>
                             </li>
 
                             <li>
-                                <span>اضافة </span>
+                                <span>ثم اضافة نقطه الى السؤال الحالي عنوانها </span>
                                 <span class="font-weight-bold">اصول الدين وفروع الدين؟ </span>
-                                <span>في عنوان النقطة.</span>
                             </li>
+
+                            <li>وهذا ممكن وينطبق على جميع انواع الاسئلة.</li>
                         </ul>
                     </ul>
                 </div>
@@ -126,7 +144,7 @@
 
                     {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
-                        @if(($exam->fake_score - $exam->questions()->sum("score"))== 0)
+                        @if(($exam->fake_score - $exam->questions()->sum("score")) == 0)
                             <div class="text-center py-5">
                                 <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
                                 <h4>لا يمكنك اضافة سؤال جديد لان درجة الامتحان المتبقية تساوي صفر</h4>

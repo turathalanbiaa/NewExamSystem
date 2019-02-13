@@ -6,6 +6,15 @@
 
 @section("content")
     <div class="container">
+        {{-- Session Create  َQuestion Message --}}
+        @if (session('CreateQuestionMessage'))
+            <div class="alert alert-success text-center mx-4 mt-4">
+                {{session('CreateQuestionMessage')}}
+            </div>
+        @endif
+
+
+
         {{-- Session Update Question Message --}}
         @if (session('UpdateQuestionMessage'))
             <div class="row">
@@ -39,18 +48,12 @@
             </div>
         @endif
 
-        {{-- Burron Create--}}
-        <div class="row">
-            <div class="col-12 mb-3">
-                <a href="/control-panel/branches/create?question={{$currentQuestion->id}}" class="btn btn-outline-default font-weight-bold">
-                    <i class="fa fa-plus ml-1"></i>
-                    <span>اضافة نقطة جديدة الى السؤال</span>
-                </a>
-            </div>
-        </div>
+
+
+
 
         <div class="row">
-            {{-- Exam --}}
+            {{-- Heading --}}
             <div class="col-12">
                 <div class="view shadow mdb-color px-3 py-4 mb-3">
                     <a class="h5 text-center text-white d-block m-0" href="/control-panel/exams/{{$currentQuestion->exam->id}}">{{$currentQuestion->exam->title}}</a>
@@ -109,8 +112,18 @@
                     {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
                         {{-- Title --}}
-                        <h5>
-                            {{$currentQuestion->title}}
+                        <h5 class="mb-3">
+                            <span>{{$currentQuestion->title}}</span>
+                            <span class="font-small mr-2">
+                                <a href="/control-panel/questions/{{$currentQuestion->id}}/edit" class="text-primary text-decoration ml-1" rel="tooltip" title="تحرير السؤال">
+                                    <i class="fa fa-edit ml-1"></i>
+                                    <span>تحرير</span>
+                                </a>
+                                <a href="#modelDeleteQuestion" data-toggle="modal" class="text-danger text-decoration mr-1" rel="tooltip" title="حذف السؤال">
+                                    <i class="fa fa-trash-alt ml-1"></i>
+                                    <span>حذف</span>
+                                </a>
+                            </span>
                             <span class="float-left">{{"( " . $currentQuestion->score . " درجة" . " )"}}</span>
                         </h5>
 
@@ -123,9 +136,15 @@
                                     <li class="mb-3">
                                         {{-- Title --}}
                                         <span>{{$branch->title}}</span>
-                                        <span class="mr-2">
-                                            <a href="/control-panel/branches/{{$branch->id}}/edit" class="text-decoration text-default ml-1" rel="tooltip" title="تحرير النقطة">تحرير</a>
-                                            <a href="#delete-branch" class="text-decoration text-default mr-1" rel="tooltip" title="حذف النقطة">حذف</a>
+                                        <span class="font-small mr-2">
+                                            <a href="/control-panel/branches/{{$branch->id}}/edit" class="text-primary text-decoration ml-1" rel="tooltip" title="تحرير النقطة">
+                                                <i class="fa fa-edit ml-1"></i>
+                                                <span>تحرير</span>
+                                            </a>
+                                            <a href="#delete-branch" class="text-danger text-decoration mr-1" rel="tooltip" title="حذف النقطة">
+                                                <i class="fa fa-trash-alt ml-1"></i>
+                                                <span>حذف</span>
+                                            </a>
                                         </span><br>
 
                                         {{-- Options --}}
@@ -147,36 +166,34 @@
 
                                         {{-- Correct Option --}}
                                         <span>
-                                            <span class="text-danger">الجواب: </span>
+                                            <span class="text-success">الجواب: </span>
                                             {{(!is_null($branch->correct_option)?$branch->correct_option:"لا يوجد جواب") . "."}}
                                         </span>
                                     </li>
                                     @if ($loop->last)
                                         @if(count($currentQuestion->branches) != $currentQuestion->no_of_branch)
-                                            <div class="alert alert-info text-center mt-2">
+                                            <div class="alert text-center py-4">
                                                 <h5 class="m-0">لم يتم رفع جميع النقاط التابعه لهذا السؤال.</h5>
                                             </div>
                                         @endif
                                 </ol>
                             @endif
                         @empty
-                            <div class="alert alert-info text-center mt-2">
+                            <div class="alert text-center py-4">
                                 <h5 class="m-0">هذا السؤال لا يحتوي على اي نقطة بعد.</h5>
                             </div>
                         @endforelse
 
                         {{-- Buttons --}}
-                        <a class="btn btn-outline-success font-weight-bold" href="/control-panel/questions/create?exam={{$currentQuestion->exam->id}}">
+                        <hr>
+                        <a class="btn btn-dark font-weight-bold" href="/control-panel/branches/create?question={{$currentQuestion->id}}">
                             <i class="fa fa-plus ml-1"></i>
-                            <span>اضافة سؤال</span>
+                            <span>اضافة نقطة جديدة الى السؤال الحالي</span>
                         </a>
-                        <a class="btn btn-outline-warning font-weight-bold" href="/control-panel/questions/{{$currentQuestion->id}}/edit">
-                            <i class="fa fa-edit ml-1"></i>
-                            <span>تحرير السؤال</span>
-                        </a>
-                        <a class="btn btn-outline-danger font-weight-bold" href="#modelDeleteQuestion" data-toggle="modal">
-                            <i class="fa fa-trash ml-1"></i>
-                            <span>حذف السؤال</span>
+
+                        <a class="btn btn-outline-dark font-weight-bold" href="/control-panel/questions/create?exam={{$currentQuestion->exam->id}}">
+                            <i class="fa fa-plus ml-1"></i>
+                            <span>اضافة سؤال الى الامتحان الحالي</span>
                         </a>
                     </div>
                 </div>

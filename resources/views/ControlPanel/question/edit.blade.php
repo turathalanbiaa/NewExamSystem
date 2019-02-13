@@ -18,14 +18,14 @@
         @endif
 
         <div class="row">
-            {{-- Exam --}}
+            {{-- Heading --}}
             <div class="col-12">
                 <div class="view shadow mdb-color px-3 py-4 mb-3">
-                    <a class="h5 text-center text-white d-block m-0" href="/control-panel/exams/{{$exam->id}}">
-                        <span>{{$exam->title}}</span>
-                        <span class="text-default"> ---- </span>
+                    <a class="h5 text-center text-white d-block m-0" href="/control-panel/exams/{{$question->exam->id}}">
+                        <span>{{$question->exam->title}}</span>
+                        <span class="text-danger"> - - - - </span>
                         <span>الامتحان حاليا </span>
-                        <span>{{\App\Enums\ExamState::getState($exam->state)}}</span>
+                        <span>{{\App\Enums\ExamState::getState($question->exam->state)}}</span>
                     </a>
                 </div>
             </div>
@@ -66,25 +66,26 @@
 
                 {{-- Question With One Branch Alert Info --}}
                 <div class="alert alert-info">
-                    <h5 class="text-center pb-2 border-bottom border-primary">اضافة سؤال يحتوي على نقطة واحدة</h5>
+                    <h5 class="text-center pb-2 border-bottom border-primary">اضافة سؤال لا يحتوي على نقاط</h5>
                     <ul class="mb-0 pr-3">
                         <li>
-                            <span>مثلاً السؤال: </span>
-                            <span class="font-weight-bold">ما الفرق بين اصول الدين وفروع الدين؟</span>
+                            <span>مثلا السؤال هو</span>
+                            <span class="font-weight-bold">مالفرق بين اصول الدين وفروع الدين؟</span>
                         </li>
                         <li>فيمكنك ذلك عن طريق اتباع الخطوات التالية.</li>
                         <ul class="pr-2">
                             <li>
-                                <span>اضافة </span>
-                                <span class="font-weight-bold">ما الفرق بين </span>
-                                <span>في عنوان السؤال.</span>
+                                <span>اضافة سؤال جديد عنوانه </span>
+                                <span class="font-weight-bold">مالفرق بين </span>
+                                <span>ووضع عدد لنقاط وعدد النقاط المطلوبة تساوي واحد.</span>
                             </li>
 
                             <li>
-                                <span>اضافة </span>
+                                <span>ثم اضافة نقطه الى السؤال الحالي عنوانها </span>
                                 <span class="font-weight-bold">اصول الدين وفروع الدين؟ </span>
-                                <span>في عنوان النقطة.</span>
                             </li>
+
+                            <li>وهذا ممكن وينطبق على جميع انواع الاسئلة.</li>
                         </ul>
                     </ul>
                 </div>
@@ -95,21 +96,21 @@
                     <ul class="mb-0 pr-3">
                         <li>
                             <span>درجة الامتحان الحقيقية </span>
-                            <span class="badge badge-success"> {{$exam->real_score}} </span>
+                            <span class="badge badge-success"> {{$question->exam->real_score}} </span>
                             <span>.</span>
                         </li>
 
                         <li>
                             <span>درجة الامتحان من </span>
-                            <span class="badge badge-success"> {{$exam->fake_score}} </span>
+                            <span class="badge badge-success"> {{$question->exam->fake_score}} </span>
                             <span> والدرجة المتبقية </span>
-                            <span class="badge badge-danger"> {{$exam->fake_score - $exam->questions()->sum("score")}} </span>
+                            <span class="badge badge-danger"> {{$question->exam->fake_score - $question->exam->questions()->sum("score")}} </span>
                             <span>.</span>
                         </li>
 
                         <li>
                             <span>عدد الاسئلة الموضوعة </span>
-                            <span class="badge badge-success"> {{count($exam->questions)}} </span>
+                            <span class="badge badge-success"> {{$question->exam->questions()->count()}} </span>
                             <span>.</span>
                         </li>
                     </ul>
@@ -136,7 +137,7 @@
                     @endif
 
                     {{-- Card Body --}}
-                    @if($question->exam->state == \App\Enums\ExamState::CLOSE)
+                    @if(($question->exam->state == \App\Enums\ExamState::CLOSE) || ($question->exam->state == \App\Enums\ExamState::END))
                         <div class="card-body px-4 border-bottom border-primary">
                             <form method="post" action="/control-panel/questions/{{$question->id}}">
                                 @csrf
@@ -154,7 +155,7 @@
 
                                 <div class="mb-4">
                                     <label for="noOfBranch">عدد النقاط</label>
-                                    <input type="number" name="noOfBranch" id="noOfBranch" class="form-control" value="{{$question->no_of_branch}}">
+                                    <input type="number" name="noOfBranch" id="noOfBranch" class="form-control" value="{{$question->no_of_branch}}" {{($question->exam->state == \App\Enums\ExamState::END)?"readonly":""}}>
                                 </div>
 
                                 <div class="mb-5">
@@ -167,44 +168,12 @@
                                 </button>
                             </form>
                         </div>
-                    @elseif($question->exam->state == \App\Enums\ExamState::OPEN)
+                    @else
                         <div class="text-center py-5">
                             <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
                             <h4>لا يمكنك تعديل السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح</h4>
                         </div>
-                    @else
-                        <div class="card-body px-4 border-bottom border-primary">
-                            <form method="post" action="/control-panel/questions/{{$question->id}}">
-                                @csrf
-                                @method("PUT")
-
-                                <div class="mb-4">
-                                    <label for="title">عنوان</label>
-                                    <input type="text" name="title" id="title" class="form-control" value="{{$question->title}}">
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="score">الدرجة</label>
-                                    <input type="number" name="score" id="score" class="form-control" value="{{$question->score}}">
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="noOfBranch">عدد النقاط</label>
-                                    <input type="number" name="noOfBranch" id="noOfBranch" class="form-control" value="{{$question->no_of_branch}}" readonly>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label for="noOfBranchRequired">عدد النقاط المطلوبة</label>
-                                    <input type="number" name="noOfBranchRequired" id="noOfBranchRequired" class="form-control" value="{{$question->no_of_branch_req}}">
-                                </div>
-
-                                <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
-                                    <span>حفظ المعلومات</span>
-                                </button>
-                            </form>
-                        </div>
                     @endif
-
                 </div>
             </div>
         </div>

@@ -90,14 +90,14 @@ class QuestionController extends Controller
         $success = $question->save();
 
         if (!$success)
-            return redirect("control-panel/questions/create")->with([
+            return redirect("control-panel/questions/create?exam=$exam->id")->with([
                 "CreateQuestionMessage" => "لم يتم اضافة السؤال بنجاح."
             ]);
 
-        //Keep event log
+        //Store event log
         $target = $question->id;
         $type = EventLogType::QUESTION;
-        $event = "اضافة سؤال لامتحان - " . $exam->title;
+        $event = "اضافة السؤال: " . $question->title . "الى امتحان " . $exam->title;
         EventLog::create($target, $type, $event);
 
         return redirect("control-panel/questions/$question->id")->with([
@@ -132,7 +132,6 @@ class QuestionController extends Controller
         $exam = $question->exam;
         ExamController::watchExam($exam);
         return view("ControlPanel.question.edit")->with([
-            "exam"     => $exam,
             "question" => $question
         ]);
     }
@@ -152,33 +151,34 @@ class QuestionController extends Controller
         ExamController::watchExam($exam);
         $remainingScore = $exam->fake_score - $exam->questions()->sum("score") + $question->score;
 
-        if ($exam->state == ExamState::CLOSE)
+        if (($exam->state == ExamState::CLOSE) || ($exam->state == ExamState::END))
         {
-            $noOfBranch = Input::get("noOfBranch");
+
+            $noOfBranch = ($exam->state==ExamState::CLOSE)?Input::get("noOfBranch"):$question->no_of_branch;
             $this->validate($request, [
                 'title'              => ['required'],
                 'score'              => ['required', 'integer', "between:1,$remainingScore"],
-                'noOfBranch'         => ['required', 'integer', 'min:1'],
+                ($exam->state==ExamState::CLOSE)?'noOfBranch':'' => ($exam->state==ExamState::CLOSE)?"required|integer|min:1":"",
                 'noOfBranchRequired' => ($noOfBranch >= 1)? "required|integer|min:1|between:1,$noOfBranch":"",
             ], [
                 'title.required'              => 'يرجى ملئ عنوان السؤال.',
                 'score.required'              => 'يرجى وضع درجة السؤال',
                 'score.integer'               => 'درجة السؤال غير مقبولة.',
                 'score.between'               => 'درجة السؤال اكبر من صفر واقل من درجة الامتحان المتبقية.',
-                'noOfBranch.required'         => 'يرجى ذكر عدد النقاط.',
-                'noOfBranch.integer'          => 'عدد النقاط غير مقبول.',
-                'noOfBranch.min'              => 'يجب ان يحتوي السؤال على نقطة واحدة على الاقل.',
+                ($exam->state==ExamState::CLOSE)?'noOfBranch.required':'' => ($exam->state==ExamState::CLOSE)?'يرجى ذكر عدد النقاط.':'',
+                ($exam->state==ExamState::CLOSE)?'noOfBranch.integer':'' => ($exam->state==ExamState::CLOSE)?'عدد النقاط غير مقبول.':'',
+                ($exam->state==ExamState::CLOSE)?'noOfBranch.min':'' => ($exam->state==ExamState::CLOSE)?'يجب ان يحتوي السؤال على نقطة واحدة على الاقل.':'',
                 'noOfBranchRequired.required' => 'يرجى ذكر عدد النقاط المطلوبة.',
                 'noOfBranchRequired.integer'  => 'عدد النقاط المطلوبة غير مقبول.',
                 'noOfBranchRequired.min'      => 'يجب ان يحتوي السؤال على نقطة واحدة مطلوبة على الاقل.',
                 'noOfBranchRequired.between'  => 'يجب ان تكون عدد النقاط المطلوبة اقل من او تساوي عدد النقاط.',
             ]);
 
-            $exception = DB::transaction(function () use ($question) {
+            $exception = DB::transaction(function () use ($question, $exam) {
                 //Update question
                 $question->title = Input::get("title");
                 $question->score = Input::get("score");
-                $question->no_of_branch = Input::get("noOfBranch");
+                $question->no_of_branch = ($exam->state==ExamState::CLOSE)?Input::get("noOfBranch"):$question->no_of_branch;
                 $question->no_of_branch_req = Input::get("noOfBranchRequired");
                 $question->save();
 
@@ -189,7 +189,7 @@ class QuestionController extends Controller
                 //Store event log
                 $target = $question->id;
                 $type = EventLogType::QUESTION;
-                $event = "تعديل السؤال - " . $question->title . " والامتحان مغلق";
+                $event = "تعديل السؤال: " . $question->title . "في امتحان " . $exam->title . "و هذا الامتحان " . ExamState::getState($exam->state);
                 EventLog::create($target, $type, $event);
             });
 
@@ -202,57 +202,10 @@ class QuestionController extends Controller
                     "UpdateQuestionMessage" => "لم يتم تعديل السؤال الحالي."
                 ]);
         }
-        elseif ($exam->state == ExamState::OPEN)
-        {
+        else
             return redirect("control-panel/questions/$question->id/edit")->with([
                 "UpdateQuestionMessage" => "لا يمكنك تعديل السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح."
             ]);
-        }
-        else
-        {
-            $noOfBranch = $question->no_of_branch;
-            $this->validate($request, [
-                'title'              => ['required'],
-                'score'              => ['required', 'integer', "between:1,$remainingScore"],
-                'noOfBranchRequired' => ($noOfBranch >= 1)? "required|integer|min:1|between:1,$noOfBranch":"",
-            ], [
-                'title.required'              => 'يرجى ملئ عنوان السؤال.',
-                'score.required'              => 'يرجى وضع درجة السؤال',
-                'score.integer'               => 'درجة السؤال غير مقبولة.',
-                'score.between'               => 'درجة السؤال اكبر من صفر واقل من درجة الامتحان المتبقية.',
-                'noOfBranchRequired.required' => 'يرجى ذكر عدد النقاط المطلوبة.',
-                'noOfBranchRequired.integer'  => 'عدد النقاط المطلوبة غير مقبول.',
-                'noOfBranchRequired.min'      => 'يجب ان يحتوي السؤال على نقطة واحدة مطلوبة على الاقل.',
-                'noOfBranchRequired.between'  => 'يجب ان تكون عدد النقاط المطلوبة اقل من او تساوي عدد النقاط.',
-            ]);
-
-            $exception = DB::transaction(function () use ($question) {
-                //Update question
-                $question->title = Input::get("title");
-                $question->score = Input::get("score");
-                $question->no_of_branch_req = Input::get("noOfBranchRequired");
-                $question->save();
-
-                //Update branches score
-                Branch::where('question_id', $question->id)
-                    ->update(array('score' => ($question->score / $question->no_of_branch_req)));
-
-                //Store event log
-                $target = $question->id;
-                $type = EventLogType::QUESTION;
-                $event = "تعديل السؤال - " . $question->title . " والامتحان منتهي";
-                EventLog::create($target, $type, $event);
-            });
-
-            if (is_null($exception))
-                return redirect("control-panel/questions/$question->id")->with([
-                    "UpdateQuestionMessage" => "تم تعديل السؤال الحالي."
-                ]);
-            else
-                return redirect("control-panel/questions/$question->id/edit")->with([
-                    "UpdateQuestionMessage" => "لم يتم تعديل السؤال الحالي."
-                ]);
-        }
     }
 
     /**
