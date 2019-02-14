@@ -13,8 +13,6 @@
             </div>
         @endif
 
-
-
         {{-- Session Update Question Message --}}
         @if (session('UpdateQuestionMessage'))
             <div class="row">
@@ -48,10 +46,6 @@
             </div>
         @endif
 
-
-
-
-
         <div class="row">
             {{-- Heading --}}
             <div class="col-12">
@@ -81,6 +75,7 @@
                                             @endif
                                             <a href="/control-panel/questions/{{$question->id}}" class="list-group-item list-group-item-action">
                                                 {{$question->title}}
+                                                <span class="badge badge-default float-left">{{$question->score . " درجة"}}</span>
                                             </a>
                                             @if ($loop->last)
                                         </div>
@@ -173,14 +168,14 @@
                                     @if ($loop->last)
                                         @if(count($currentQuestion->branches) != $currentQuestion->no_of_branch)
                                             <div class="alert text-center py-4">
-                                                <h5 class="m-0">لم يتم رفع جميع النقاط التابعه لهذا السؤال.</h5>
+                                                <h5 class="m-0">لم يتم رفع جميع النقاط التابعه لهذا السؤال</h5>
                                             </div>
                                         @endif
                                 </ol>
                             @endif
                         @empty
                             <div class="alert text-center py-4">
-                                <h5 class="m-0">هذا السؤال لا يحتوي على اي نقطة بعد.</h5>
+                                <h5 class="m-0">هذا السؤال لا يحتوي على اي نقطة بعد</h5>
                             </div>
                         @endforelse
 
@@ -222,7 +217,7 @@
                         @if($currentQuestion->exam->state == \App\Enums\ExamState::CLOSE)
                             <p>بعد حذف السؤال سوف يتم مسح جميع النقاط التابعه لهذا السؤال.</p>
                         @elseif($currentQuestion->exam->state == \App\Enums\ExamState::OPEN)
-                            <p>بعد حذف السؤال سوف يتم مسح جميع النقاط التابعه لهذا السؤال.</p>
+                            <p>لا يمكنك حذف السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح.</p>
                         @else
                             <p>بعد حذف السؤال سوف يتم مسح جميع النقاط التابعه لهذا السؤال وجميع اجابات الطلبة على هذا السؤال.</p>
                         @endif

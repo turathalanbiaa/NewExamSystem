@@ -140,7 +140,7 @@ class BranchController extends Controller
         //Store event log
         $target = $branch->id;
         $type = EventLogType::BRANCH;
-        $event = "اضافة نقطة الى السؤال - " . $question->title;
+        $event = "اضافة نقطة الى السؤال: " . $question->title;
         EventLog::create($target, $type, $event);
 
         if ($question->branches()->count() == $question->no_of_branch)
@@ -172,7 +172,12 @@ class BranchController extends Controller
      */
     public function edit(Branch $branch)
     {
-        dd("Edit");
+        Auth::check();
+        $exam = $branch->question->exam;
+        ExamController::watchExam($exam);
+        return view("ControlPanel.branch.edit")->with([
+            "branch" => $branch
+        ]);
     }
 
     /**
@@ -195,6 +200,6 @@ class BranchController extends Controller
      */
     public function destroy(Branch $branch)
     {
-        //
+        dd("Delete");
     }
 }

@@ -347,28 +347,34 @@ class ExamController extends Controller
             ]);
 
         $exception = DB::transaction(function () use ($exam) {
+
             foreach ($exam->questions as $question)
             {
+                //Delete answers for branch
                 foreach ($question->branches as $branch)
-                {
                     $branch->answers()->delete();
-                    $branch->delete();
-                }
+
+                //Delete branches for question
+                $question->branches()->delete();
+
+                //Delete question
                 $question->delete();
             }
 
+            //Make score is zero for current exam
             foreach ($exam->studentEnrolled as $studentEnroll)
-            {
                 StudentDocument::where('student_id', $studentEnroll->student_id)
                     ->where("course_id", $exam->course_id)
                     ->update(
                         $exam->type == ExamType::FIRST_MONTH?["first_month_score" => 0]:
-                        $exam->type == ExamType::SECOND_MONTH?["second_month_score" => 0]:
-                        $exam->type == ExamType::FINAL_FIRST_ROLE?["final_first_score" => 0]:["final_second_score" => 0]
+                            $exam->type == ExamType::SECOND_MONTH?["second_month_score" => 0]:
+                                $exam->type == ExamType::FINAL_FIRST_ROLE?["final_first_score" => 0]:["final_second_score" => 0]
                     );
-            }
 
+            //Delete every student enrolled in current exam
             $exam->studentEnrolled()->delete();
+
+            //Delete exam
             $exam->delete();
 
             //Store event log

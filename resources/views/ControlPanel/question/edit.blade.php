@@ -137,8 +137,8 @@
                     @endif
 
                     {{-- Card Body --}}
-                    @if(($question->exam->state == \App\Enums\ExamState::CLOSE) || ($question->exam->state == \App\Enums\ExamState::END))
-                        <div class="card-body px-4 border-bottom border-primary">
+                    <div class="card-body px-4 border-bottom border-primary">
+                        @if(($question->exam->state == \App\Enums\ExamState::CLOSE) || ($question->exam->state == \App\Enums\ExamState::END))
                             <form method="post" action="/control-panel/questions/{{$question->id}}">
                                 @csrf
                                 @method("PUT")
@@ -167,13 +167,13 @@
                                     <span>حفظ المعلومات</span>
                                 </button>
                             </form>
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
-                            <h4>لا يمكنك تعديل السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح</h4>
-                        </div>
-                    @endif
+                        @else
+                            <div class="text-center py-5">
+                                <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
+                                <h4>لا يمكنك تعديل السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح</h4>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

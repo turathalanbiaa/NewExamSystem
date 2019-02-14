@@ -14,4 +14,9 @@ class Branch extends Model
     {
         return $this->hasMany("App\Models\Answer");
     }
+
+    public function question()
+    {
+        return $this->belongsTo("App\Models\Question","question_id", "id");
+    }
 }

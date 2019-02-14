@@ -1,17 +1,17 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>{{$question->exam->title}}</title>
+    <title>{{$branch->question->exam->title}}</title>
 @endsection
 
 @section("content")
     <div class="container">
-        {{-- Session Create Branch Message --}}
-        @if (session('CreateBranchMessage'))
+        {{-- Session Update Branch Message --}}
+        @if (session('UpdateBranchMessage'))
             <div class="row">
                 <div class="col-12">
-                    <div class="alert alert-success text-center">
-                        {{session('CreateBranchMessage')}}
+                    <div class="alert alert-danger text-center">
+                        {{session('UpdateBranchMessage')}}
                     </div>
                 </div>
             </div>
@@ -21,7 +21,7 @@
             {{-- Heading --}}
             <div class="col-12">
                 <div class="view shadow mdb-color px-3 py-4 mb-3">
-                    <a class="h5 text-center text-white d-block m-0" href="/control-panel/exams/{{$question->exam->id}}">{{$question->exam->title}}</a>
+                    <a class="h5 text-center text-white d-block m-0" href="/control-panel/exams/{{$branch->question->exam->id}}">{{$branch->question->exam->title}}</a>
                 </div>
             </div>
 
@@ -60,13 +60,8 @@
                     {{-- Card View --}}
                     <div class="view shadow mdb-color px-3 py-4">
                         <h5 class="text-right text-white m-0">
-                            <span>اضافة نقطه الى السؤال: </span>
-                            <span>{{$question->title}}</span>
-                            <span class="badge badge-default float-left">
-                                <span rel="tooltip" title="عدد النقاط المرفوعه">{{$question->branches()->count()}}</span>
-                                <span>/</span>
-                                <span rel="tooltip" title="عدد النقاط المطلوبة">{{$question->no_of_branch}}</span>
-                            </span>
+                            <span>تعديل نقطه في السؤال: </span>
+                            <span>{{$branch->question->title}}</span>
                         </h5>
                     </div>
 
@@ -83,22 +78,17 @@
 
                     {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
-                        @if($question->branches()->count() == $question->no_of_branch)
-                            <div class="text-center py-5">
-                                <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
-                                <h4>لا يمكنك اضافة نقطة الى السؤال الحالي لان عدد النقاط المرفوعة تساوي عدد النقاط المطلوبة</h4>
-                            </div>
-                        @else
-                            <form method="post" action="/control-panel/branches">
+                        @if(($branch->question->exam->state == \App\Enums\ExamState::CLOSE) || ($branch->question->exam->state == \App\Enums\ExamState::END))
+                            <form method="post" action="/control-panel/branches/{{$branch->id}}">
                                 @csrf
-                                <input type="hidden" name="question" value="{{$question->id}}">
+                                @method("PUT")
 
                                 <div class="mb-4">
                                     <label for="title">عنوان (النص)</label>
                                     <input type="text" name="title" id="title" class="form-control" value="{{old("title")}}">
                                 </div>
 
-                                @if($question->type == \App\Enums\QuestionType::TRUE_OR_FALSE)
+                                @if($branch->question->type == \App\Enums\QuestionType::TRUE_OR_FALSE)
                                     <div class="mb-5">
                                         <label for="correctOption">اختر الاجابة الصحيحة</label>
                                         <select class="browser-default custom-select" name="correctOption" id="correctOption">
@@ -109,7 +99,7 @@
                                     </div>
                                 @endif
 
-                                @if($question->type == \App\Enums\QuestionType::SINGLE_CHOICE)
+                                @if($branch->question->type == \App\Enums\QuestionType::SINGLE_CHOICE)
                                     <div class="mb-4">
                                         <p class="font-weight-bold">الاختيارات</p>
 
@@ -144,14 +134,14 @@
                                     </div>
                                 @endif
 
-                                @if($question->type == \App\Enums\QuestionType::FILL_BLANK)
+                                @if($branch->question->type == \App\Enums\QuestionType::FILL_BLANK)
                                     <div class="mb-5">
                                         <label for="correctOption">الاجابة الصحيحة (اختياري)</label>
                                         <input type="text" name="correctOption" id="correctOption" class="form-control" value="{{old("correctOption")}}">
                                     </div>
                                 @endif
 
-                                @if($question->type == \App\Enums\QuestionType::EXPLAIN)
+                                @if($branch->question->type == \App\Enums\QuestionType::EXPLAIN)
                                     <div class="mb-5">
                                         <label for="correctOption">الاجابة الصحيحة (اختياري)</label>
                                         <textarea rows="5" name="correctOption" id="correctOption" class="form-control">{{old("correctOption")}}</textarea>
@@ -162,6 +152,11 @@
                                     <span>حفظ المعلومات</span>
                                 </button>
                             </form>
+                        @else
+                            <div class="text-center py-5">
+                                <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
+                                <h4>لا يمكنك تعديل النقطة الحالية لان الامتحان مفتوح</h4>
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -176,48 +171,48 @@
             // Tooltips Initialization
             $('[rel="tooltip"]').tooltip();
 
-            @if($question->type == \App\Enums\QuestionType::SINGLE_CHOICE)
-                //Change Options
-                $("input[data-action='change']").change(function () {
-                    insertOption($(this));
-                });
+            @if($branch->question->type == \App\Enums\QuestionType::SINGLE_CHOICE)
+            //Change Options
+            $("input[data-action='change']").change(function () {
+                insertOption($(this));
+            });
 
-                //Fill Select
-                for (let i=1;i<=4;i++)
+            //Fill Select
+            for (let i=1;i<=4;i++)
+            {
+                let currentInput = $("input#option-"+i);
+                if (currentInput.val() != "")
+                    insertOption(currentInput);
+
+                //Selected Option
+                let selectOption = $("select#correctOption > option." + currentInput.attr("id"));
+                if (selectOption.val() == '{{old("correctOption")}}')
+                    selectOption.attr("selected", "selected")
+            }
+
+            //Insert Or Update Option
+            function insertOption(currentInput)
+            {
+                let select = $("select#correctOption");
+                let selectOption = $("select#correctOption > option." + currentInput.attr("id"));
+
+                //Update Option
+                if (selectOption.attr("class") === currentInput.attr("id"))
                 {
-                    let currentInput = $("input#option-"+i);
-                    if (currentInput.val() != "")
-                        insertOption(currentInput);
-
-                    //Selected Option
-                    let selectOption = $("select#correctOption > option." + currentInput.attr("id"));
-                    if (selectOption.val() == '{{old("correctOption")}}')
-                        selectOption.attr("selected", "selected")
-                }
-
-                //Insert Or Update Option
-                function insertOption(currentInput)
-                {
-                    let select = $("select#correctOption");
-                    let selectOption = $("select#correctOption > option." + currentInput.attr("id"));
+                    //Delete Option
+                    if (currentInput.val() == "")
+                        selectOption.remove();
 
                     //Update Option
-                    if (selectOption.attr("class") === currentInput.attr("id"))
-                    {
-                        //Delete Option
-                        if (currentInput.val() == "")
-                            selectOption.remove();
-
-                        //Update Option
-                        selectOption.html(currentInput.val());
-                    }
-                    //Create New Option
-                    else
-                    {
-                        let newOption = '<option class="' + currentInput.attr("id") + '" value="' + currentInput.attr("id") + '">' + currentInput.val() + '</option>';
-                        select.append(newOption);
-                    }
+                    selectOption.html(currentInput.val());
                 }
+                //Create New Option
+                else
+                {
+                    let newOption = '<option class="' + currentInput.attr("id") + '" value="' + currentInput.attr("id") + '">' + currentInput.val() + '</option>';
+                    select.append(newOption);
+                }
+            }
             @endif
         });
     </script>

@@ -228,10 +228,10 @@
                                         @endif
                                         @if ($loop->last)
                                             @if(count($question->branches) != $question->no_of_branch)
-                                                <div class="alert alert-info text-center mt-2">
+                                                <div class="alert text-center py-4">
                                                     <h5 class="m-0">
                                                         <span>لم يتم رفع جميع النقاط التابعه لهذا السؤال.</span>
-                                                        <a href="/control-panel/branches/create?question={{$question->id}}" class="btn btn-outline-dark font-weight-bold">
+                                                        <a href="/control-panel/branches/create?question={{$question->id}}" class="btn btn-outline-primary font-weight-bold">
                                                             <i class="fa fa-plus ml-1"></i>
                                                             <span>اضافة نقطة</span>
                                                         </a>
@@ -241,10 +241,10 @@
                                     </ol>
                                 @endif
                             @empty
-                                <div class="alert alert-info text-center mt-2">
+                                <div class="alert text-center py-4">
                                     <h5 class="m-0">
-                                        <span>هذا السؤال لا يحتوي على اي نقطة</span>
-                                        <a href="/control-panel/branches/create?question={{$question->id}}" class="btn btn-outline-dark font-weight-bold">
+                                        <span>هذا السؤال لا يحتوي على بعد على اي نقطة</span>
+                                        <a href="/control-panel/branches/create?question={{$question->id}}" class="btn btn-outline-primary font-weight-bold">
                                             <i class="fa fa-plus ml-1"></i>
                                             <span>اضافة نقطة</span>
                                         </a>

@@ -220,12 +220,16 @@ class QuestionController extends Controller
         $exam = $question->exam;
         ExamController::watchExam($exam);
 
-        if ($exam->state == ExamState::CLOSE)
+        if (($exam->state == ExamState::CLOSE) || ($exam->state == ExamState::END))
         {
-            $exception = DB::transaction(function () use ($question) {
+            $exception = DB::transaction(function () use ($question, $exam) {
+                //Delete answers for branch
+                if ($exam->state == ExamState::END)
+                    foreach ($question->branches as $branch)
+                        $branch->answers()->delete();
+
                 //Delete branches
-                Branch::where('question_id', $question->id)
-                    ->delete();
+                $question->branches()->delete();
 
                 //Delete question
                 $question->delete();
@@ -233,60 +237,22 @@ class QuestionController extends Controller
                 //Store event log
                 $target = $question->id;
                 $type = EventLogType::QUESTION;
-                $event = "حذف السؤال - " . $question->title . " والامتحان مغلق";
+                $event = "حذف السؤال: " . $question->title . "في امتحان " . $exam->title . "و هذا الامتحان " . ExamState::getState($exam->state);
                 EventLog::create($target, $type, $event);
             });
 
             if (is_null($exception))
                 return redirect("/control-panel/exams/$exam->id")->with([
-                    "DeleteQuestionMessage" => "تم حذف السؤال."
+                    "DeleteQuestionMessage" => "تم حذف السؤال: " . $question->title
                 ]);
             else
                 return redirect("/control-panel/questions/$question->id")->with([
                     "DeleteQuestionMessage" => "لم يتم حذف السؤال."
                 ]);
         }
-        elseif ($exam->state == ExamState::OPEN)
-        {
+        else
             return redirect("/control-panel/questions/$question->id")->with([
                 "DeleteQuestionMessage" => "لا يمكنك حذف السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح."
             ]);
-        }
-        else
-        {
-            $exception = DB::transaction(function () use ($question) {
-                $branchesIds = $question->branches()->pluck("id")->toArray();
-
-                //Delete marking for each branch
-                Marking::whereIn("branch_id", $branchesIds)
-                    ->delete();
-
-                //Delete answer for each branch
-                Answer::whereIn("branch_id", $branchesIds)
-                    ->delete();
-
-                //Delete branches
-                Branch::where('question_id', $question->id)
-                    ->delete();
-
-                //Delete question
-                $question->delete();
-
-                //Store event log
-                $target = $question->id;
-                $type = EventLogType::QUESTION;
-                $event = "حذف السؤال - " . $question->title . " والامتحان منتهي";
-                EventLog::create($target, $type, $event);
-            });
-
-            if (is_null($exception))
-                return redirect("/control-panel/exams/$exam->id")->with([
-                    "DeleteQuestionMessage" => "تم حذف السؤال."
-                ]);
-            else
-                return redirect("/control-panel/questions/$question->id")->with([
-                    "DeleteQuestionMessage" => "لم يتم حذف السؤال."
-                ]);
-        }
     }
 }
