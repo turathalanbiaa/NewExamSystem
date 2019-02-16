@@ -85,16 +85,17 @@
 
                                 <div class="mb-4">
                                     <label for="title">عنوان (النص)</label>
-                                    <input type="text" name="title" id="title" class="form-control" value="{{old("title")}}">
+                                    <input type="text" name="title" id="title" class="form-control" value="{{$branch->title}}">
                                 </div>
 
                                 @if($branch->question->type == \App\Enums\QuestionType::TRUE_OR_FALSE)
-                                    <div class="mb-5">
+                                    <div class="mb-4">
                                         <label for="correctOption">اختر الاجابة الصحيحة</label>
                                         <select class="browser-default custom-select" name="correctOption" id="correctOption">
                                             <option value="" disabled="" selected="">يرجى اختيار الاجابة الصحيحة</option>
-                                            <option value="صح" {{(old("correctOption") == "صح" ? "selected":"")}}> صح </option>
-                                            <option value="خطأ" {{(old("correctOption") == "خطأ" ? "selected":"")}}> خطأ </option>
+                                            @foreach(json_decode($branch->options) as $option)
+                                                <option value="{{$option}}" {{($branch->correct_option == $option ? "selected":"")}}> {{$option}} </option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 @endif
@@ -104,29 +105,30 @@
                                         <p class="font-weight-bold">الاختيارات</p>
 
                                         <div class="mr-3">
+                                            @php $options = json_decode($branch->options); @endphp
                                             <div class="mb-3">
                                                 <label for="option-1">الاختيار الاول</label>
-                                                <input type="text" name="option-1" id="option-1" class="form-control" value="{{old("option-1")}}" data-action="change">
+                                                <input type="text" name="option-1" id="option-1" class="form-control" value="{{$options[0]}}" data-action="change">
                                             </div>
 
                                             <div class="mb-3">
                                                 <label for="option-2">الاختيار الثاني</label>
-                                                <input type="text" name="option-2" id="option-2" class="form-control" value="{{old("option-2")}}" data-action="change">
+                                                <input type="text" name="option-2" id="option-2" class="form-control" value="{{$options[1]}}" data-action="change">
                                             </div>
 
                                             <div class="mb-3">
                                                 <label for="option-3">الاختيار الثالث</label>
-                                                <input type="text" name="option-3" id="option-3" class="form-control" value="{{old("option-3")}}" data-action="change">
+                                                <input type="text" name="option-3" id="option-3" class="form-control" value="{{$options[2]}}" data-action="change">
                                             </div>
 
                                             <div class="mb-3">
                                                 <label for="option-4">الاختيار الرابع (اختياري)</label>
-                                                <input type="text" name="option-4" id="option-4" class="form-control" value="{{old("option-4")}}" data-action="change">
+                                                <input type="text" name="option-4" id="option-4" class="form-control" value="{{$options[3]}}" data-action="change">
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="mb-5">
+                                    <div class="mb-4">
                                         <label for="correctOption">اختر الاجابة الصحيحة</label>
                                         <select class="browser-default custom-select" name="correctOption" id="correctOption">
                                             <option value="" disabled="" selected="">يرجى اختيار الاجابة الصحيحة</option>
@@ -135,17 +137,28 @@
                                 @endif
 
                                 @if($branch->question->type == \App\Enums\QuestionType::FILL_BLANK)
-                                    <div class="mb-5">
+                                    <div class="mb-4">
                                         <label for="correctOption">الاجابة الصحيحة (اختياري)</label>
-                                        <input type="text" name="correctOption" id="correctOption" class="form-control" value="{{old("correctOption")}}">
+                                        <input type="text" name="correctOption" id="correctOption" class="form-control" value="{{$branch->correct_option}}">
                                     </div>
                                 @endif
 
                                 @if($branch->question->type == \App\Enums\QuestionType::EXPLAIN)
-                                    <div class="mb-5">
+                                    <div class="mb-4">
                                         <label for="correctOption">الاجابة الصحيحة (اختياري)</label>
-                                        <textarea rows="5" name="correctOption" id="correctOption" class="form-control">{{old("correctOption")}}</textarea>
+                                        <textarea rows="5" name="correctOption" id="correctOption" class="form-control">{{$branch->correct_option}}</textarea>
                                     </div>
+                                @endif
+
+                                @if($branch->question->exam->state == \App\Enums\ExamState::END)
+                                    <div class="mb-5">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" name="reCorrectAnswers" id="reCorrectAnswers" class="custom-control-input" value="true">
+                                            <label class="custom-control-label" for="reCorrectAnswers">اعتبار اجابة جميع الطلبة المجيبين على هذه النقطة اجابة صحيحة.</label>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="pb-4"></div>
                                 @endif
 
                                 <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
@@ -186,7 +199,7 @@
 
                 //Selected Option
                 let selectOption = $("select#correctOption > option." + currentInput.attr("id"));
-                if (selectOption.val() == '{{old("correctOption")}}')
+                if (selectOption.val() == '{{$branch->correct_option}}')
                     selectOption.attr("selected", "selected")
             }
 
@@ -209,7 +222,7 @@
                 //Create New Option
                 else
                 {
-                    let newOption = '<option class="' + currentInput.attr("id") + '" value="' + currentInput.attr("id") + '">' + currentInput.val() + '</option>';
+                    let newOption = '<option class="' + currentInput.attr("id") + '" value="' + currentInput.val() + '">' + currentInput.val() + '</option>';
                     select.append(newOption);
                 }
             }

@@ -46,6 +46,17 @@
             </div>
         @endif
 
+        {{-- Session Update Branch Message --}}
+        @if (session('UpdateBranchMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-success text-center">
+                        {{session('UpdateBranchMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <div class="row">
             {{-- Heading --}}
             <div class="col-12">

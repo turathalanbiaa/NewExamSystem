@@ -214,7 +214,7 @@
                     //Create New Option
                     else
                     {
-                        let newOption = '<option class="' + currentInput.attr("id") + '" value="' + currentInput.attr("id") + '">' + currentInput.val() + '</option>';
+                        let newOption = '<option class="' + currentInput.attr("id") + '" value="' + currentInput.val() + '">' + currentInput.val() + '</option>';
                         select.append(newOption);
                     }
                 }
