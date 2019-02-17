@@ -6,6 +6,18 @@
 
 @section("content")
     <div class="container">
+        {{-- Session Create Exam Message --}}
+        @if (session('CreateExamMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
+                        {{session('CreateExamMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+
         <div class="row">
             {{-- Heading --}}
             <div class="col-12 mb-3">
@@ -52,13 +64,6 @@
                                     <li>{{ $error }}</li>
                                 @endforeach
                             </ul>
-                        </div>
-                    @endif
-
-                    {{-- Session Create Exam Message --}}
-                    @if (session('CreateExamMessage'))
-                        <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center mx-4 mt-4">
-                            {{session('CreateExamMessage')}}
                         </div>
                     @endif
 

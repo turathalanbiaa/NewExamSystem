@@ -315,6 +315,51 @@ class BranchController extends Controller
      */
     public function destroy(Branch $branch)
     {
-        dd("Delete");
+        Auth::check();
+        $exam = $branch->question->exam;
+        ExamController::watchExam($exam);
+        $question = $branch->question;
+
+        if (($exam->state == ExamState::CLOSE) || ($exam->state == ExamState::END))
+        {
+            $exception = DB::transaction(function () use ($exam, $question, $branch) {
+                //Delete
+                $branch->delete();
+
+                //Update Answers
+                if ($exam->state == ExamState::END)
+                {
+                    //Delete Answers
+                    $branch->answers()->delete();
+
+                    //Store event log
+                    $target = $branch->id;
+                    $type = EventLogType::BRANCH;
+                    $event = "تم حذف اجوبة الطلبة على النقطة: ". $branch->title . " التابعه للسؤال: " . $question->title . " في الامتحان: " . $exam->title;
+                    EventLog::create($target, $type, $event);
+                }
+
+                //Store event log
+                $target = $branch->id;
+                $type = EventLogType::BRANCH;
+                $event = "حذف النقطة: ". $branch->title . "التابعه للسؤال: " . $question->title;
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("control-panel/questions/$question->id")->with([
+                    "DeleteBranchMessage" => "تم حذف النقطة: " . $branch->title . " بنجاح"
+                ]);
+            else
+                return redirect("control-panel/branches/$question->id")->with([
+                    "DeleteBranchMessage" => "لم يتم حذف النقطة بنجاح.",
+                    "TypeMessage" => "Error"
+                ]);
+        }
+        else
+            return redirect("control-panel/questions/$question->id")->with([
+                "DeleteBranchMessage" => "لا يمكنك حذف اي نقطة لان الامتحان مفتوح",
+                "TypeMessage" => "Error"
+            ]);
     }
 }

@@ -6,6 +6,18 @@
 
 @section("content")
     <div class="container">
+        {{-- Session Update Exam Message --}}
+        @if (session('UpdateExamMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger text-center">
+                        {{session('UpdateExamMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+
         <div class="row">
             {{-- Heading --}}
             <div class="col-12 mb-3">
@@ -48,13 +60,6 @@
                                     <li>{{ $error }}</li>
                                 @endforeach
                             </ul>
-                        </div>
-                    @endif
-
-                    {{-- Session Update Exam Message --}}
-                    @if (session('UpdateExamMessage'))
-                        <div class="alert alert-danger text-center mx-4 mt-4">
-                            {{session('UpdateExamMessage')}}
                         </div>
                     @endif
 

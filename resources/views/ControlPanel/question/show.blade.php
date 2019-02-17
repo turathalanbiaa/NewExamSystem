@@ -57,6 +57,17 @@
             </div>
         @endif
 
+        {{-- Session Delete Branch Message --}}
+        @if (session('DeleteBranchMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
+                        {{session('DeleteBranchMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <div class="row">
             {{-- Heading --}}
             <div class="col-12">
@@ -147,7 +158,7 @@
                                                 <i class="fa fa-edit ml-1"></i>
                                                 <span>تحرير</span>
                                             </a>
-                                            <a href="#delete-branch" class="text-danger text-decoration mr-1" rel="tooltip" title="حذف النقطة">
+                                            <a href="#modelDeleteBranch" data-toggle="modal" class="text-danger text-decoration mr-1" rel="tooltip" title="حذف النقطة" data-action="fillDeleteBranchForm" data-branch-id="{{$branch->id}}" data-branch-title="{{$branch->title}}">
                                                 <i class="fa fa-trash-alt ml-1"></i>
                                                 <span>حذف</span>
                                             </a>
@@ -248,13 +259,63 @@
         @csrf
         @method("DELETE")
     </form>
+
+    {{-- Delete Branch Modal --}}
+    <div class="modal fade" id="modelDeleteBranch" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notify modal-danger" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="heading lead">حذف النقطة</p>
+
+                    <a href="javascript:void(0)" class="close ml-0" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="white-text">&times;</span>
+                    </a>
+                </div>
+
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fa fa-trash-alt fa-4x mb-3 animated fadeIn"></i>
+                        <h2 class="text-danger">هل تريد حذف النقطة </h2>
+                        <p id="branch-title"></p>
+                        @if($currentQuestion->exam->state == \App\Enums\ExamState::CLOSE)
+                            <p>سيتم حذف النقطة فقط.</p>
+                        @elseif($currentQuestion->exam->state == \App\Enums\ExamState::OPEN)
+                            <p>لا يمكنك حذف النقطة الحالي لان الامتحان مفتوح.</p>
+                        @else
+                            <p>بعد حذف النقطة سوف يتم مسح جميع اجابات الطلبة على النقطة الحالية.</p>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-danger" onclick="$('form#deleteBranch').submit();">حذف النقطة</button>
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">لا شكرا</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Delete Branch Form--}}
+    <form id="deleteBranch" method="post" action="/control-panel/branches/">
+        @csrf
+        @method("DELETE")
+    </form>
 @endsection
 
 @section("script")
     <script>
         $(document).ready(function () {
             // Tooltips Initialization
-            $('[rel="tooltip"]').tooltip()
+            $('[rel="tooltip"]').tooltip();
+
+            //Fill Delete Exam Form And Model
+            $("[data-action='fillDeleteBranchForm']").click(function () {
+                let branchId = $(this).data("branch-id");
+                let branchTitle = $(this).data("branch-title");
+
+                $("form#deleteBranch").attr("action","/control-panel/branches/" + branchId);
+                $("#branch-title").html(branchTitle);
+            });
         });
     </script>
 @endsection
