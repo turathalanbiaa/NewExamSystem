@@ -160,7 +160,7 @@
                     <div class="col-12 mb-3">
                         <a class="bg-light h5 p-3 m-0 d-block" data-toggle="collapse" data-target="#manual-correction-questions" aria-expanded="false" aria-controls="collapseManualCorrectionQuestions">
                             <i class="fa fa-caret-left text-default ml-1"></i>
-                            <span>أسئلة التصحيح اليدوي</span>
+                            <span>تصحيح الاسئلة</span>
                         </a>
                     </div>
 
@@ -172,12 +172,10 @@
                                     @if ($loop->first)
                                         <div class="list-group list-group-flush">
                                             @endif
-                                            @if(($question->type == \App\Enums\QuestionType::FILL_BLANK) || ($question->type == \App\Enums\QuestionType::EXPLAIN))
-                                                <a href="/control-panel/questions/{{$question->id}}" class="list-group-item list-group-item-action">
-                                                    {{$question->title}}
-                                                    <span class="badge badge-default float-left">{{$question->score . " درجة"}}</span>
-                                                </a>
-                                            @endif
+                                            <a href="/control-panel/questions/{{$question->id}}" class="list-group-item list-group-item-action">
+                                                {{$question->title}}
+                                                <span class="badge badge-default float-left">{{$question->score . " درجة"}}</span>
+                                            </a>
                                             @if ($loop->last)
                                         </div>
                                     @endif
