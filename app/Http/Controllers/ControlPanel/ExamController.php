@@ -7,6 +7,7 @@ use App\Enums\CourseState;
 use App\Enums\EventLogType;
 use App\Enums\ExamState;
 use App\Enums\ExamType;
+use App\Enums\QuestionCorrectionState;
 use App\Models\Course;
 use App\Models\EventLog;
 use App\Models\Exam;
@@ -150,8 +151,10 @@ class ExamController extends Controller
     {
         Auth::check();
         self::watchExam($exam);
+        $questionsCorrection = $exam->questions()->where("question.correction", QuestionCorrectionState::UNCORRECTED)->get();
         return view("ControlPanel.exam.show")->with([
-            "exam" => $exam
+            "exam" => $exam,
+            "questionsCorrection" => $questionsCorrection
         ]);
     }
 

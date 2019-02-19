@@ -168,13 +168,13 @@
                     <div class="col-12 mb-3 collapse" id="manual-correction-questions">
                         <div class="card">
                             <div class="card-body border-bottom border-default">
-                                @forelse($exam->questions as $question)
+                                @forelse($questionsCorrection as $question)
                                     @if ($loop->first)
                                         <div class="list-group list-group-flush">
                                             @endif
-                                            <a href="/control-panel/questions/{{$question->id}}" class="list-group-item list-group-item-action">
-                                                {{$question->title}}
-                                                <span class="badge badge-default float-left">{{$question->score . " درجة"}}</span>
+                                            <a href="/control-panel/questions-correction/{{$question->id}}" class="list-group-item list-group-item-action">
+                                                <span class="font-weight-bold">تصحيح السؤال: </span>
+                                                <span>{{$question->title}}</span>
                                             </a>
                                             @if ($loop->last)
                                         </div>
