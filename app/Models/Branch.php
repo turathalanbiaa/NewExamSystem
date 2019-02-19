@@ -10,5 +10,4 @@ class Branch extends Model
     protected $primaryKey = "id";
     public $timestamps = false;
 
-
 }

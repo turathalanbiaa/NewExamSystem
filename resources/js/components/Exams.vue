@@ -42,7 +42,6 @@
                 axios.get('get-exams')
                     .then(({data})=>{
                         this.examList=data;
-                       console.log(data)
                     })
                     .catch((resp)=> {
                         console.log(resp);

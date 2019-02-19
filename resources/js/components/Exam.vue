@@ -2,17 +2,39 @@
     <v-container  fluid
                   grid-list-lg
     >
-        <p class="text-lg-right headline"> امتحان اسئلة دينيه عامه الشهر الاول </p>
+        <p class="text-lg-right headline">{{questionsList[0].title}}</p>
         <v-layout row wrap>
 
-            <v-flex xs12 sm12 md12 lg12>
-                <v-card>
+            <v-flex v-for="(question, index) in questionsList[1]" :key="question.id" sm12 md12 lg12>
+
+              <!--true false-->
+                <v-card v-if="question.type === 1">
                     <v-card-title primary-title>
-                        <h3 class="title mb-0">من أول ملك فرعوني آمن بالتوحيد ؟</h3>
+                        <h3 class="title mb-0">{{question.title}}</h3>
                     </v-card-title>
-                    <v-card-text>
-                    <v-radio-group column v-model="questionsList[0].value">
-                        <v-radio  label="اخناتون" value="اخناتون" @change="getValue('value1', 1)"  checked></v-radio>
+                        <v-card-text v-for="branche in question.branches"  :key="branche.id">
+                            {{branche.title}}
+                            <v-radio-group column >
+                                <v-radio  label="صح" value="صح" @change="getValue('value1', 2)"></v-radio>
+                                <v-radio label="خطأ" value="خطأ" @change="getValue('value2', 2)"></v-radio>
+                            </v-radio-group>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-btn class="mb-2"  color="success" dark @click="saveAnswer(2)">حفظ
+                                <v-icon dark left>save</v-icon>
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+
+                <!--multi choice -->
+                <v-card v-if="question.type === 2">
+                    <v-card-title primary-title>
+                        <h3 class="title mb-0">{{question.title}}</h3>
+                    </v-card-title>
+                    <v-card-text v-for="branche in question.branches"  :key="branche.id">
+                        {{branche.title}}
+                        <v-radio-group column >
+                        <v-radio  label="اخناتون" value="اخناتون" @change="getValue('value1', 1)"></v-radio>
                         <v-radio label="توت عنغ امون" value="توت عنغ امون" @change="getValue('value2', 1)"></v-radio>
                         <v-radio label="خوفو" value="خوفو" @change="getValue('value3', 1)"></v-radio>
                         <v-radio label="خفرع" value="خفرع" @change="getValue('value4', 1)"></v-radio>
@@ -24,15 +46,50 @@
                             </v-btn>
                         </v-card-actions>
                 </v-card>
+
+                <!--fill in the blank -->
+                <v-card v-if="question.type === 3">
+                    <v-card-title primary-title>
+                        <h3 class="title mb-0">{{question.title}}</h3>
+                    </v-card-title>
+                    <v-card-text v-for="branche in question.branches"  :key="branche.id">
+                        {{branche.title}}
+                        <v-text-field  single-line outline @input="getValue($event, 3)">
+                        </v-text-field>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-btn class="mb-2"  color="success" dark @click="saveAnswer(3)">حفظ
+                            <v-icon dark left>save</v-icon>
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+
+                <!--explain -->
+                <v-card v-if="question.type === 4">
+                    <v-card-title primary-title>
+                        <h3 class="title mb-0">{{question.title}}</h3>
+                    </v-card-title>
+                    <v-card-text v-for="branche in question.branches"  :key="branche.id">
+                        {{branche.title}}
+                        <v-textarea  outline  @input="getValue($event, 4)">
+                        </v-textarea>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-btn class="mb-2"  color="success" dark @click="saveAnswer(4)">حفظ
+                            <v-icon dark left>save</v-icon>
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+
             </v-flex>
 
-            <v-flex xs12 sm12 md12 lg12>
+           <!-- <v-flex xs12 sm12 md12 lg12>
                 <v-card>
                     <v-card-title primary-title>
                         <h3 class="title mb-0">أول قاضي في البصرة ابو مريم الحنفي؟</h3>
                     </v-card-title>
                     <v-card-text>
-                    <v-radio-group column v-model="questionsList[1].value">
+                    <v-radio-group column v-model="questionsList[1].title">
                         <v-radio  label="صح" value="صح" @change="getValue('value1', 2)"></v-radio>
                         <v-radio label="خطأ" value="خطأ" @change="getValue('value2', 2)"></v-radio>
                     </v-radio-group>
@@ -53,7 +110,7 @@
                     </v-card-title>
                     <v-card-text>
                         <v-text-field single-line outline @input="getValue($event, 3)"
-                                      :value="questionsList[1].name"
+                                      :value="questionsList[2].title"
                         ></v-text-field>
                         </v-card-text>
                     <v-card-actions>
@@ -71,7 +128,7 @@
                     </v-card-title>
                     <v-card-text>
                     <v-textarea outline  @input="getValue($event, 4)"
-                                :value="questionsList[1].name"
+                                :value="questionsList[3].title"
                     ></v-textarea>
                         </v-card-text>
                     <v-card-actions>
@@ -80,7 +137,7 @@
                         </v-btn>
                     </v-card-actions>
                 </v-card>
-            </v-flex>
+            </v-flex>-->
 
             <v-snackbar
                     v-model="snackbar"
@@ -151,21 +208,11 @@
                 color:'',
                 questionId:null,
                 answer:null,
-                questionsList:[
-                    {
-                    name:'سوال1',
-                    value:'خوفو'
-                },
-                    {
-                        name:'سوال2',
-                        value:'خطأ'
-                    },
-                ]
+                questionsList:[]
             };
         },
 
         mounted() {
-            console.log('id'+this.$route.params.id);
             this.initData();
         },
         methods: {
@@ -199,9 +246,8 @@
             initData() {
                 axios.get('get-exam', {params: {id:this.$route.params.id}})
                     .then(({data})=>{
-                        //this.questionsList=data;
-
-                        console.log(this.questionsList[0].value);
+                        this.questionsList=data;
+                        console.log(data[0].title);
                     })
                     .catch((resp)=> {
                         console.log(resp);

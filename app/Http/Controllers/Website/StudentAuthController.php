@@ -15,9 +15,9 @@ class StudentAuthController extends Controller
     {
         //Id come from request
         $requestId=4;
-
         $eduStudent=EduStudent::find($requestId);
         $student=Student::where('edu_student_id',$eduStudent->ID)->first();
+
         if (!$student) {
             $student = new Student;
             $student->edu_student_id = $eduStudent->ID;
@@ -30,7 +30,7 @@ class StudentAuthController extends Controller
                 $examsIds->push($course->exams->pluck('id'));
             }
             $student->exams()->attach($examsIds->collapse());
-            Cookie::queue(Cookie::forever('remember_me', $remember_token));
+            Cookie::queue(cookie()->forever('remember_me', $remember_token));
             session('newExamsChecked',true);
             return redirect('/');
         }
@@ -43,9 +43,12 @@ class StudentAuthController extends Controller
                 $examsIds->push($course->exams->pluck('id'));
             }
             $student->exams()->sync($examsIds->collapse());
-            Cookie::queue(Cookie::forever('remember_me', $student->remember_token));
+            Cookie::queue(cookie()->forever('remember_me', $student->remember_token));
             Session::put('newExamsChecked',true);
             return redirect('/');
         }
+    }
+    public function info(){
+        return view('Website.info');
     }
 }

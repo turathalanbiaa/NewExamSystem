@@ -19,7 +19,7 @@ class StudentAuthMiddleware
             else{
                 $student=Student::where('remember_token',Cookie::get('remember_me'))->first();
                 $eduStudent=EduStudent::find($student->edu_student_id);
-                $courseExamsByLevel = Course::where(['level' => $eduStudent->level, 'state' => 1])->with('exams')->has('exams')->get(['id']);
+                $courseExamsByLevel = Course::where(['level' => $eduStudent->Level, 'state' => 1])->with('exams')->has('exams')->get(['id']);
                 $examsIds = collect();
                 foreach ($courseExamsByLevel as $course) {
                     $examsIds->push($course->exams->pluck('id'));

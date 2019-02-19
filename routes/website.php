@@ -5,9 +5,12 @@
  * Date: 12/10/2018
  * Time: 1:44 PM
  */
-Route::get('/', 'Website\HomeController@index')->middleware('StudentAuth');
 Route::get('/student-auth', 'Website\StudentAuthController@studentAuth');
-Route::get('/info', 'Website\HomeController@info');
-Route::get('/get-exams', 'Website\StudentExamController@exams');
-Route::get('/get-exam', 'Website\StudentExamController@exam');
+Route::get('/info', 'Website\StudentAuthController@info');
+
+Route::get('/', 'Website\StudentExamController@exams')->middleware('StudentAuth');
+Route::get('/exam/{id}', 'Website\StudentExamController@exam');
+Route::post('/store', 'Website\StudentExamController@store');
+Route::post('/finish', 'Website\StudentExamController@finish');
+
 
