@@ -6,18 +6,42 @@
 
 @section("content")
     <div class="container">
+        {{-- Session Update Exam Message --}}
+        @if (session('UpdateExamMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger text-center">
+                        {{session('UpdateExamMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+
         <div class="row">
+            {{-- Heading --}}
+            <div class="col-12 mb-3">
+                <div class="view shadow mdb-color px-3 py-4">
+                    <h5 class="text-center text-white m-0">تعديل النموذج الامتحاني</h5>
+                </div>
+            </div>
+
             {{-- Info --}}
             <div class="col-lg-4">
                 {{-- Exam Alert Info --}}
                 <div class="alert alert-info">
-                    <h5 class="text-center pb-2 border-bottom border-primary">طريفة توزيع الدرجة عند تعديل الامتحان</h5>
+                    <h5 class="text-center pb-2 border-bottom border-primary">طريقة تعديل النموذج الامتحاني</h5>
                     <ul class="mb-0 pr-3">
-                        <li>مجموع درجة امتحان الشهر الاول وامتحان الشهر الثاني يساوي (25) درجة.</li>
-                        <li>درجة الامتحان النهائي هي (60) درجة، سواء كان الامتحان النهائي دور اول او دور ثاني.</li>
                         <li>اذا كان نوع الامتحان شهر اول اوثاني فيمكنك تعديل عنوان ودرجة وتاريخ الامتحان فقط.</li>
                         <li>واذا كان نوع الامتحان نهائي فيمكنك تعديل عنوان وتاريخ الامتحان فقط.</li>
                         <li>لا يمكنك تعديل المادة التابع لها هذا الامتحان ولا نوع الامتحان.</li>
+                    </ul>
+                </div>
+
+                {{-- Exam Score Alert Info --}}
+                <div class="alert alert-info">
+                    <h5 class="text-center pb-2 border-bottom border-primary">طريقة توزيع الدرجة بعد تعديل النموذج الامتحاني</h5>
+                    <ul class="mb-0 pr-3">
                         <li>لا يمكنك وضع (25 درجة) لامتحان الشهر الاول، اذا كانت المادة تملك امتحان شهر ثاني.</li>
                         <li>لا يمكنك وضع (25 درجة) لامتحان الشهر الثاني.</li>
                         <li>بعد تعديل درجة امتحان الشهر الاول سيتم تعديل درجة امتحان الشهر الثاني تلقائيا والعكس صحيح.</li>
@@ -39,18 +63,12 @@
                         </div>
                     @endif
 
-                    {{-- Session Update Exam Message --}}
-                    @if (session('UpdateExamMessage'))
-                        <div class="alert alert-danger text-center mx-4 mt-4">
-                            {{session('UpdateExamMessage')}}
-                        </div>
-                    @endif
-
                     {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
                         <form method="post" action="/control-panel/exams/{{$exam->id}}">
                             @csrf
                             @method("PUT")
+                            <input type="hidden" name="general" value="general">
 
                             <div class="mb-4">
                                 <label for="title">عنوان الامتحان</label>

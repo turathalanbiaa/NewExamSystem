@@ -1,27 +1,32 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>اضافة سؤال</title>
+    <title>تحرير سؤال</title>
 @endsection
 
 @section("content")
     <div class="container">
-        <div class="row">
-            {{-- Session Create  َQuestion Message --}}
-            @if (session('CreateQuestionMessage'))
-                <div class="row">
-                    <div class="col-12">
-                        <div class="alert alert-danger text-center">
-                            {{session('CreateQuestionMessage')}}
-                        </div>
+        {{-- Session Update Question Message --}}
+        @if (session('UpdateQuestionMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger text-center">
+                        {{session('UpdateQuestionMessage')}}
                     </div>
                 </div>
-            @endif
+            </div>
+        @endif
 
+        <div class="row">
             {{-- Heading --}}
             <div class="col-12">
                 <div class="view shadow mdb-color px-3 py-4 mb-3">
-                    <a class="h5 d-block text-center text-white m-0" href="/control-panel/exams/{{$exam->id}}">{{$exam->title}}</a>
+                    <a class="h5 text-center text-white d-block m-0" href="/control-panel/exams/{{$question->exam->id}}">
+                        <span>{{$question->exam->title}}</span>
+                        <span class="text-danger"> - - - - </span>
+                        <span>الامتحان حاليا </span>
+                        <span>{{\App\Enums\ExamState::getState($question->exam->state)}}</span>
+                    </a>
                 </div>
             </div>
 
@@ -29,7 +34,7 @@
             <div class="col-lg-4">
                 {{-- Question Alert Info --}}
                 <div class="alert alert-info">
-                    <h5 class="text-center pb-2 border-bottom border-primary">التعليمات حول اضافة السؤال</h5>
+                    <h5 class="text-center pb-2 border-bottom border-primary">التعليمات حول تعديل السؤال</h5>
                     <ul class="mb-0 pr-3">
                         <li>
                             <span>تقسم درجة السؤال </span>
@@ -53,11 +58,9 @@
                             <span>عدد النقاط.</span>
                         </li>
 
-                        <li>
-                            <span>لايمكن ان تكون </span>
-                            <span class="font-weight-bold">درجة السؤال اكبر من درجة الامتحان المتبقية</span>
-                            <span>.</span>
-                        </li>
+                        <li>لا يمكنك تعديل السؤال اذا كان الامتحان التابع له هذا السؤال مفتوح.</li>
+
+                        <li>اذا كان الامتحان منتهي فلا يمكنك تغيير عدد النقاط.</li>
                     </ul>
                 </div>
 
@@ -93,42 +96,33 @@
                     <ul class="mb-0 pr-3">
                         <li>
                             <span>درجة الامتحان الحقيقية </span>
-                            <span class="badge badge-success"> {{$exam->real_score}} </span>
+                            <span class="badge badge-success"> {{$question->exam->real_score}} </span>
                             <span>.</span>
                         </li>
 
                         <li>
                             <span>درجة الامتحان من </span>
-                            <span class="badge badge-success"> {{$exam->fake_score}} </span>
+                            <span class="badge badge-success"> {{$question->exam->fake_score}} </span>
                             <span> والدرجة المتبقية </span>
-                            <span class="badge badge-danger"> {{$exam->fake_score - $exam->questions()->sum("score")}} </span>
+                            <span class="badge badge-danger"> {{$question->exam->fake_score - $question->exam->questions()->sum("score")}} </span>
                             <span>.</span>
                         </li>
 
                         <li>
                             <span>عدد الاسئلة الموضوعة </span>
-                            <span class="badge badge-success"> {{count($exam->questions)}} </span>
+                            <span class="badge badge-success"> {{$question->exam->questions()->count()}} </span>
                             <span>.</span>
                         </li>
                     </ul>
                 </div>
-
-                {{-- Question Type Alert Info --}}
-                <div class="alert alert-info">
-                    <h5 class="text-center pb-2 border-bottom border-primary">التصحيح اليدوي والالكتروني</h5>
-                    <ul class="mb-0 pr-3">
-                        <li>يكون التصحيح الكتروني اذا كان نوع السؤال صح او خطأ او اختيارات.</li>
-                        <li>يكون التصحيح يدوي اذا كان نوع السؤال فراغات او تعاريف او شرح.</li>
-                    </ul>
-                </div>
             </div>
 
-            {{-- Create Question --}}
+            {{-- Edit Question --}}
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Card View --}}
                     <div class="view shadow mdb-color px-3 py-4">
-                        <h5 class="text-center text-white m-0">اضافة سؤال جديد</h5>
+                        <h5 class="text-center text-white m-0">تحرير السؤال الحالي</h5>
                     </div>
 
                     {{-- Alert Errors --}}
@@ -144,59 +138,40 @@
 
                     {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
-                        @if(($exam->fake_score - $exam->questions()->sum("score")) == 0)
-                            <div class="text-center py-5">
-                                <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
-                                <h4>لا يمكنك اضافة سؤال جديد لان درجة الامتحان المتبقية تساوي صفر</h4>
-                            </div>
-                        @else
-                            <form method="post" action="/control-panel/questions">
+                        @if(($question->exam->state == \App\Enums\ExamState::CLOSE) || ($question->exam->state == \App\Enums\ExamState::END))
+                            <form method="post" action="/control-panel/questions/{{$question->id}}">
                                 @csrf
-                                <input type="hidden" name="exam" value="{{$exam->id}}">
+                                @method("PUT")
 
                                 <div class="mb-4">
                                     <label for="title">عنوان</label>
-                                    <input type="text" name="title" id="title" class="form-control" value="{{old("title")}}">
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="type">اختر نوع السؤال</label>
-                                    <select class="browser-default custom-select" name="type" id="type">
-                                        <option value="" disabled="" selected="">يرجى اختيار نوع السؤال</option>
-                                        <option value="{{\App\Enums\QuestionType::TRUE_OR_FALSE}}" {{(old("type") == \App\Enums\QuestionType::TRUE_OR_FALSE ? "selected":"")}}>
-                                            {{\App\Enums\QuestionType::getType(\App\Enums\QuestionType::TRUE_OR_FALSE)}}
-                                        </option>
-                                        <option value="{{\App\Enums\QuestionType::SINGLE_CHOICE}}" {{(old("type") == \App\Enums\QuestionType::SINGLE_CHOICE ? "selected":"")}}>
-                                            {{\App\Enums\QuestionType::getType(\App\Enums\QuestionType::SINGLE_CHOICE)}}
-                                        </option>
-                                        <option value="{{\App\Enums\QuestionType::FILL_BLANK}}" {{(old("type") == \App\Enums\QuestionType::FILL_BLANK ? "selected":"")}}>
-                                            {{\App\Enums\QuestionType::getType(\App\Enums\QuestionType::FILL_BLANK)}}
-                                        </option>
-                                        <option value="{{\App\Enums\QuestionType::EXPLAIN}}" {{(old("type") == \App\Enums\QuestionType::EXPLAIN ? "selected":"")}}>
-                                            {{\App\Enums\QuestionType::getType(\App\Enums\QuestionType::EXPLAIN)}}
-                                        </option>
-                                    </select>
+                                    <input type="text" name="title" id="title" class="form-control" value="{{$question->title}}">
                                 </div>
 
                                 <div class="mb-4">
                                     <label for="score">الدرجة</label>
-                                    <input type="number" name="score" id="score" class="form-control" value="{{old("score", 0)}}">
+                                    <input type="number" name="score" id="score" class="form-control" value="{{$question->score}}">
                                 </div>
 
                                 <div class="mb-4">
                                     <label for="noOfBranch">عدد النقاط</label>
-                                    <input type="number" name="noOfBranch" id="noOfBranch" class="form-control" value="{{old("noOfBranch", 1)}}">
+                                    <input type="number" name="noOfBranch" id="noOfBranch" class="form-control" value="{{$question->no_of_branch}}" {{($question->exam->state == \App\Enums\ExamState::END)?"readonly":""}}>
                                 </div>
 
                                 <div class="mb-5">
                                     <label for="noOfBranchRequired">عدد النقاط المطلوبة</label>
-                                    <input type="number" name="noOfBranchRequired" id="noOfBranchRequired" class="form-control" value="{{old("noOfBranchRequired", 1)}}">
+                                    <input type="number" name="noOfBranchRequired" id="noOfBranchRequired" class="form-control" value="{{$question->no_of_branch_req}}">
                                 </div>
 
                                 <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
                                     <span>حفظ المعلومات</span>
                                 </button>
                             </form>
+                        @else
+                            <div class="text-center py-5">
+                                <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
+                                <h4>لا يمكنك تعديل السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح</h4>
+                            </div>
                         @endif
                     </div>
                 </div>

@@ -10,4 +10,13 @@ class Branch extends Model
     protected $primaryKey = "id";
     public $timestamps = false;
 
+    public function answers()
+    {
+        return $this->hasMany("App\Models\Answer");
+    }
+
+    public function question()
+    {
+        return $this->belongsTo("App\Models\Question","question_id", "id");
+    }
 }

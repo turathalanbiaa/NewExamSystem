@@ -221,7 +221,7 @@
                                             <tbody>
                                                 @php $i=0; @endphp
                                                 @foreach($events as $event)
-                                                    @if(($event->type == \App\Enums\EventLogType::EXAM) || ($event->type == \App\Enums\EventLogType::ROOT_QUESTION) || ($event->type == \App\Enums\EventLogType::QUESTION))
+                                                    @if(($event->type == \App\Enums\EventLogType::EXAM)  || ($event->type == \App\Enums\EventLogType::QUESTION))
                                                         <tr data-event="{{$event->id}}">
                                                             <td>{{++$i}}</td>
                                                             <td>{{\App\Enums\EventLogType::getType($event->type)}}</td>

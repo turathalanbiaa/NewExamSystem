@@ -68,6 +68,12 @@ table.dataTable thead .sorting_desc_disabled:after {
     padding: 0 20px 20px 20px;
 }
 
+.text-decoration {
+    text-decoration: underline;
+}
+
+/*for custom radio*/
+
 .custom-control-inline {
     margin-right: 0;
     margin-left: 1rem;
