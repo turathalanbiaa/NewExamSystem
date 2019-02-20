@@ -20,4 +20,4 @@ Route::resource('control-panel/exams', 'ControlPanel\ExamController');
 Route::resource('control-panel/questions', 'ControlPanel\QuestionController');
 Route::resource('control-panel/branches', 'ControlPanel\BranchController');
 
-Route::get('control-panel/questions-correction/{id}', 'ControlPanel\QuestionsCorrectionController@correction');
+Route::get('control-panel/questions-correction/{id}', 'ControlPanel\QuestionsCorrectionController@showQuestionToCorrection');

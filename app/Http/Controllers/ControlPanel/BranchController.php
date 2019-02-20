@@ -131,6 +131,7 @@ class BranchController extends Controller
         $branch->options = (!is_null($options))?json_encode($options, JSON_UNESCAPED_UNICODE):null;
         $branch->correct_option = $correctOption;
         $branch->score = $question->score / $question->no_of_branch_req;
+
         $success = $branch->save();
 
         if (!$success)
