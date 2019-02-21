@@ -151,11 +151,8 @@ class ExamController extends Controller
     {
         Auth::check();
         self::watchExam($exam);
-        $questionsCorrection = $exam->questions()->where("question.correction", QuestionCorrectionState::UNCORRECTED)->get();
         return view("ControlPanel.exam.show")->with([
-            "exam" => $exam,
-            "questionsCorrection" => $questionsCorrection
-        ]);
+            "exam" => $exam]);
     }
 
     /**

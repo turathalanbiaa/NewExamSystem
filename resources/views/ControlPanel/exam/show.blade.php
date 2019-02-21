@@ -10,7 +10,7 @@
         @if (session('UpdateExamCurveMessage'))
             <div class="row">
                 <div class="col-12">
-                    <div class="alert alert-success text-center">
+                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
                         {{session('UpdateExamCurveMessage')}}
                     </div>
                 </div>
@@ -23,6 +23,17 @@
                 <div class="col-12">
                     <div class="alert alert-success text-center">
                         {{session('DeleteQuestionMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Session Question Correction Message --}}
+        @if (session('QuestionCorrectionMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
+                        {{session('QuestionCorrectionMessage')}}
                     </div>
                 </div>
             </div>
@@ -168,11 +179,16 @@
                     <div class="col-12 mb-3 collapse" id="manual-correction-questions">
                         <div class="card">
                             <div class="card-body border-bottom border-default">
-                                @forelse($questionsCorrection as $question)
+                                @forelse($exam->questions as $question)
                                     @if ($loop->first)
                                         <div class="list-group list-group-flush">
                                             @endif
                                             <a href="/control-panel/questions-correction/{{$question->id}}" class="list-group-item list-group-item-action">
+                                                @if($question->correction == \App\Enums\QuestionCorrectionState::CORRECTED)
+                                                    <span class="far fa-check-square text-default ml-1"></span>
+                                                @else
+                                                    <span class="far fa-minus-square text-default ml-1"></span>
+                                                @endif
                                                 <span class="font-weight-bold">تصحيح السؤال: </span>
                                                 <span>{{$question->title}}</span>
                                             </a>
