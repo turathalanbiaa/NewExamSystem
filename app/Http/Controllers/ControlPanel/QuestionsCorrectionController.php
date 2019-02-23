@@ -22,21 +22,6 @@ class QuestionsCorrectionController extends Controller
         $exam = $question->exam;
         ExamController::watchExam($exam);
 
-
-        //Show answers
-        $studentsAnswers = Answer::whereIn("branch_id", $question->branches->Pluck("id")->toArray())
-            ->get()
-            ->groupBy("student_id");
-
-        return view("ControlPanel.questionCorrection.show")->with([
-            "studentsAnswers" => $studentsAnswers,
-            "exam" => $exam,
-            "question" => $question
-        ]);
-
-
-
-
         if ($question->correction == QuestionCorrectionState::CORRECTED)
             return redirect("/control-panel/exams/$exam->id")->with([
                 "QuestionCorrectionMessage" => "تم تصحيح السؤال:  " . $question->title . "مسبقاً"
@@ -63,9 +48,10 @@ class QuestionsCorrectionController extends Controller
             ->get()
             ->groupBy("student_id");
 
-        dd($studentsAnswers);
         return view("ControlPanel.questionCorrection.show")->with([
-            ""
+            "studentsAnswers" => $studentsAnswers,
+            "exam" => $exam,
+            "question" => $question
         ]);
     }
 

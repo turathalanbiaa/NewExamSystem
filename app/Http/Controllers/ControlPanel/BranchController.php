@@ -54,6 +54,7 @@ class BranchController extends Controller
         Auth::check();
         $question = Question::findOrFail(Input::get("question"));
         ExamController::watchExam($question->exam);
+
         if ($question->branches()->count() == $question->no_of_branch)
             return redirect("control-panel/branches/create?question=$question->id")->with([
                 "CreateBranchMessage" => "تحذير، لا يمكنك اضافة نقطة الى السؤال الحالي.",
