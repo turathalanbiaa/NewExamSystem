@@ -10,6 +10,7 @@ use App\Enums\QuestionType;
 use App\Models\Answer;
 use App\Models\EventLog;
 use App\Models\Question;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -52,12 +53,19 @@ class QuestionsCorrectionController extends Controller
         }
 
 
-        //Show answers
+        //Manual Correction
+        //Get students ids
         $students = Answer::whereIn("branch_id", $question->branches->Pluck("id")->toArray())
-            ->get()
-            ->groupBy("student_id");
+            ->select("student_id")
+            ->orderBy("student_id")
+            ->distinct()
+            ->pluck("student_id");
 
-        dd($students);
+        //Make students collections
+        $index = 0;
+        foreach ($students as $student)
+            $students[$index++] = Student::find($student);
+
 
         return view("ControlPanel.questionCorrection.show")->with([
             "studentsAnswers" => $students,
