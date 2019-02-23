@@ -13,14 +13,10 @@
     <link href="{{asset("mdb/css/mdb.min.css")}}" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
           integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-
 </head>
 <body>
 <div class="container">
-    <main style="margin: 75px 0;">
-
-        <div class="card card-image"
-             style="background-image: url(https://mdbootstrap.com/img/Photos/Others/gradient1.jpg);">
+        <div class="card card-image mx-auto d-block primary-color">
             <div class="text-white text-center py-5 px-4 my-5">
                 <div>
                     <h2 class="card-title h1-responsive pt-3 mb-5 font-bold"><strong>معهد تراث الانبياء للدراسات
@@ -32,8 +28,7 @@
                 </div>
             </div>
         </div>
-    </main>
-</div>
+    </div>
 <footer class="page-footer font-small primary-color fixed-bottom">
     <div class="footer-copyright text-center py-3" style="direction: ltr; text-align: right;">
         <span>© 2018 Copyright:</span>
