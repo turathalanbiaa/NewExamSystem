@@ -20,7 +20,10 @@
                                         <div class="custom-control custom-radio">
                                             <input type="radio" class="custom-control-input"
                                                    id="{{$branch->id."-".$loop->index}}" name="{{$branch->id}}"
-                                                   onchange="saveAnswer({{$branch->id}},'{{$option}}')">
+                                                   onchange="saveAnswer({{$branch->id}},'{{$option}}')"
+                                                   @if(!empty($branch->getStudentAnswer))
+                                                   @if ($branch->getStudentAnswer->text==$option) checked @endif
+                                                    @endif >
                                             <label class="custom-control-label"
                                                    for="{{$branch->id."-".$loop->index}}">{{$option}}</label>
                                         </div>
@@ -36,7 +39,10 @@
                                         <div class="custom-control custom-radio">
                                             <input type="radio" class="custom-control-input"
                                                    id="{{$branch->id."-".$loop->index}}" name="{{$branch->id}}"
-                                                   onchange="saveAnswer({{$branch->id}},'{{$option}}')">
+                                                   onchange="saveAnswer({{$branch->id}},'{{$option}}')"
+                                            @if(!empty($branch->getStudentAnswer))
+                                                   @if ($branch->getStudentAnswer->text==$option) checked @endif
+                                             @endif>
                                             <label class="custom-control-label"
                                                    for="{{$branch->id."-".$loop->index}}">{{$option}}</label>
                                         </div>
@@ -48,7 +54,7 @@
                             @if ($question->type==\App\Enums\QuestionType::FILL_BLANK)
                                 @foreach($question->branches as $branch)
                                     <div class="md-form">
-                                        <input type="text" id="{{$branch->id}}" class="form-control">
+                                        <input type="text" id="{{$branch->id}}" class="form-control" value="@if(!empty($branch->getStudentAnswer)){{$branch->getStudentAnswer->text}}@endif">
                                         <label class="w-100" for="{{$branch->id}}">{{$branch->title}}</label>
                                     </div>
                                     <button type="button"
@@ -62,7 +68,7 @@
                             @if ($question->type==\App\Enums\QuestionType::EXPLAIN)
                                 @foreach($question->branches as $branch)
                                     <div class="md-form">
-                                        <input type="text" id="{{$branch->id}}" class="form-control">
+                                        <input type="text" id="{{$branch->id}}" class="form-control" value="@if(!empty($branch->getStudentAnswer)){{$branch->getStudentAnswer->text}}@endif">
                                         <label class="w-100" for="{{$branch->id}}">{{$branch->title}}</label>
                                     </div>
                                     <button type="button"
@@ -147,7 +153,7 @@
                                 $('#notifyAnswerModel').modal('show');
                                 setTimeout(function () {
                                     $('#notifyAnswerModel').modal('hide');
-                                }, 3000);
+                                }, 2000);
                             }
                         });
                     }
@@ -170,7 +176,7 @@
                             $('#notifyAnswerModel').modal('show');
                             setTimeout(function () {
                                 $('#notifyAnswerModel').modal('hide');
-                            }, 3000);
+                            }, 2000);
                         }
                     });
                 }

@@ -24,6 +24,18 @@ class StudentExamController extends Controller
             return $e->getMessage();
         }
     }
+    public function finishedExams()
+    {
+        try{
+            $student=Student::where('remember_token',Cookie::get('remember_me'))->first();
+            //return response()->json($student->notFinishedExams);
+            return view("Website/finishedExams",compact('student',$student));
+        }
+        catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
 
     public function exam($id)
     {

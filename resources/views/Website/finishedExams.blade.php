@@ -1,11 +1,11 @@
 @extends("Website.layout.app")
 @section("title")
-    <title>الأمتحانات الحالية</title>
+    <title>الأمتحانات المنتهية</title>
 @endsection
 @section("content")
     <div class="container">
         <div class="row">
-            @forelse($student->notFinishedExams as $exam)
+            @forelse($student->finishedExams as $exam)
                 @if ($exam->state==App\Enums\ExamState::OPEN)
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-5">
 
@@ -20,22 +20,15 @@
 
                             <div class="card-body" style="padding-bottom: 75px;">
                                 <h5>
-                                    الدرجة
-                                    {{$exam->real_score}}
+                                    التاريخ :
+                                    {{$exam->date}}
                                 </h5>
                                 <p class="card-text text-justify">
 
                                 </p>
 
                                 <div class="card-body-content-fixed">
-                                    <hr>
 
-                                    <div class="btn-group w-100">
-                                        <a class="btn btn-sm btn-outline-primary font-weight-bold w-50 ml-1 mr-0 waves-effect waves-light"  href="{{URL::to('exam',$exam->id)}}">
-                                            <i class="fa fa-play ml-1"></i>
-                                            <span>بدء</span>
-                                        </a>
-                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -17,14 +17,14 @@
 
                     {{-- For Lecturer --}}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{URL::to('/')}}">
-                            <span>الامتحانات السابقة</span>
+                        <a class="nav-link" href="{{URL::to('/finished-exams')}}">
+                            <span>الامتحانات المنتهية</span>
                         </a>
                     </li>
 
                     <li class="nav-item">
                         <a class="nav-link" href="{{URL::to('/')}}">
-                            <span>الامتحانات السابقة</span>
+                            <span>الامتحانات القادمة</span>
                         </a>
                     </li>
                 </ul>
