@@ -27,6 +27,11 @@
                             <span>الامتحانات القادمة</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{URL::to('/student-logout')}}">
+                            <span>تسجيل خروج</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
     </div>

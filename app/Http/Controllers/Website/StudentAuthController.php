@@ -53,4 +53,8 @@ class StudentAuthController extends Controller
     public function info(){
         return view('Website.info');
     }
+    public function logout(){
+        Cookie::queue(Cookie::forget('remember_me'));
+        return redirect('/info');
+    }
 }
