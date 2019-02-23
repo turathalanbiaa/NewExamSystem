@@ -277,8 +277,7 @@ class BranchController extends Controller
                 if (($exam->state == ExamState::END) && Input::get("reCorrectOption"))
                 {
                     //Update Answers
-                    Answer::where("branch_id", $branch->id)
-                        ->update(array("re_correct" => 1));
+                    $branch->answers()->update(array("re_correct" => 1));
 
                     //Store event log
                     $target = $branch->id;

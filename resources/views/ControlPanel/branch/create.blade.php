@@ -20,7 +20,7 @@
         <div class="row">
             {{-- Heading --}}
             <div class="col-12">
-                <div class="view shadow mdb-color px-3 py-4 mb-3">
+                <div class="view shadow mdb-color p-3 mb-3">
                     <a class="h5 text-center text-white d-block m-0" href="/control-panel/exams/{{$question->exam->id}}">{{$question->exam->title}}</a>
                 </div>
             </div>
@@ -58,7 +58,7 @@
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Card View --}}
-                    <div class="view shadow mdb-color px-3 py-4">
+                    <div class="view shadow mdb-color p-3">
                         <h5 class="text-right text-white m-0">
                             <span>اضافة نقطه الى السؤال: </span>
                             <span>{{$question->title}}</span>

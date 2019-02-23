@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ControlPanel;
 
 use App\Enums\AnswerCorrectionState;
 use App\Enums\EventLogType;
+use App\Enums\ExamState;
 use App\Enums\QuestionCorrectionState;
 use App\Enums\QuestionType;
 use App\Models\Answer;
@@ -22,9 +23,16 @@ class QuestionsCorrectionController extends Controller
         $exam = $question->exam;
         ExamController::watchExam($exam);
 
+        if ($exam->state != ExamState::END)
+            return redirect("/control-panel/exams/$exam->id")->with([
+                "QuestionCorrectionMessage" => "لا يمكن تصحيح السؤال لان الامتحان الحالي غير منتهي",
+                "TypeMessage" => "Error"
+            ]);
+
         if ($question->correction == QuestionCorrectionState::CORRECTED)
             return redirect("/control-panel/exams/$exam->id")->with([
-                "QuestionCorrectionMessage" => "تم تصحيح السؤال:  " . $question->title . "مسبقاً"
+                "QuestionCorrectionMessage" => "تم تصحيح السؤال:  " . $question->title . " مسبقاً",
+                "TypeMessage" => "Error"
             ]);
 
         //Auto correction
@@ -43,13 +51,16 @@ class QuestionsCorrectionController extends Controller
                 ]);
         }
 
+
         //Show answers
-        $studentsAnswers = Answer::whereIn("branch_id", $question->branches->Pluck("id")->toArray())
+        $students = Answer::whereIn("branch_id", $question->branches->Pluck("id")->toArray())
             ->get()
             ->groupBy("student_id");
 
+        dd($students);
+
         return view("ControlPanel.questionCorrection.show")->with([
-            "studentsAnswers" => $studentsAnswers,
+            "studentsAnswers" => $students,
             "exam" => $exam,
             "question" => $question
         ]);

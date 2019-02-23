@@ -15,7 +15,7 @@ class StudentAuthController extends Controller
     public function studentAuth(Request $request)
     {
         //Id come from request
-        $requestId=8;
+        $requestId=4;
         $eduStudent=EduStudent::find($requestId);
         $student=Student::where('edu_student_id',$eduStudent->ID)->first();
 
