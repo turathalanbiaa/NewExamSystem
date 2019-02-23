@@ -5,6 +5,7 @@ use App\Models\Course;
 use App\Models\EduStudent;
 use App\Models\Student;
 use Closure;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Session;
 
@@ -24,7 +25,7 @@ class StudentAuthMiddleware
                 foreach ($courseExamsByLevel as $course) {
                     $examsIds->push($course->exams->pluck('id'));
                 }
-                $student->exams()->sync($examsIds->collapse());
+                $student->exams()->sync($examsIds->collapse(),['date'=>Carbon::now()]);
                 Session::put('newExamsChecked',true);
                 return $next($request);
             }

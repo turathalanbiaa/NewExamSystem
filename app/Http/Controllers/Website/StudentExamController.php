@@ -8,6 +8,7 @@ use App\Models\ExamStudent;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cookie;
 
 class StudentExamController extends Controller
@@ -58,7 +59,7 @@ class StudentExamController extends Controller
         $answer->student_id = $student->id;
         $answer->branch_id = $request->id;
         $answer->text = $request->val;
-        $answer->time = date("Y-m-d H:i:s");
+        $answer->time = Carbon::now();
         $answer->score = 0.0000; //Default 0.00000
         $answer->re_correct = 0; //Default 0
         $answer->correction = 0; //Default 0
