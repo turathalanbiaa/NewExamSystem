@@ -53,11 +53,17 @@ class StudentExamController extends Controller
         try{
         $student=Student::where('remember_token',Cookie::get('remember_me'))->first();
         Answer::where('branch_id',$request->id)->delete();
-        $answer=new Answer;
-        $answer->student_id=$student->id;
-        $answer->branch_id=$request->id;
-        $answer->text=$request->val;
+
+        $answer = new Answer;
+        $answer->student_id = $student->id;
+        $answer->branch_id = $request->id;
+        $answer->text = $request->val;
+        $answer->time = date("Y-m-d H:i:s");
+        $answer->score = 0.0000; //Default 0.00000
+        $answer->re_correct = 0; //Default 0
+        $answer->correction = 0; //Default 0
         $answer->save();
+
         return response()->json('ok');
         }
         catch (\Exception $e) {

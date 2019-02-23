@@ -89,68 +89,7 @@
 
                     {{-- Questions --}}
                     <div class="card-body border-bottom border-primary">
-                        @forelse($exam->questions as $question)
-                            {{-- Question Title --}}
-                            <h5>
-                                {{$question->title}}
-                                <span class="float-left">{{"( " . $question->score . " درجة" . " )"}}</span>
-                            </h5>
 
-                            {{-- Question Branches --}}
-                            @forelse($question->branches as $branch)
-                                @if ($loop->first)
-                                    <ol>
-                                        @endif
-                                        <li>{{$branch->title}}</li>
-                                        @if($question->type == \App\Enums\QuestionType::SINGLE_CHOICE)
-                                            @foreach(json_decode($branch->options) as $option)
-                                                @if($loop->first)
-                                                    {{"( " . $option . " ، "}}
-                                                    @continue
-                                                @endif
-                                                @if($loop->last)
-                                                    {{$option . " )."}}
-                                                    @break
-                                                @endif
-                                                {{$option . " ، "}}
-                                            @endforeach
-                                        @endif
-                                        @if ($loop->last)
-                                            @if(count($question->branches) != $question->no_of_branch)
-                                                <div class="alert text-center py-4">
-                                                    <h5 class="m-0">
-                                                        <span>لم يتم رفع جميع النقاط التابعه لهذا السؤال.</span>
-                                                        <a href="/control-panel/branches/create?question={{$question->id}}" class="btn btn-outline-primary font-weight-bold">
-                                                            <i class="fa fa-plus ml-1"></i>
-                                                            <span>اضافة نقطة</span>
-                                                        </a>
-                                                    </h5>
-                                                </div>
-                                            @endif
-                                    </ol>
-                                @endif
-                            @empty
-                                <div class="alert text-center py-4">
-                                    <h5 class="m-0">
-                                        <span>هذا السؤال لا يحتوي على بعد على اي نقطة</span>
-                                        <a href="/control-panel/branches/create?question={{$question->id}}" class="btn btn-outline-primary font-weight-bold">
-                                            <i class="fa fa-plus ml-1"></i>
-                                            <span>اضافة نقطة</span>
-                                        </a>
-                                    </h5>
-                                </div>
-                            @endforelse
-
-                            {{-- Line --}}
-                            @if(!$loop->last)
-                                <hr class="mb-4">
-                            @endif
-                        @empty
-                            <div class="text-center py-5">
-                                <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
-                                <h4>هذا النموذج الامتحاني لايحتوي بعد على اي سؤال</h4>
-                            </div>
-                        @endforelse
                     </div>
                 </div>
             </div>
