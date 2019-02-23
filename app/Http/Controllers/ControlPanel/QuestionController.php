@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ControlPanel;
 
 use App\Enums\EventLogType;
 use App\Enums\ExamState;
+use App\Enums\QuestionCorrectionState;
 use App\Models\Answer;
 use App\Models\Branch;
 use App\Models\EventLog;
@@ -87,6 +88,7 @@ class QuestionController extends Controller
         $question->score = Input::get("score");
         $question->no_of_branch = Input::get("noOfBranch");
         $question->no_of_branch_req = Input::get("noOfBranchRequired");
+        $question->correction = QuestionCorrectionState::UNCORRECTED;
         $success = $question->save();
 
         if (!$success)
