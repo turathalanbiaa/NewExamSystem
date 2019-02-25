@@ -4,11 +4,13 @@ namespace App\Http\Controllers\ControlPanel;
 
 use App\Enums\AnswerCorrectionState;
 use App\Enums\EventLogType;
+use App\Enums\ExamState;
 use App\Enums\QuestionCorrectionState;
 use App\Enums\QuestionType;
 use App\Models\Answer;
 use App\Models\EventLog;
 use App\Models\Question;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -22,24 +24,16 @@ class QuestionsCorrectionController extends Controller
         $exam = $question->exam;
         ExamController::watchExam($exam);
 
-
-        //Show answers
-        $studentsAnswers = Answer::whereIn("branch_id", $question->branches->Pluck("id")->toArray())
-            ->get()
-            ->groupBy("student_id");
-
-        return view("ControlPanel.questionCorrection.show")->with([
-            "studentsAnswers" => $studentsAnswers,
-            "exam" => $exam,
-            "question" => $question
-        ]);
-
-
-
+        if ($exam->state != ExamState::END)
+            return redirect("/control-panel/exams/$exam->id")->with([
+                "QuestionCorrectionMessage" => "لا يمكن تصحيح السؤال لان الامتحان الحالي غير منتهي",
+                "TypeMessage" => "Error"
+            ]);
 
         if ($question->correction == QuestionCorrectionState::CORRECTED)
             return redirect("/control-panel/exams/$exam->id")->with([
-                "QuestionCorrectionMessage" => "تم تصحيح السؤال:  " . $question->title . "مسبقاً"
+                "QuestionCorrectionMessage" => "تم تصحيح السؤال:  " . $question->title . " مسبقاً",
+                "TypeMessage" => "Error"
             ]);
 
         //Auto correction
@@ -58,14 +52,25 @@ class QuestionsCorrectionController extends Controller
                 ]);
         }
 
-        //Show answers
-        $studentsAnswers = Answer::whereIn("branch_id", $question->branches->Pluck("id")->toArray())
-            ->get()
-            ->groupBy("student_id");
 
-        dd($studentsAnswers);
+        //Manual Correction
+        //Get students ids
+        $students = Answer::whereIn("branch_id", $question->branches->Pluck("id")->toArray())
+            ->select("student_id")
+            ->orderBy("student_id")
+            ->distinct()
+            ->pluck("student_id");
+
+        //Make students collections
+        $index = 0;
+        foreach ($students as $student)
+            $students[$index++] = Student::find($student);
+
+
         return view("ControlPanel.questionCorrection.show")->with([
-            ""
+            "studentsAnswers" => $students,
+            "exam" => $exam,
+            "question" => $question
         ]);
     }
 

@@ -21,4 +21,11 @@ class Student extends Model
     public function exams(){
         return $this->belongsToMany('App\Models\Exam', 'exam_student', 'student_id', 'exam_id');
     }
+
+    public function getQuestionAnswers($question)
+    {
+        return Answer::where("student_id", $this->id)
+            ->whereIn("branch_id", $question->branches->Pluck("id")->toArray())
+            ->get();
+    }
 }

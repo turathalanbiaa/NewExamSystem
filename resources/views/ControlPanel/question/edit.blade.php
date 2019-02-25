@@ -20,10 +20,10 @@
         <div class="row">
             {{-- Heading --}}
             <div class="col-12">
-                <div class="view shadow mdb-color px-3 py-4 mb-3">
+                <div class="view shadow mdb-color p-3 mb-3">
                     <a class="h5 text-center text-white d-block m-0" href="/control-panel/exams/{{$question->exam->id}}">
                         <span>{{$question->exam->title}}</span>
-                        <span class="text-danger"> - - - - </span>
+                        <span class="text-warning"> - - - - </span>
                         <span>الامتحان حاليا </span>
                         <span>{{\App\Enums\ExamState::getState($question->exam->state)}}</span>
                     </a>
@@ -121,7 +121,7 @@
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Card View --}}
-                    <div class="view shadow mdb-color px-3 py-4">
+                    <div class="view shadow mdb-color p-3">
                         <h5 class="text-center text-white m-0">تحرير السؤال الحالي</h5>
                     </div>
 

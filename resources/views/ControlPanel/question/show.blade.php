@@ -71,7 +71,7 @@
         <div class="row">
             {{-- Heading --}}
             <div class="col-12">
-                <div class="view shadow mdb-color px-3 py-4 mb-3">
+                <div class="view shadow mdb-color p-3 mb-3">
                     <a class="h5 text-center text-white d-block m-0" href="/control-panel/exams/{{$currentQuestion->exam->id}}">{{$currentQuestion->exam->title}}</a>
                 </div>
             </div>
@@ -115,7 +115,7 @@
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Card View --}}
-                    <div class="view shadow mdb-color px-3 py-4">
+                    <div class="view shadow mdb-color p-3">
                         <h5 class="text-center text-white m-0">
                             <span>السؤال الحالي</span>
                             <span class="badge badge-default float-left">
@@ -188,9 +188,15 @@
                                         </span>
                                     </li>
                                     @if ($loop->last)
-                                        @if(count($currentQuestion->branches) != $currentQuestion->no_of_branch)
+                                        @if(count($currentQuestion->branches) < $currentQuestion->no_of_branch)
                                             <div class="alert text-center py-4">
                                                 <h5 class="m-0">لم يتم رفع جميع النقاط التابعه لهذا السؤال</h5>
+                                            </div>
+                                        @endif
+
+                                        @if(count($currentQuestion->branches) > $currentQuestion->no_of_branch)
+                                            <div class="alert text-center text-danger py-4 animated infinite flash">
+                                                <h3 class="m-0">يجب حذف بعض النقاط التابعه لهذا السؤال.</h3>
                                             </div>
                                         @endif
                                 </ol>

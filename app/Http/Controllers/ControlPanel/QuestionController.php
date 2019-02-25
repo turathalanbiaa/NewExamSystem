@@ -155,7 +155,6 @@ class QuestionController extends Controller
 
         if (($exam->state == ExamState::CLOSE) || ($exam->state == ExamState::END))
         {
-
             $noOfBranch = ($exam->state==ExamState::CLOSE)?Input::get("noOfBranch"):$question->no_of_branch;
             $this->validate($request, [
                 'title'              => ['required'],

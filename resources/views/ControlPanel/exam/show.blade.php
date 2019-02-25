@@ -86,6 +86,17 @@
                                         <span>الكيرف: </span>
                                         {{$exam->curve}}
                                     </li>
+
+                                    <li class="list-group-item">
+                                        <span>حالة الامتحان: </span>
+                                        @if($exam->state == \App\Enums\ExamState::CLOSE)
+                                            <span>مغلق</span>
+                                        @elseif($exam->state == \App\Enums\ExamState::OPEN)
+                                            <span>مفتوح</span>
+                                        @else
+                                            <span>منتهي</span>
+                                        @endif
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -208,7 +219,7 @@
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Heading --}}
-                    <div class="view shadow mdb-color px-3 py-4">
+                    <div class="view shadow mdb-color p-3">
                         <h5 class="text-center text-white m-0">{{$exam->title}}</h5>
                     </div>
 
