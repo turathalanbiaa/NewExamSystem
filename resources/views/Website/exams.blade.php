@@ -5,7 +5,7 @@
 @section("content")
     <div class="container">
         <div class="row">
-            @forelse($student->notFinishedExams as $exam)
+            @forelse($studentNotFinishedExams->notFinishedExams as $exam)
                 @if ($exam->state==App\Enums\ExamState::OPEN)
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-5">
 

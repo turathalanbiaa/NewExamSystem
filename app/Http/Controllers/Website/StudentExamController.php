@@ -13,13 +13,20 @@ use Illuminate\Support\Facades\Cookie;
 
 class StudentExamController extends Controller
 {
-
     public function exams()
     {
         try {
-            $student = Student::where('remember_token', Cookie::get('remember_me'))->first();
-            //return response()->json($student->notFinishedExams);
-            return view("Website/exams", compact('student', $student));
+            $studentNotFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
+            return view("Website/exams", compact('studentNotFinishedExams', $studentNotFinishedExams->notFinishedExams));
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    public function nextExams()
+    {
+        try {
+            $studentNotFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
+            return view("Website/nextExams", compact('studentNotFinishedExams', $studentNotFinishedExams->notFinishedExams));
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -28,9 +35,9 @@ class StudentExamController extends Controller
     public function finishedExams()
     {
         try {
-            $student = Student::where('remember_token', Cookie::get('remember_me'))->first();
+            $studentFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
             //return response()->json($student->notFinishedExams);
-            return view("Website/finishedExams", compact('student', $student));
+            return view("Website/finishedExams", compact('studentFinishedExams', $studentFinishedExams->finishedExams));
         } catch (\Exception $e) {
             return $e->getMessage();
         }

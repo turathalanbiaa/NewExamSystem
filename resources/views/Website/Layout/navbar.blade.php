@@ -23,7 +23,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="{{URL::to('/')}}">
+                        <a class="nav-link" href="{{URL::to('/next-exams')}}">
                             <span>الامتحانات القادمة</span>
                         </a>
                     </li>
