@@ -14,22 +14,32 @@ use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 
 class QuestionsCorrectionController extends Controller
 {
-    public function showQuestionToCorrection($id)
+    public function QuestionCorrectionAutomatically($id)
     {
         Auth::check();
         $question = Question::findOrFail($id);
         $exam = $question->exam;
         ExamController::watchExam($exam);
 
+        //Check if exam is not end
         if ($exam->state != ExamState::END)
             return redirect("/control-panel/exams/$exam->id")->with([
                 "QuestionCorrectionMessage" => "لا يمكن تصحيح السؤال لان الامتحان الحالي غير منتهي",
                 "TypeMessage" => "Error"
             ]);
 
+        //Check if question type is eligible for correction automatically
+        if (($question->type == QuestionType::FILL_BLANK) || ($question->type == QuestionType::EXPLAIN))
+            return redirect("/control-panel/exams/$exam->id")->with([
+                "QuestionCorrectionMessage" => "لايمكن تصحيح السؤال:  " . $question->title . " تلقائياً",
+                "TypeMessage" => "Error"
+            ]);
+
+        //Check if question is already correction
         if ($question->correction == QuestionCorrectionState::CORRECTED)
             return redirect("/control-panel/exams/$exam->id")->with([
                 "QuestionCorrectionMessage" => "تم تصحيح السؤال:  " . $question->title . " مسبقاً",
@@ -37,48 +47,7 @@ class QuestionsCorrectionController extends Controller
             ]);
 
         //Auto correction
-        if (($question->type == QuestionType::TRUE_OR_FALSE) || ($question->type == QuestionType::SINGLE_CHOICE))
-        {
-            $success = self::autoCorrection($question);
-
-            if ($success)
-                return redirect("/control-panel/exams/$exam->id")->with([
-                    "QuestionCorrectionMessage" => "تم تصحيح السؤال:  " . $question->title
-                ]);
-            else
-                return redirect("/control-panel/exams/$exam->id")->with([
-                    "QuestionCorrectionMessage" => "لم يتم تصحيح السؤال: " . $question->title,
-                    "TypeMessage" => "Error"
-                ]);
-        }
-
-
-        //Manual Correction
-        //Get students ids
-        $students = Answer::whereIn("branch_id", $question->branches->Pluck("id")->toArray())
-            ->select("student_id")
-            ->orderBy("student_id")
-            ->distinct()
-            ->pluck("student_id");
-
-        //Make students collections
-        $index = 0;
-        foreach ($students as $student)
-            $students[$index++] = Student::find($student);
-
-
-        return view("ControlPanel.questionCorrection.show")->with([
-            "studentsAnswers" => $students,
-            "exam" => $exam,
-            "question" => $question
-        ]);
-    }
-
-    public static function autoCorrection($question)
-    {
-        $exception = DB::transaction(function () use ($question){
-            $exam = $question->exam;
-
+        $exception = DB::transaction(function () use ($question, $exam){
             //Correction answers
             foreach ($question->branches as $branch)
             {
@@ -105,11 +74,90 @@ class QuestionsCorrectionController extends Controller
             EventLog::create($target, $type, $event);
         });
 
-        return is_null($exception)?true:false;
+        if (is_null($exception))
+            return redirect("/control-panel/exams/$exam->id")->with([
+                "QuestionCorrectionMessage" => "تم تصحيح السؤال:  " . $question->title
+            ]);
+        else
+            return redirect("/control-panel/exams/$exam->id")->with([
+                "QuestionCorrectionMessage" => "لم يتم تصحيح السؤال: " . $question->title,
+                "TypeMessage" => "Error"
+            ]);
     }
 
-    public static function manualCorrection($question)
+    public function ShowQuestionToCorrectionManually($id)
     {
+        Auth::check();
+        $question = Question::findOrFail($id);
+        $exam = $question->exam;
+        ExamController::watchExam($exam);
 
+        //Check if exam is not end
+        if ($exam->state != ExamState::END)
+            return redirect("/control-panel/exams/$exam->id")->with([
+                "QuestionCorrectionMessage" => "لا يمكن تصحيح السؤال لان الامتحان الحالي غير منتهي",
+                "TypeMessage" => "Error"
+            ]);
+
+        //Check if question type is eligible for correction manually
+        if (($question->type == QuestionType::TRUE_OR_FALSE) || ($question->type == QuestionType::SINGLE_CHOICE))
+            return redirect("/control-panel/exams/$exam->id")->with([
+                "QuestionCorrectionMessage" => "لايمكن تصحيح السؤال:  " . $question->title . "يَدَوياً",
+                "TypeMessage" => "Error"
+            ]);
+
+        //Check if question is already correction
+        if ($question->correction == QuestionCorrectionState::CORRECTED)
+            return redirect("/control-panel/exams/$exam->id")->with([
+                "QuestionCorrectionMessage" => "تم تصحيح السؤال:  " . $question->title . " مسبقاً",
+                "TypeMessage" => "Error"
+            ]);
+
+        //Get answers group by student
+        $studentsAnswers = Answer::whereIn("branch_id", $question->branches->Pluck("id")->toArray())
+            ->where("correction", AnswerCorrectionState::UNCORRECTED)
+            ->orderBy("student_id")
+            ->get()
+            ->groupBy("student_id");
+
+        //Marge student with your answers in collection
+        $index = 0;
+        $students = array();
+        foreach ($studentsAnswers as $studentAnswers)
+        {
+            $student = Student::find($studentAnswers[0]->student_id);
+            $students[$index++] = array("info" => $student, "answers" => $studentAnswers);
+        }
+
+        return view("ControlPanel.questionCorrection.show")->with([
+            "students" => $students,
+            "exam" => $exam,
+            "question" => $question
+        ]);
+    }
+
+    public function QuestionCorrectionManually()
+    {
+        $question = Question::findOrFail(Input::get("question"));
+        $answers = Input::get("answers");
+        $maxScoreForBranch = ($question->score / $question->no_of_branch_req);
+        $exception = DB::transaction(function () use ($answers, $maxScoreForBranch){
+            foreach ($answers as $answer)
+            {
+                Answer::where("id", $answer["id"])
+                    ->where("re_correct", 0)
+                    ->update(
+                        array(
+                            "score" => ($answer["score"] > $maxScoreForBranch)?$maxScoreForBranch:abs($answer["score"]),
+                            "correction" => AnswerCorrectionState::UNCORRECTED
+                        )
+                    );
+            }
+        });
+
+        if (is_null($exception))
+            return ["correction" => "success"];
+        else
+            return ["correction" => "fail"];
     }
 }
