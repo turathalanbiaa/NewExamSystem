@@ -118,19 +118,46 @@ class QuestionsCorrectionController extends Controller
             ->where("correction", AnswerCorrectionState::UNCORRECTED)
             ->orderBy("student_id")
             ->get()
-            ->groupBy("student_id");
+            ->groupBy("student_id")
+            ->take(25);
+
+        //Not have answers, Make question is corrected
+        if ($studentsAnswers->isEmpty())
+        {
+            $exception = DB::transaction(function () use ($exam, $question){
+                //Make question is corrected
+                $question->correction = QuestionCorrectionState::CORRECTED;
+                $question->save();
+
+                //Store event log
+                $target = $question->id;
+                $type = EventLogType::QUESTION;
+                $event = "تصحيح السؤال: " . $question->title . "التابع للامتحان: " . $exam->title;
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("/control-panel/exams/$exam->id")->with([
+                    "QuestionCorrectionMessage" => "تم تصحيح السؤال:  " . $question->title
+                ]);
+            else
+                return redirect("/control-panel/exams/$exam->id")->with([
+                    "QuestionCorrectionMessage" => "لم يتم تصحيح السؤال: " . $question->title,
+                    "TypeMessage" => "Error"
+                ]);
+        }
 
         //Marge student with your answers in collection
         $index = 0;
-        $students = array();
+        $studentsCollections = array();
         foreach ($studentsAnswers as $studentAnswers)
         {
             $student = Student::find($studentAnswers[0]->student_id);
-            $students[$index++] = array("info" => $student, "answers" => $studentAnswers);
+            $studentsCollections[$index++] = array("student" => $student, "answers" => $studentAnswers);
         }
 
         return view("ControlPanel.questionCorrection.show")->with([
-            "students" => $students,
+            "studentsCollections" => $studentsCollections,
             "exam" => $exam,
             "question" => $question
         ]);
@@ -149,7 +176,7 @@ class QuestionsCorrectionController extends Controller
                     ->update(
                         array(
                             "score" => ($answer["score"] > $maxScoreForBranch)?$maxScoreForBranch:abs($answer["score"]),
-                            "correction" => AnswerCorrectionState::UNCORRECTED
+                            "correction" => AnswerCorrectionState::CORRECTED
                         )
                     );
             }

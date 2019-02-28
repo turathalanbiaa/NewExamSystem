@@ -80,7 +80,7 @@
                                         {{-- Card Content --}}
                                         <div class="card-body">
                                             <div class="list-group list-group-flush">
-                                                <a href="/control-panel/exams/{{$exam->id}}" class="list-group-item list-group-item-action">عرض النموذج الامتحاني</a>
+                                                <a href="/control-panel/exams/{{$exam->id}}" class="list-group-item list-group-item-action">عرض وتصحيح النموذج الامتحاني</a>
                                                 <a href="/control-panel/exams/{{$exam->id}}/edit" class="list-group-item list-group-item-action">تعديل النموذج الامتحاني</a>
 
                                                 @if($exam->state == \App\Enums\ExamState::CLOSE)
