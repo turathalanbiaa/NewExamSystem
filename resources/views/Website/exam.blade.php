@@ -58,8 +58,8 @@
                                         <label class="w-100" for="{{$branch->id}}">{{$branch->title}}</label>
                                     </div>
                                     <button type="button"
-                                            class="btn btn-sm btn-outline-primary waves-effect font-weight-bold"
-                                            onclick="saveAnswer({{$branch->id}},'')">حفظ
+                                            class="btn btn-sm  @if(!empty($branch->getStudentAnswer)){{$branch->getStudentAnswer->text}} btn-outline-success @else btn-outline-primary @endif waves-effect font-weight-bold"
+                                            onclick="saveAnswer({{$branch->id}},'',this)">حفظ
                                     </button>
                                     <hr/>
                                 @endforeach
@@ -72,8 +72,8 @@
                                         <label class="w-100" for="{{$branch->id}}">{{$branch->title}}</label>
                                     </div>
                                     <button type="button"
-                                            class="btn btn-sm btn-outline-primary waves-effect font-weight-bold"
-                                            onclick="saveAnswer({{$branch->id}},'')">حفظ
+                                            class="btn btn-sm @if(!empty($branch->getStudentAnswer)){{$branch->getStudentAnswer->text}} btn-outline-success @else btn-outline-primary @endif waves-effect font-weight-bold"
+                                            onclick="saveAnswer({{$branch->id}},'',this)">حفظ
                                     </button>
                                     <hr/>
                                 @endforeach
@@ -133,7 +133,7 @@
 @endsection
 @section('script')
     <script>
-            saveAnswer = function (id, val) {
+            saveAnswer = function (id, val,element) {
                 if (val === '') {
                     if ($('#' + id).val() !== '') {
                         $.ajaxSetup({
@@ -154,6 +154,8 @@
                                 setTimeout(function () {
                                     $('#notifyAnswerModel').modal('hide');
                                 }, 2000);
+                                $(element).removeClass('btn-outline-primary');
+                                $(element).addClass('btn-outline-success');
                             }
                         });
                     }
