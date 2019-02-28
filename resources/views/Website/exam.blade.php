@@ -153,12 +153,16 @@
                                 $('#notifyAnswerModel').modal('show');
                                 setTimeout(function () {
                                     $('#notifyAnswerModel').modal('hide');
-                                }, 2000);
+                                }, 1000);
                                 $(element).removeClass('btn-outline-primary');
                                 $(element).addClass('btn-outline-success');
                             }
                         });
-                    }
+                   }
+                   else{
+                       $(element).addClass('btn-outline-primary');
+                       $(element).removeClass('btn-outline-success');
+                   }
                 }
                 else {
                     $.ajaxSetup({
@@ -178,7 +182,7 @@
                             $('#notifyAnswerModel').modal('show');
                             setTimeout(function () {
                                 $('#notifyAnswerModel').modal('hide');
-                            }, 2000);
+                            }, 1000);
                         }
                     });
                 }

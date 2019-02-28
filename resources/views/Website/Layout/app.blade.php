@@ -17,7 +17,15 @@
     <link href="{{asset("mdb/css/addons/datatables.min.css")}}" rel="stylesheet">
     {{-- My Custom Style --}}
     <link href="{{asset("mdb/css/style.css")}}" rel="stylesheet">
-
+    <style>
+        .custom-radio .custom-control-input:checked~.custom-control-label::before {
+            background-color: #00C851 !important;
+        }
+        .custom-control-input:checked~.custom-control-label::before {
+            color: #fff;
+            background-color: #00C851 !important;
+        }
+    </style>
 </head>
 <body>
     {{-- Main Navigation --}}
