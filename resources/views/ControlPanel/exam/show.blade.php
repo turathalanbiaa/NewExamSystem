@@ -194,7 +194,7 @@
                                     @if ($loop->first)
                                         <div class="list-group list-group-flush">
                                             @endif
-                                            <a href="/control-panel/questions-correction/{{$question->id}}" class="list-group-item list-group-item-action">
+                                            <a href="/control-panel/questions-correction/{{(($question->type==\App\Enums\QuestionType::TRUE_OR_FALSE) || ($question->type==\App\Enums\QuestionType::SINGLE_CHOICE)?"automatically":"manually")}}/{{$question->id}}" class="list-group-item list-group-item-action">
                                                 @if($question->correction == \App\Enums\QuestionCorrectionState::CORRECTED)
                                                     <span class="far fa-check-square text-default ml-1"></span>
                                                 @else

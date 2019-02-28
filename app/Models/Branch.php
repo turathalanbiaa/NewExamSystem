@@ -20,6 +20,7 @@ class Branch extends Model
     {
         return $this->belongsTo("App\Models\Question","question_id", "id");
     }
+
     public function getStudentAnswer()
     {
         $student=Student::where('remember_token',Cookie::get('remember_me'))->first();

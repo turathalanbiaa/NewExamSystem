@@ -20,4 +20,6 @@ Route::resource('control-panel/exams', 'ControlPanel\ExamController');
 Route::resource('control-panel/questions', 'ControlPanel\QuestionController');
 Route::resource('control-panel/branches', 'ControlPanel\BranchController');
 
-Route::get('control-panel/questions-correction/{id}', 'ControlPanel\QuestionsCorrectionController@showQuestionToCorrection');
+Route::get('control-panel/questions-correction/automatically/{id}', 'ControlPanel\QuestionsCorrectionController@QuestionCorrectionAutomatically');
+Route::get('control-panel/questions-correction/manually/{id}', 'ControlPanel\QuestionsCorrectionController@ShowQuestionToCorrectionManually');
+Route::post('/control-panel/questions-correction/manually', 'ControlPanel\QuestionsCorrectionController@QuestionCorrectionManually');

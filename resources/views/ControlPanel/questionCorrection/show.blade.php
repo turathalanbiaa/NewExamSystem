@@ -18,9 +18,68 @@
         @endif
 
 
-        <div class="row">
-            {{-- Question --}}
-            <div class="col-lg-5 col-sm-12">
+        <div class="row align-items-start">
+            {{-- Show Students Answers to the current question --}}
+            <div class="col-lg-6 col-sm-12">
+                <div class="row">
+                    @foreach($students as $student)
+                        <div class="col-12 mb-4">
+                            <div class="card">
+                                {{-- Heading --}}
+                                <div class="view shadow mdb-color p-3">
+                                    <h5 class="text-center text-white m-0">
+                                        <span>اجوبة الطالب </span>
+                                        <span>{{$student["info"]->originalStudent->Name}}</span>
+                                    </h5>
+                                </div>
+
+                                {{-- Body --}}
+                                <div class="card-body border-bottom border-primary">
+                                    <div class="form">
+                                        {{-- Question Answers --}}
+                                        @foreach($student["answers"] as $answer)
+                                            @if ($loop->first)
+                                                <ul class="mb-0 pr-4">
+                                                    @endif
+                                                    {{-- Answer --}}
+                                                    <li class="mb-3">
+                                                        {{-- Branch --}}
+                                                        <p class="mb-1">{{$answer->branch->title}}</p>
+
+                                                        {{-- Answer --}}
+                                                        <div class="d-flex justify-content-between">
+                                                            {{-- Text --}}
+                                                            <p class="mb-0">
+                                                                <span class="text-success">الجواب: </span>
+                                                                <span>{{$answer->text}}</span>
+                                                            </p>
+
+                                                            {{-- Score --}}
+                                                            <p class="d-flex mb-0 justify-content-end">
+                                                                <label for="answer-{{$answer->id}}" class="text-success my-auto ml-1">الدرجة: </label>
+                                                                <input type="number" class="form-control d-inline w-25" id="answer-{{$answer->id}}" name="{{$answer->id}}" value="{{$answer->score}}">
+                                                            </p>
+                                                        </div>
+                                                    </li>
+                                                    @if ($loop->last)
+                                                </ul>
+                                            @endif
+                                        @endforeach
+
+                                        <hr>
+                                        <input type="hidden" name="student" value="{{$student["info"]->id}}">
+                                        <input type="hidden" name="question" value="{{$question->id}}">
+                                        <button class="btn btn-block btn-outline-dark-green font-weight-bold" data-action="save-scores">حفظ الدرجات</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Typical answers to the current question --}}
+            <div class="col-lg-6 col-sm-12" style="position: sticky; top: 75px;">
                 <div class="card">
                     {{-- Heading --}}
                     <div class="view shadow mdb-color p-3">
@@ -40,7 +99,7 @@
                         {{-- Question Branches --}}
                         @foreach($question->branches as $branch)
                             @if ($loop->first)
-                                <ol>
+                                <ul>
                                     @endif
                                     {{-- Branch --}}
                                     <li class="mb-3">
@@ -54,7 +113,7 @@
                                         </span>
                                     </li>
                                     @if ($loop->last)
-                                </ol>
+                                </ul>
                             @endif
                         @endforeach
 
@@ -76,23 +135,50 @@
                     </div>
                 </div>
             </div>
-
-            {{-- Show Students Answers --}}
-            <div class="col-lg-7 col-sm-12">
-                <div class="card">
-                    {{-- Heading --}}
-                    <div class="view shadow mdb-color p-3">
-                        <h5 class="text-center text-white m-0">
-                           <span>اجوبة الطلاب</span>
-                        </h5>
-                    </div>
-
-                    {{-- Questions --}}
-                    <div class="card-body border-bottom border-primary">
-
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
+@endsection
+
+@section("script")
+    <script>
+        $("button[data-action='save-scores']").click(function () {
+            let student = $(this).parent().find("input[type='hidden'][name='student']").val();
+            let question = $(this).parent().find("input[type='hidden'][name='question']").val();
+            let answers = $(this).parent().find("input[type='number']").map(function() {
+                return {
+                    "id":$(this).attr("name"),
+                    "score": $(this).val()
+                };
+            }).get();
+            let currentStudentCard = $(this).parent().parent().parent();
+            let currentStudentCardHeading = currentStudentCard.find(".view");
+            let currentStudentCardBody = currentStudentCard.find(".card-body");
+
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "post",
+                url: "/control-panel/questions-correction/manually",
+                data: {student:student, question:question, answers:answers},
+                dataType: "json",
+                success: function(result){
+                    console.log(result);
+                    if (result["correction"] == "success")
+                    {
+                        currentStudentCardBody.addClass("animated zoomOut");
+                        setTimeout(function () {
+                            currentStudentCardBody.addClass("d-none");
+                        },750);
+                    }
+                },
+                error: function () {
+                    
+                },
+                complete: function () {
+
+                }
+            });
+        });
+    </script>
 @endsection
