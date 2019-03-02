@@ -56,6 +56,7 @@ class ExamController extends Controller
      */
     public function store(Request $request)
     {
+        //Validation
         $this->validate($request, [
             'course' => ['required', Rule::in(self::getCoursesOpen()->pluck("id")->toArray())],
             'type'   => ['required', 'integer', 'between:1,4', Rule::notIn(self::getExamTypes(Input::get("course")))],
@@ -111,33 +112,36 @@ class ExamController extends Controller
                 ]);
         }
 
-        //Add new exam
-        $exam = new Exam();
-        $exam->title = Input::get("title");
-        $exam->course_id = Input::get("course");
-        $exam->type = Input::get("type");
-        $exam->state = ExamState::CLOSE;
-        $exam->real_score = $score;
-        $exam->fake_score = 100; //Default Value 100
-        $exam->curve = 0;       //Default Value 0
-        $exam->date = Input::get("date");
-        $success = $exam->save();
+        //Transaction
+        $exception = DB::transaction(function () use ($score, &$exam) {
+            //Store exam
+            $exam = new Exam();
+            $exam->title = Input::get("title");
+            $exam->course_id = Input::get("course");
+            $exam->type = Input::get("type");
+            $exam->state = ExamState::CLOSE;
+            $exam->real_score = $score;
+            $exam->fake_score = 100; //Default Value 100
+            $exam->curve = 0;       //Default Value 0
+            $exam->date = Input::get("date");
+            $exam->save();
 
-        if (!$success)
+            //Store event log
+            $target = $exam->id;
+            $type = EventLogType::EXAM;
+            $event = "انشاء النموذج الامتحاني " . $exam->title;
+            EventLog::create($target, $type, $event);
+        });
+
+        if (is_null($exception))
+            return redirect("/control-panel/exams/create")->with([
+                "CreateExamMessage" => "تم انشاء النموذج الامتحاني " . $exam->title
+            ]);
+        else
             return redirect("/control-panel/exams/create")->with([
                 "CreateExamMessage" => "لم يتم انشاء النموذج الامتحاني",
                 "TypeMessage" => "Error"
             ]);
-
-        //Store event log
-        $target = $exam->id;
-        $type = EventLogType::EXAM;
-        $event = "انشاء النموذج الامتحاني " . $exam->title;
-        EventLog::create($target, $type, $event);
-
-        return redirect("/control-panel/exams/create")->with([
-            "CreateExamMessage" => "تم انشاء النموذج الامتحاني " . $exam->title
-        ]);
     }
 
     /**
@@ -186,12 +190,13 @@ class ExamController extends Controller
         //Update state for exam
         if (Input::get("state"))
         {
+            //change exam state
             switch (Input::get("state"))
             {
                 case "open":
                     if (!self::complete($exam))
                         return redirect("/control-panel/exams")->with([
-                            "UpdateExamStateMessage" => "لا يمكن فتح النموذج الامتحاني " . $exam->title . " لان رفع الاسئلة لم يكتمل",
+                            "UpdateExamStateMessage" => "لا يمكن فتح النموذج الامتحاني " . $exam->title . " لان النموذج الامتحاني غير جاهز",
                             "TypeMessage" => "Error"
                         ]);
                     $exam->state = ExamState::OPEN;
@@ -204,7 +209,7 @@ class ExamController extends Controller
                 case "reopen":
                     if (!self::complete($exam))
                         return redirect("/control-panel/exams")->with([
-                            "UpdateExamStateMessage" => "لا يمكن اعادة فتح النموذج الامتحاني " . $exam->title . " لان رفع الاسئلة لم يكتمل",
+                            "UpdateExamStateMessage" => "لا يمكن اعادة فتح النموذج الامتحاني " . $exam->title . " لان النموذج الامتحاني غير جاهز",
                             "TypeMessage" => "Error"
                         ]);
                     $exam->state = ExamState::OPEN;
@@ -215,50 +220,62 @@ class ExamController extends Controller
                     $event = "غلق النموذج الامتحاني " . $exam->title . " بسبب تلاعب المستخدم بالبيانات";
             }
 
-            $success = $exam->save();
+            //Transaction
+            $exception = DB::transaction(function () use ($exam, $event){
+                //Make questions for current exam are uncorrected
+                $exam->questions()
+                    ->update(array('correction' => QuestionCorrectionState::UNCORRECTED));
 
-            if (!$success)
+                //Update exam
+                $exam->save();
+
+                //Store event log
+                $target = $exam->id;
+                $type = EventLogType::EXAM;
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("/control-panel/exams")->with([
+                    "UpdateExamStateMessage" => "تم " . $event
+                ]);
+            else
                 return redirect("/control-panel/exams")->with([
                     "UpdateExamStateMessage" => "لم يتم تغيير حالة النموذج الامتحاني " . $exam->title,
                     "TypeMessage" => "Error"
                 ]);
-
-            //Store event log
-            $target = $exam->id;
-            $type = EventLogType::EXAM;
-            EventLog::create($target, $type, $event);
-
-            return redirect("/control-panel/exams")->with([
-                "UpdateExamStateMessage" => "تم " . $event
-            ]);
         }
 
         //Update curve for exam
         if (Input::get("curve"))
         {
-            $exam->curve = (Input::get("curve") > 10) ? 10:Input::get("curve");
-            $success = $exam->save();
+            $exception = DB::transaction(function () use ($exam){
+                //Update exam
+                $exam->curve = (Input::get("curve") > 10) ? 10:Input::get("curve");
+                $exam->save();
 
-            if (!$success)
+                //Store event log
+                $target = $exam->id;
+                $type = EventLogType::EXAM;
+                $event = "اضافة كيرف للنموذج الامتحاني " . $exam->title;
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("/control-panel/exams/$exam->id")->with([
+                    "UpdateExamCurveMessage" => "تم اضافة الكيرف للامتحان الحالي"
+                ]);
+            else
                 return redirect("/control-panel/exams/$exam->id")->with([
                     "UpdateExamCurveMessage" => "لم يتم اضافة الكيرف للامتحان الحالي",
                     "TypeMessage"       => "Error"
                 ]);
-
-            //Store event log
-            $target = $exam->id;
-            $type = EventLogType::EXAM;
-            $event = "اضافة كيرف للنموذج الامتحاني " . $exam->title;
-            EventLog::create($target, $type, $event);
-
-            return redirect("/control-panel/exams/$exam->id")->with([
-                "UpdateExamCurveMessage" => "تم اضافة الكيرف للامتحان الحالي"
-            ]);
         }
 
         //General update for exam
         if (Input::get("general"))
         {
+            //Validation
             $this->validate($request, [
                 'title' => ['required'],
                 'score' => ['required', 'integer', (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
@@ -272,6 +289,7 @@ class ExamController extends Controller
                 'date.date'      => 'تاريخ الامتحان غير مقبولة.',
             ]);
 
+            //Generate score for exam
             $score = Input::get("score");
             if ($exam->type == ExamType::FIRST_MONTH)
             {
@@ -306,27 +324,32 @@ class ExamController extends Controller
                 $firstMonthExam->save();
             }
 
-            $exam->title = Input::get("title");
-            $exam->real_score = $score;
-            $exam->date = Input::get("date");
-            $success = $exam->save();
+            //Transaction
+            $exception = DB::transaction(function () use ($exam, $score){
+                //Update exam
+                $exam->title = Input::get("title");
+                $exam->real_score = $score;
+                $exam->date = Input::get("date");
+                $exam->save();
 
-            if (!$success)
+                //Store event log
+                $target = $exam->id;
+                $type = EventLogType::EXAM;
+                $event = "تعديل النموذج الامتحاني " . $exam->title;
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("/control-panel/exams")->with([
+                    "UpdateExamMessage" => "تم تعديل النموذج الامتحاني " . $exam->title
+                ]);
+            else
                 return redirect("/control-panel/exams/$exam->id/edit")->with([
                     "UpdateExamMessage" => "لم يتم نعديل النموذج الامتحاني " . $exam->title
                 ]);
-
-            //Store event log
-            $target = $exam->id;
-            $type = EventLogType::EXAM;
-            $event = "تعديل النموذج الامتحاني " . $exam->title;
-            EventLog::create($target, $type, $event);
-
-            return redirect("/control-panel/exams")->with([
-                "UpdateExamMessage" => "تم تعديل النموذج الامتحاني " . $exam->title
-            ]);
         }
 
+        //Otherwise
         return abort(404);
     }
 

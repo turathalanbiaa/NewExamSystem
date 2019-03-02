@@ -11,7 +11,6 @@ use App\Models\Answer;
 use App\Models\EventLog;
 use App\Models\Question;
 use App\Models\Student;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
@@ -124,6 +123,7 @@ class QuestionsCorrectionController extends Controller
         //Not have answers, Make question is corrected
         if ($studentsAnswers->isEmpty())
         {
+            //Transaction
             $exception = DB::transaction(function () use ($exam, $question){
                 //Make question is corrected
                 $question->correction = QuestionCorrectionState::CORRECTED;
@@ -168,6 +168,8 @@ class QuestionsCorrectionController extends Controller
         $question = Question::findOrFail(Input::get("question"));
         $answers = Input::get("answers");
         $maxScoreForBranch = ($question->score / $question->no_of_branch_req);
+
+        //Transaction
         $exception = DB::transaction(function () use ($answers, $maxScoreForBranch){
             foreach ($answers as $answer)
             {
