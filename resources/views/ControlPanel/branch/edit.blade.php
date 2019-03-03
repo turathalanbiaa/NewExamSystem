@@ -41,7 +41,7 @@
                             <span>اذا كان نوع السؤال </span>
                             <span class="font-weight-bold">اخيارات </span>
                             <span>فهنا يمكنك اضافة عنوان (النص) النقطة والاختيارات واختيار الاجابة الصحيحة، </span>
-                            <span class="font-weight-bold">علما ان اول ثلاث اختيارات مطلوبة.</span>
+                            <span class="font-weight-bold">علما أن الاختيارين الأولين مطلوبان.</span>
                         </li>
 
                         <li>

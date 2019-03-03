@@ -158,10 +158,12 @@
                                                 <i class="fa fa-edit ml-1"></i>
                                                 <span>تحرير</span>
                                             </a>
-                                            <a href="#modelDeleteBranch" data-toggle="modal" class="text-danger text-decoration mr-1" rel="tooltip" title="حذف النقطة" data-action="fillDeleteBranchForm" data-branch-id="{{$branch->id}}" data-branch-title="{{$branch->title}}">
-                                                <i class="fa fa-trash-alt ml-1"></i>
-                                                <span>حذف</span>
-                                            </a>
+                                            @if($currentQuestion->exam->state == \App\Enums\ExamState::CLOSE)
+                                                <a href="#modelDeleteBranch" data-toggle="modal" class="text-danger text-decoration mr-1" rel="tooltip" title="حذف النقطة" data-action="fillDeleteBranchForm" data-branch-id="{{$branch->id}}" data-branch-title="{{$branch->title}}">
+                                                    <i class="fa fa-trash-alt ml-1"></i>
+                                                    <span>حذف</span>
+                                                </a>
+                                            @endif
                                         </span><br>
 
                                         {{-- Options --}}

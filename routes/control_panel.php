@@ -22,4 +22,5 @@ Route::resource('control-panel/branches', 'ControlPanel\BranchController');
 
 Route::get('control-panel/questions-correction/automatically/{id}', 'ControlPanel\QuestionsCorrectionController@QuestionCorrectionAutomatically');
 Route::get('control-panel/questions-correction/manually/{id}', 'ControlPanel\QuestionsCorrectionController@ShowQuestionToCorrectionManually');
-Route::post('/control-panel/questions-correction/manually', 'ControlPanel\QuestionsCorrectionController@QuestionCorrectionManually');
+Route::post('control-panel/questions-correction/manually', 'ControlPanel\QuestionsCorrectionController@QuestionCorrectionManually');
+Route::get('control-panel/exams/{exam}/total-scores', 'ControlPanel\ExamController@totalScores');

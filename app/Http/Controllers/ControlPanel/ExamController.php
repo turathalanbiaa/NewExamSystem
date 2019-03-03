@@ -419,6 +419,19 @@ class ExamController extends Controller
     }
 
     /**
+     * Total scores for all student
+     *
+     * @param Exam $exam
+     */
+    public function totalScores($exam)
+    {
+        $exam = Exam::findOrFail($exam);
+        self::watchExam($exam);
+
+        dd($exam->studentEnrolled);
+    }
+
+    /**
      * Get exam types from the specified course
      *
      * @param $course

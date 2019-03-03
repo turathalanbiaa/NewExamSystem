@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\AnswerCorrectionState;
 use App\Enums\EventLogType;
 use App\Enums\ExamState;
 use App\Enums\QuestionCorrectionState;
@@ -193,16 +194,34 @@ class QuestionController extends Controller
             $question->score = Input::get("score");
             $question->no_of_branch = ($exam->state==ExamState::CLOSE)?Input::get("noOfBranch"):$question->no_of_branch;
             $question->no_of_branch_req = Input::get("noOfBranchRequired");
+
+            //Re-correct the question
+            if (($exam->state == ExamState::END) && (Input::get("reCorrectQuestion")))
+            {
+                //Update question
+                $question->correction = QuestionCorrectionState::UNCORRECTED;
+
+                //Re-correct the answers
+                foreach ($question->branches as $branch)
+                    $branch->answers()
+                        ->update(array('correction' => AnswerCorrectionState::UNCORRECTED));
+            }
+
             $question->save();
 
             //Update branches score
-            Branch::where('question_id', $question->id)
+            $question->branches()
                 ->update(array('score' => ($question->score / $question->no_of_branch_req)));
 
             //Store event log
             $target = $question->id;
             $type = EventLogType::QUESTION;
-            $event = "تعديل السؤال: " . $question->title . "في امتحان " . $exam->title . "و هذا الامتحان " . ExamState::getState($exam->state);
+            if (($exam->state == ExamState::END) && Input::get("reCorrectQuestion"))
+                $event = "تعديل السؤال: " . $question->title . "في امتحان " . $exam->title . "و هذا الامتحان منتهي، مع اعادة تصحيح السؤال";
+            elseif ($exam->state == ExamState::END)
+                $event = "تعديل السؤال: " . $question->title . "في امتحان " . $exam->title . "و هذا الامتحان منتهي";
+            else
+                $event = "تعديل السؤال: " . $question->title . "في امتحان " . $exam->title . "و هذا الامتحان مغلق";
             EventLog::create($target, $type, $event);
         });
 

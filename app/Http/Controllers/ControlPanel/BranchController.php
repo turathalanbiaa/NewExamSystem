@@ -290,21 +290,21 @@ class BranchController extends Controller
             $branch->save();
 
             //Update Answers
-            if (($exam->state == ExamState::END) && Input::get("reCorrectOption")) {
+            if (($exam->state == ExamState::END) && (Input::get("reCorrectAnswers"))) {
                 //Update Answers
-                $branch->answers()->update(array("re_correct" => 1));
-
-                //Store event log
-                $target = $branch->id;
-                $type = EventLogType::BRANCH;
-                $event = "تم اعتبار اجابة الطلبة صحيحة في النقطة: " . $branch->title . " في السؤال: " . $question->title . " في الامتحان: " . $exam->title;
-                EventLog::create($target, $type, $event);
+                $branch->answers()
+                    ->update(array("re_correct" => 1));
             }
 
             //Store event log
             $target = $branch->id;
             $type = EventLogType::BRANCH;
-            $event = "تعديل النقطة: " . $branch->title . " في السؤال: " . $question->title . " في الامتحان: " . $exam->title;
+            if (($exam->state == ExamState::END) && Input::get("reCorrectAnswers"))
+                $event = "تعديل النقطة: " . $branch->title . " في السؤال: " . $question->title . "في امتحان " . $exam->title . "و هذا الامتحان منتهي، مع اعتبار اجوبة الطلبة اجوبة صحيحه";
+            elseif ($exam->state == ExamState::END)
+                $event = "تعديل النقطة: " . $branch->title . " في السؤال: " . $question->title . " في الامتحان: " . $exam->title . "و هذا الامتحان منتهي";
+            else
+                $event = "تعديل النقطة: " . $branch->title . " في السؤال: " . $question->title . " في الامتحان: " . $exam->title. "و هذا الامتحان مفلق";
             EventLog::create($target, $type, $event);
         });
 
