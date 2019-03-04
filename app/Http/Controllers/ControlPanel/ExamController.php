@@ -8,10 +8,12 @@ use App\Enums\EventLogType;
 use App\Enums\ExamState;
 use App\Enums\ExamType;
 use App\Enums\QuestionCorrectionState;
+use App\Models\Answer;
 use App\Models\Course;
 use App\Models\EventLog;
 use App\Models\Exam;
 use App\Models\ExamStudent;
+use App\Models\Student;
 use App\Models\StudentDocument;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -428,7 +430,69 @@ class ExamController extends Controller
         $exam = Exam::findOrFail($exam);
         self::watchExam($exam);
 
-        dd($exam->studentEnrolled);
+        //Check all questions are corrected for the exam
+        if (self::corrected($exam))
+            return redirect("/control-panel/exams/$exam->id")->with([
+                "CalculateTotalScoresMessage" => "لا يمكن جمع درجة الامتحان للطلاب لانه لم يكتمل تصحيح جميع الاسئلة",
+                "TypeMessage" => "Error"
+            ]);
+
+        //Get students
+        $studentsIds = ExamStudent::where("exam_id", $exam->id)
+            ->pluck("student_id")->toArray();
+        $students = Student::whereIn("id", $studentsIds)->get();
+        $questions = $exam->questions;
+
+        //Calculate total scores for each student
+        foreach ($students as $student)
+        {
+            //Calculate total scores
+            $total = 0;
+            foreach ($questions as $question)
+            {
+                $branchesIds = $question->branches()->pluck("id")->toArray();
+                $total = $total + Answer::where("student_id", $student->id)
+                    ->whereIn("branch_id", $branchesIds)
+                    ->select("score")
+                    ->orderBy("score","DESC")
+                    ->take($question->no_of_branch_req)
+                    ->sum("score");
+            }
+
+            //Store total scores in document
+            $document = StudentDocument::where("student_id", $student->id)
+                ->where("course_id", $exam->course->id)
+                ->first();
+
+            if (!$document)
+            {
+                //Store new document
+                $document = new StudentDocument();
+                $document->student_id = $student->id;
+                $document->course_id = $exam->course->id;
+                $document->first_month_score = ($exam->type == ExamType::FIRST_MONTH)?$total:0;
+                $document->second_month_score = ($exam->type == ExamType::SECOND_MONTH)?$total:0;
+                $document->assessment_score = 0;
+                $document->final_first_score = ($exam->type == ExamType::FINAL_FIRST_ROLE)?$total:0;
+                $document->final_second_score = ($exam->type == ExamType::FINAL_SECOND_ROLE)?$total:0;
+                $document->year = date("Y");
+                $document->save();
+                dd("new");
+            }
+            else
+            {
+                //Update document
+                $document->first_month_score = ($exam->type == ExamType::FIRST_MONTH)?$total:$document->first_month_score;
+                $document->second_month_score = ($exam->type == ExamType::SECOND_MONTH)?$total:$document->second_month_score;
+                $document->final_first_score = ($exam->type == ExamType::FINAL_FIRST_ROLE)?$total:$document->final_first_score;
+                $document->final_second_score = ($exam->type == ExamType::FINAL_SECOND_ROLE)?$total:$document->final_second_score;
+                $document->save();
+                dd("old");
+            }
+        }
+
+        dd("OK");
+
     }
 
     /**
@@ -505,5 +569,22 @@ class ExamController extends Controller
                 return false;
 
             return true;
+    }
+
+    /**
+     * Check all questions are corrected for the exam
+     *
+     * @param $exam
+     * @return bool
+     */
+    private static function corrected($exam)
+    {
+        $questions = $exam->questions;
+        foreach ($questions as $question)
+        {
+            if ($question->correction != QuestionCorrectionState::CORRECTED)
+                return false;
+        }
+        return true;
     }
 }
