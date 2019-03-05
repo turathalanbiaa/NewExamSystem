@@ -165,6 +165,7 @@ class QuestionsCorrectionController extends Controller
 
     public function QuestionCorrectionManually()
     {
+        Auth::check();
         $question = Question::findOrFail(Input::get("question"));
         $answers = Input::get("answers");
         $maxScoreForBranch = ($question->score / $question->no_of_branch_req);

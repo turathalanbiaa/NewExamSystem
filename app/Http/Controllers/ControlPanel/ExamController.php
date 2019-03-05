@@ -425,15 +425,16 @@ class ExamController extends Controller
      *
      * @param Exam $exam
      */
-    public function totalScores($exam)
+    public function sum($exam)
     {
+        Auth::check();
         $exam = Exam::findOrFail($exam);
         self::watchExam($exam);
 
         //Check all questions are corrected for the exam
         if (self::corrected($exam))
             return redirect("/control-panel/exams/$exam->id")->with([
-                "CalculateTotalScoresMessage" => "لا يمكن جمع درجة الامتحان للطلاب لانه لم يكتمل تصحيح جميع الاسئلة",
+                "SumMessage" => "لا يمكن جمع درجة الامتحان للطلاب لانه لم يكتمل تصحيح جميع الاسئلة",
                 "TypeMessage" => "Error"
             ]);
 
@@ -443,15 +444,15 @@ class ExamController extends Controller
         $students = Student::whereIn("id", $studentsIds)->get();
         $questions = $exam->questions;
 
-        //Calculate total scores for each student
+        //Find sum degree for each student
         foreach ($students as $student)
         {
-            //Calculate total scores
-            $total = 0;
+            //Find sum degree
+            $sum = 0;
             foreach ($questions as $question)
             {
                 $branchesIds = $question->branches()->pluck("id")->toArray();
-                $total = $total + Answer::where("student_id", $student->id)
+                $sum = $sum + Answer::where("student_id", $student->id)
                     ->whereIn("branch_id", $branchesIds)
                     ->select("score")
                     ->orderBy("score","DESC")
@@ -459,7 +460,11 @@ class ExamController extends Controller
                     ->sum("score");
             }
 
-            //Store total scores in document
+            //convert sum degree from fake to real
+            $ratio = $exam->real_score/$exam->fake_score;
+            $sum = $sum * $ratio;
+
+            //Store sum degree in document
             $document = StudentDocument::where("student_id", $student->id)
                 ->where("course_id", $exam->course->id)
                 ->first();
@@ -470,29 +475,26 @@ class ExamController extends Controller
                 $document = new StudentDocument();
                 $document->student_id = $student->id;
                 $document->course_id = $exam->course->id;
-                $document->first_month_score = ($exam->type == ExamType::FIRST_MONTH)?$total:0;
-                $document->second_month_score = ($exam->type == ExamType::SECOND_MONTH)?$total:0;
+                $document->first_month_score = ($exam->type == ExamType::FIRST_MONTH)?$sum:0;
+                $document->second_month_score = ($exam->type == ExamType::SECOND_MONTH)?$sum:0;
                 $document->assessment_score = 0;
-                $document->final_first_score = ($exam->type == ExamType::FINAL_FIRST_ROLE)?$total:0;
-                $document->final_second_score = ($exam->type == ExamType::FINAL_SECOND_ROLE)?$total:0;
+                $document->final_first_score = ($exam->type == ExamType::FINAL_FIRST_ROLE)?$sum:0;
+                $document->final_second_score = ($exam->type == ExamType::FINAL_SECOND_ROLE)?$sum:0;
                 $document->year = date("Y");
                 $document->save();
-                dd("new");
             }
             else
             {
                 //Update document
-                $document->first_month_score = ($exam->type == ExamType::FIRST_MONTH)?$total:$document->first_month_score;
-                $document->second_month_score = ($exam->type == ExamType::SECOND_MONTH)?$total:$document->second_month_score;
-                $document->final_first_score = ($exam->type == ExamType::FINAL_FIRST_ROLE)?$total:$document->final_first_score;
-                $document->final_second_score = ($exam->type == ExamType::FINAL_SECOND_ROLE)?$total:$document->final_second_score;
+                $document->first_month_score = ($exam->type == ExamType::FIRST_MONTH)?$sum:$document->first_month_score;
+                $document->second_month_score = ($exam->type == ExamType::SECOND_MONTH)?$sum:$document->second_month_score;
+                $document->final_first_score = ($exam->type == ExamType::FINAL_FIRST_ROLE)?$sum:$document->final_first_score;
+                $document->final_second_score = ($exam->type == ExamType::FINAL_SECOND_ROLE)?$sum:$document->final_second_score;
                 $document->save();
-                dd("old");
             }
         }
 
-        dd("OK");
-
+        return "OK";
     }
 
     /**

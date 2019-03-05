@@ -17,6 +17,17 @@
             </div>
         @endif
 
+        {{-- Session Sum Message --}}
+        @if (session('SumMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger text-center">
+                        {{session('SumMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Session Delete Question Message --}}
         @if (session('DeleteQuestionMessage'))
             <div class="row">
@@ -217,9 +228,9 @@
                 {{-- Collect The Exam Score --}}
                 <div class="row">
                     <div class="col-12">
-                        <a class="bg-light h5 p-3 m-0 d-block" href="/control-panel/exams/{{$exam->id}}/total-scores">
+                        <a class="bg-light h5 p-3 m-0 d-block" href="/control-panel/exams/{{$exam->id}}/sum" style="color: inherit;">
                             <i class="fa fa-caret-left text-default ml-1"></i>
-                            <span>جمع درجة الامتحان للطلاب وترحيلها الى وثائقهم</span>
+                            <span>جمع درجة الامتحان للطلاب</span>
                         </a>
                     </div>
                 </div>
