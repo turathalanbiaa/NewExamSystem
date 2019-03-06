@@ -9,6 +9,7 @@ use App\Models\Admin;
 use App\Models\EventLog;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
 
@@ -49,6 +50,7 @@ class AdminController extends Controller
     public function store(Request $request)
     {
         Auth::check();
+        //Validation
         $this->validate($request, [
             'name'                  => 'required',
             'username'              => 'required|unique:admin,username',
@@ -58,7 +60,7 @@ class AdminController extends Controller
         ], [
             'name.required'                       => 'الاسم الحقيقي فارغ.',
             'username.required'                   => 'اسم المستخدم فارغ.',
-            'username.unique'                     => 'يوجد مستخدم اخر بنفس الاسم.',
+            'username.unique'                     => 'اسم المستخدم هذا مستخدم بالفعل، يرجى استخدام اسم آخر.',
             'password.required'                   => 'كلمة المرور فارغ.',
             'password.min'                        => 'كلمة المرور يجب ان لاتقل عن 8 حروف.',
             'password_confirmation.required_with' => 'يرجى اعادة كتابة كلمة المرور.',
@@ -68,32 +70,32 @@ class AdminController extends Controller
             'state.between'                       => 'يجب اختيار حالة الحساب اما مفتوح او مغلق.'
         ]);
 
-        $admin = new Admin();
-        $admin->name = Input::get("name");
-        $admin->username = Input::get("username");
-        $admin->password = md5(Input::get("password"));
-        $admin->state = Input::get("state");
-        $admin->session = null;
-        $admin->date = date("Y-m-d");
-        $success = $admin->save();
+        $exception = DB::transaction(function () use (&$admin){
+            $admin = new Admin();
+            $admin->name = Input::get("name");
+            $admin->username = Input::get("username");
+            $admin->password = md5(Input::get("password"));
+            $admin->state = Input::get("state");
+            $admin->remember_token = null;
+            $admin->date = date("Y-m-d");
+            $admin->save();
 
-        if (!$success)
+            //Store event log
+            $target = $admin->id;
+            $type = EventLogType::ADMIN;
+            $event = "اضافة مدير " . $admin->name;
+            EventLog::create($target, $type, $event);
+        });
+
+        if (is_null($exception))
+            return redirect("/control-panel/admins/create")->with([
+                "CreateAdminMessage" => "تمت عملية اضافة المدير " . $admin->name . " بنجاح"
+            ]);
+        else
             return redirect("/control-panel/admins/create")->with([
                 "CreateAdminMessage" => "لم تتم عملية اضافة المدير بنجاح",
                 "TypeMessage" => "Error"
             ]);
-
-        /**
-         * Keep event log
-         */
-        $target = $admin->id;
-        $type = EventLogType::ADMIN;
-        $event = "اضافة حساب مدير - " . $admin->name;
-        EventLog::create($target, $type, $event);
-
-        return redirect("/control-panel/admins/create")->with([
-            "CreateAdminMessage" => "تمت عملية اضافة المدير بنجاح - " . $admin->name
-        ]);
     }
 
     /**

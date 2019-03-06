@@ -23,7 +23,7 @@ class Auth extends Controller
      */
     private static function isLoggedIn()
     {
-        if (!session()->has("EXAM_SYSTEM_ACCOUNT_SESSION"))
+        if (!session()->has("EXAM_SYSTEM_ACCOUNT_TOKEN"))
             abort(302, '', ['Location' => "/control-panel/login"]);
     }
 

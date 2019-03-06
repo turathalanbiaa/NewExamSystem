@@ -7,6 +7,32 @@
 @section("content")
     <div class="container">
         {{-- Student Info--}}
+        <div class="row">
+            <div class="col-12 mb-3">
+                <div class="d-flex">
+                    <div style="width: 100px">اسم الطالب </div>
+                    <div>
+                        <span class="ml-1">:</span>
+                        <span>{{$student->originalStudent->Name}}</span>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div style="width: 100px">المستوي الدراسي </div>
+                    <div>
+                        <span class="ml-1">:</span>
+                        <span>{{\App\Enums\Level::get($student->originalStudent->Level)}}</span>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div style="width: 100px">رقم الطالب </div>
+                    <div>
+                        <span>:</span>
+                        <span>{{$student->id . "-" . $student->originalStudent->ID}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Student DataTable --}}
         <div class="row">
             <div class="col-12">
@@ -64,7 +90,7 @@
                                 <span>{{$document->final_second_score}}</span>
                             </td>
                             <td class="th-sm fa d-table-cell">
-                                <span>الدرجة النهائية</span>
+                                <span>{{$document->first_month_score + $document->second_month_score + $document->assessment_score + $document->final_first_score}}</span>
                             </td>
                         </tr>
                     @endforeach

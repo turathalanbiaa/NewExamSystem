@@ -6,7 +6,40 @@
 
 @section("content")
     <div class="container">
-        <div class="row justify-content-center">
+        {{-- Session Create Admin Message --}}
+        @if (session('CreateAdminMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
+                        {{session('CreateAdminMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="row">
+            {{-- Heading --}}
+            <div class="col-12 mb-3">
+                <div class="view shadow mdb-color p-3">
+                    <h5 class="text-center text-white m-0">انشاء حساب مدير</h5>
+                </div>
+            </div>
+
+            {{-- Info --}}
+            <div class="col-lg-4">
+                {{-- Admin Alert Info --}}
+                <div class="alert alert-info">
+                    <h5 class="text-center pb-2 border-bottom border-primary">معلومات حول امكانيات المدير</h5>
+                    <ul class="mb-0 pr-3">
+                        <li>له كل الامكانيات على الاساتذة والمواد الدراسية من اضافة وتعديل وحذف.</li>
+                        <li>له جميع امكانيات الاستاذ على الامتحانات من اضافة وتعديل وحذف وتغيير حالة الامتحان وتصحيح الامتحان.</li>
+                        <li>طباعة تقارير ووثائق الطلبة.</li>
+                        <li>مراجعة سجل احداث الاستاذ.</li>
+                    </ul>
+                </div>
+            </div>
+
+            {{-- Create Admin --}}
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Alert Errors --}}
@@ -20,13 +53,7 @@
                         </div>
                     @endif
 
-                    {{-- Session Create Admin Message --}}
-                    @if (session('CreateAdminMessage'))
-                        <div class="alert {{(session('TypeMessage') == "Error" ? "alert-danger":"alert-success")}} text-center mx-4 mt-4">
-                            {{session('CreateAdminMessage')}}
-                        </div>
-                    @endif
-
+                    {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
                         <form method="post" action="/control-panel/admins">
                             @csrf

@@ -13,6 +13,7 @@ Route::post('control-panel/login', 'ControlPanel\LoginController@loginValidate')
 Route::get('control-panel/logout', 'ControlPanel\LogoutController@logout');
 
 Route::resource('control-panel/profile', 'ControlPanel\ProfileController');
+
 Route::resource('control-panel/admins', 'ControlPanel\AdminController');
 Route::resource('control-panel/lecturers', 'ControlPanel\LecturerController');
 Route::resource('control-panel/courses', 'ControlPanel\CourseController');

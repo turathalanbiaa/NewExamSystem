@@ -10,7 +10,7 @@
         @if (session('UpdateAdminMessage'))
             <div class="row">
                 <div class="col-12">
-                    <div class="alert alert-success text-center my-3">
+                    <div class="alert alert-success text-center">
                         {{session('UpdateAdminMessage')}}
                     </div>
                 </div>
@@ -21,7 +21,7 @@
         @if (session('ArchiveAdminMessage'))
             <div class="row">
                 <div class="col-12">
-                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center my-3">
+                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
                         {{session('ArchiveAdminMessage')}}
                     </div>
                 </div>
@@ -64,11 +64,11 @@
                     <tbody>
                         @foreach($admins as $admin)
                             <tr>
-                                <td>{{$admin->id}}</td>
-                                <td>{{$admin->name}}</td>
-                                <td>{{$admin->username}}</td>
-                                <td>{{\App\Enums\AccountState::getState($admin->state)}}</td>
-                                <td class="text-center">
+                                <td class="align-baseline">{{$admin->id}}</td>
+                                <td class="align-baseline">{{$admin->name}}</td>
+                                <td class="align-baseline">{{$admin->username}}</td>
+                                <td class="align-baseline">{{\App\Enums\AccountState::getState($admin->state)}}</td>
+                                <td class="align-baseline text-center">
                                     <a class="btn btn-sm btn-outline-dark m-1" href="/control-panel/admins/{{$admin->id}}" rel="tooltip" title="مزيد من المعلومات">
                                         <i class="fa fa-info-circle"></i>
                                     </a>
