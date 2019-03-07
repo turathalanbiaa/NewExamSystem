@@ -34,11 +34,11 @@ class LoginController extends Controller
             switch ($accountType)
             {
                 case (AccountType::MANAGER):
-                    $account = Admin::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                    $account = Admin::where("remember_token", Cookie::get("EXAM_SYSTEM_ACCOUNT_TOKEN"))
                         ->first();
                     break;
                 case (AccountType::LECTURER):
-                    $account = Lecturer::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                    $account = Lecturer::where("remember_token", Cookie::get("EXAM_SYSTEM_ACCOUNT_TOKEN"))
                         ->first();
                     break;
                 default: $account = false;

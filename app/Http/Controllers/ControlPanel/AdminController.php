@@ -70,6 +70,7 @@ class AdminController extends Controller
             'state.between'                       => 'يجب اختيار حالة الحساب اما مفتوح او مغلق.'
         ]);
 
+        //Transaction
         $exception = DB::transaction(function () use (&$admin){
             $admin = new Admin();
             $admin->name = Input::get("name");
@@ -142,11 +143,10 @@ class AdminController extends Controller
     public function update(Request $request, Admin $admin)
     {
         Auth::check();
-        /**
-         * For change password
-         */
+        //For change password
         if (Input::get("type") == "change-password")
         {
+            //Validation
             $this->validate($request, [
                 'password'              => 'required|min:8',
                 'password_confirmation' => 'required_with:password|same:password'
@@ -157,37 +157,34 @@ class AdminController extends Controller
                 'password_confirmation.same'          => 'كلمتا المرور ليس متطابقتان.'
             ]);
 
-            $admin->password = md5(Input::get("password"));
+            //Transaction
+            $exception = DB::transaction(function () use ($admin){
+                //Update admin and remove session for all managers except super admin
+                $admin->password = md5(Input::get("password"));
+                $admin->remember_token = (session()->get("EXAM_SYSTEM_ACCOUNT_ID") != 1)?null:$admin->remember_token;
+                $admin->save();
 
-            /**
-             * Keep logged in to super ِ admin
-             */
-            if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") != 1)
-                $admin->session = null;
+                //Store event log
+                $target = $admin->id;
+                $type = EventLogType::ADMIN;
+                $event = "تغيير كلمة المرور المدير " . $admin->name;
+                EventLog::create($target, $type, $event);
+            });
 
-            $success = $admin->save();
-
-            if (!$success)
+            if (is_null($exception))
+                return redirect("/control-panel/admins")->with([
+                    "UpdateAdminMessage" => "تم تغيير كلمة المرور المدير " . $admin->name
+                ]);
+            else
                 return redirect("/control-panel/admins/$admin->id/edit?type=change-password")->with([
                     "UpdateAdminMessage" => "لم يتم تغيير كلمة المرور المدير"
                 ]);
-
-            /**
-             * Keep event log
-             */
-            $target = $admin->id;
-            $type = EventLogType::ADMIN;
-            $event = "تغيير كلمة المرور المدير - " . $admin->name;
-            EventLog::create($target, $type, $event);
-
-            return redirect("/control-panel/admins")->with([
-                "UpdateAdminMessage" => "تم تغيير كلمة المرور المدير - " . $admin->name
-            ]);
         }
-        /**
-         * For change info account
-         */
-        else {
+
+        //For change info account
+        if (Input::get("type") == "change-info")
+        {
+            //Validation
             $this->validate($request, [
                 'name'     => 'required',
                 'username' => ["required", Rule::unique('admin')->ignore($admin->id)],
@@ -201,39 +198,42 @@ class AdminController extends Controller
                 'state.between'     => 'يجب اختيار حالة الحساب اما مفتوح او مغلق.'
             ]);
 
-            $admin->name = Input::get("name");
-            $admin->username = Input::get("username");
-            $admin->state = Input::get("state");
-            $success = $admin->save();
+            //Transaction
+            $exception = DB::transaction(function () use ($admin){
+                //Update Admin
+                $admin->name = Input::get("name");
+                $admin->username = Input::get("username");
+                $admin->state = Input::get("state");
+                $admin->save();
 
-            if (!$success)
+                //Store event log
+                $target = $admin->id;
+                $type = EventLogType::ADMIN;
+                $event = "تعديل الحساب المدير " . $admin->name;
+                EventLog::create($target, $type, $event);
+
+                //Update session for super admin
+                if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") == 1)
+                {
+                    session()->put('EXAM_SYSTEM_ACCOUNT_NAME', $admin->name);
+                    session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME', $admin->username);
+                    session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $admin->state);
+                    session()->save();
+                }
+            });
+
+            if (is_null($exception))
+                return redirect("/control-panel/admins")->with([
+                    "UpdateAdminMessage" => "تم تحديث المعلومات المدير " . $admin->name
+                ]);
+            else
                 return redirect("/control-panel/admins/$admin->id/edit?type=change-info")->with([
                     "UpdateAdminMessage" => "لم يتم تحديث المعلومات المدير"
                 ]);
-
-            /**
-             * Keep session info for super admin
-             */
-            if (session()->get("EXAM_SYSTEM_ACCOUNT_ID") == 1)
-            {
-                session()->put('EXAM_SYSTEM_ACCOUNT_NAME', $admin->name);
-                session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME', $admin->username);
-                session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $admin->state);
-                session()->save();
-            }
-
-            /**
-             * Keep event log
-             */
-            $target = $admin->id;
-            $type = EventLogType::ADMIN;
-            $event = "تعديل الحساب المدير - " . $admin->name;
-            EventLog::create($target, $type, $event);
-
-            return redirect("/control-panel/admins")->with([
-                "UpdateAdminMessage" => "تم تحديث المعلومات المدير - " . $admin->name
-            ]);
         }
+
+        //Otherwise
+        return abort(404);
     }
 
     /**
@@ -245,35 +245,36 @@ class AdminController extends Controller
     public function destroy(Admin $admin)
     {
         Auth::check();
-        $admin->state = AccountState::CLOSE;
-        $admin->session = null;
-        $success = $admin->save();
 
-        if (!$success)
+        //Transaction
+        $exception = DB::transaction(function () use ($admin){
+            //Update Admin
+            $admin->state = AccountState::CLOSE;
+            $admin->session = null;
+            $admin->save();
+
+            //Store event log
+            $target = $admin->id;
+            $type = EventLogType::ADMIN;
+            $event = "اغلاق الحساب المدير " . $admin->name;
+            EventLog::create($target, $type, $event);
+
+            //Update session for super admin
+            if ($admin->id == 1)
+            {
+                session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $admin->state);
+                session()->save();
+            }
+        });
+
+        if (is_null($exception))
             return redirect("/control-panel/admins")->with([
-                "ArchiveAdminMessage" => "لم يتم غلق حساب المدير - " . $admin->name,
+                "ArchiveAdminMessage" => "تم غلق حساب المدير " . $admin->name
+            ]);
+        else
+            return redirect("/control-panel/admins")->with([
+                "ArchiveAdminMessage" => "لم يتم غلق حساب المدير " . $admin->name,
                 "TypeMessage" => "Error"
             ]);
-
-        /**
-         * Keep session info for super admin
-         */
-        if ($admin->id == 1)
-        {
-            session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $admin->state);
-            session()->save();
-        }
-
-        /**
-         * Keep event log
-         */
-        $target = $admin->id;
-        $type = EventLogType::ADMIN;
-        $event = "اغلاق الحساب المدير - " . $admin->name;
-        EventLog::create($target, $type, $event);
-
-        return redirect("/control-panel/admins")->with([
-            "ArchiveAdminMessage" => "تم غلق حساب المدير - " . $admin->name
-        ]);
     }
 }

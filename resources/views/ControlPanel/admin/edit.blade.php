@@ -2,15 +2,55 @@
 
 @section("title")
     @if($_GET["type"] == "change-password")
-        <title>{{"تغيير كلمة المرور-".$admin->name}}</title>
+        <title>تغيير كلمة المرور</title>
     @else
-        <title>{{"تعديل الحساب-".$admin->name}}</title>
+        <title>تحرير الحساب</title>
     @endif
+    <title></title>
 @endsection
 
 @section("content")
     <div class="container">
-        <div class="row justify-content-center">
+        {{-- Session Update Admin Message --}}
+        @if (session('UpdateAdminMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        {{session('UpdateAdminMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+
+        <div class="row">
+            {{-- Heading --}}
+            <div class="col-12 mb-3">
+                <div class="view shadow mdb-color p-3">
+                    <h5 class="text-center text-white m-0">
+                        @if($_GET["type"] == "change-password")
+                            <span>{{"تغيير كلمة المرور المدير ".$admin->name}}</span>
+                        @else
+                            <span>{{"تحرير حساب المدير ".$admin->name}}</span>
+                        @endif
+                    </h5>
+                </div>
+            </div>
+
+            {{-- Info --}}
+            <div class="col-lg-4">
+                {{-- Admin Alert Info --}}
+                <div class="alert alert-info">
+                    <h5 class="text-center pb-2 border-bottom border-primary">تحرير حساب المدير</h5>
+                    <ul class="mb-0 pr-3">
+                        <li>يمكنك تعديل كل بيانات المدير.</li>
+                        <li>اذا قمت بتغيير كلمة المرور سوف يتم تسجيل خروج تلقائي للحساب.</li>
+                        <li>اذا قمت بتغيير حالة الحساب الى مفلق فيستطيع صاحب الحساب تسجيل الدخول فقط.</li>
+                    </ul>
+                </div>
+            </div>
+
+            {{-- Edit Admin--}}
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Alert Errors --}}
@@ -24,13 +64,7 @@
                         </div>
                     @endif
 
-                    {{-- Session Update Admin Message --}}
-                    @if (session('UpdateAdminMessage'))
-                        <div class="alert alert-info text-center mx-4 mt-4">
-                            {{session('UpdateAdminMessage')}}
-                        </div>
-                    @endif
-
+                    {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
                         <form method="post" action="/control-panel/admins/{{$admin->id}}">
                             @csrf
@@ -46,6 +80,7 @@
                                     <label for="password_confirmation">اعد كتابة كلمة المرور الجديدة</label>
                                     <input type="password" name="password_confirmation" id="password_confirmation" class="form-control">
                                 </div>
+
                                 <input type="hidden" name="type" value="change-password">
                             @else
                                 <div class="mb-4">
@@ -70,6 +105,8 @@
                                         </option>
                                     </select>
                                 </div>
+
+                                <input type="hidden" name="type" value="change-info">
                             @endif
 
                             <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">

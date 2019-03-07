@@ -26,6 +26,10 @@ Route::get('control-panel/questions-correction/manually/{id}', 'ControlPanel\Que
 Route::post('control-panel/questions-correction/manually', 'ControlPanel\QuestionsCorrectionController@QuestionCorrectionManually');
 Route::get('control-panel/exams/{exam}/sum', 'ControlPanel\ExamController@sum');
 
+
+
+
+
 Route::get('control-panel/reports', 'ControlPanel\ReportController@index');
 Route::get('control-panel/reports/students', 'ControlPanel\ReportController@showStudents');
 Route::get('control-panel/reports/students/{id}', 'ControlPanel\ReportController@showStudent');
