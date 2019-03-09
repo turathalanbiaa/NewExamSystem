@@ -36,8 +36,14 @@
                             <div class="col-md-3">
                                 <ul class="nav flex-column p-0 pl-4" role="tablist">
                                     <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-default btn-block active" data-toggle="tab" href="#last-event-log" role="tab">
+                                        <a class="nav-link btn btn-default btn-block active" data-toggle="tab" href="#latest-event-log" role="tab">
                                             <span>آخر الاحداث</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item mb-1">
+                                        <a class="nav-link btn btn-default btn-block" data-toggle="tab" href="#profile-event-log" role="tab">
+                                            <span>الملف الشخصي</span>
                                         </a>
                                     </li>
 
@@ -70,19 +76,40 @@
                                             <span>الاسئلة</span>
                                         </a>
                                     </li>
-
-                                    <li class="nav-item mb-1">
-                                        <a class="nav-link btn btn-default btn-block" data-toggle="tab" href="#" role="tab">
-                                            <span>new item one</span>
-                                        </a>
-                                    </li>
                                 </ul>
                             </div>
 
                             {{-- Tab Panels --}}
                             <div class="col-md-9">
                                 <div class="tab-content vertical">
-                                    <div class="tab-pane fade in show active" id="last-event-log" role="tabpanel">
+                                    <div class="tab-pane fade in show active" id="latest-event-log" role="tabpanel">
+                                        <table data-table="dtEventLog" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
+                                            <thead class="default-color text-white">
+                                                <tr>
+                                                    <th class="th-sm fa d-table-cell">
+                                                        <span>رقم الحدث</span>
+                                                    </th>
+                                                    <th class="th-sm fa d-table-cell">
+                                                        <span>الحدث</span>
+                                                    </th>
+                                                    <th class="th-sm fa d-table-cell">
+                                                        <span>التاريخ والوقت</span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($events as $event)
+                                                    <tr>
+                                                        <td>{{$event->id}}</td>
+                                                        <td>{{$event->event}}</td>
+                                                        <td>{{$event->time}}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="profile-event-log" role="tabpanel">
                                         <table data-table="dtEventLog" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
                                             <thead class="default-color text-white">
                                                 <tr>

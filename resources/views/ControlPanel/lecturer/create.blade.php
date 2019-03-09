@@ -6,7 +6,38 @@
 
 @section("content")
     <div class="container">
-        <div class="row justify-content-center">
+        {{-- Session Create Lecturer Message --}}
+        @if (session('CreateLecturerMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert {{((session('TypeMessage')=="Error")?"alert-danger":"alert-success")}} text-center">
+                        {{session('CreateLecturerMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="row">
+            {{-- Heading --}}
+            <div class="col-12 mb-3">
+                <div class="view shadow mdb-color p-3">
+                    <h5 class="text-center text-white m-0">انشاء حساب استاذ</h5>
+                </div>
+            </div>
+
+            {{-- Info --}}
+            <div class="col-lg-4">
+                {{-- Lecturer Alert Info --}}
+                <div class="alert alert-info">
+                    <h5 class="text-center pb-2 border-bottom border-primary">معلومات حول امكانيات الاستاذ</h5>
+                    <ul class="mb-0 pr-3">
+                        <li>له كل الامكانيات على المواد الدراسية الخاصة به من اضافة وتعديل وحذف.</li>
+                        <li>له جميع امكانيات على الامتحانات من اضافة وتعديل وحذف وتغيير حالة الامتحان وتصحيح الامتحان.</li>
+                    </ul>
+                </div>
+            </div>
+
+            {{-- Create Lecturer --}}
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Alert Errors --}}
@@ -20,13 +51,7 @@
                         </div>
                     @endif
 
-                    {{-- Session Create Lecturer Message --}}
-                    @if (session('CreateLecturerMessage'))
-                        <div class="alert {{((session('TypeMessage')=="Error")?"alert-danger":"alert-success")}} text-center mx-4 mt-4">
-                            {{session('CreateLecturerMessage')}}
-                        </div>
-                    @endif
-
+                    {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
                         <form method="post" action="/control-panel/lecturers">
                             @csrf

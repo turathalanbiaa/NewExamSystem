@@ -10,7 +10,7 @@
         @if (session('UpdateLecturerMessage'))
             <div class="row">
                 <div class="col-12">
-                    <div class="alert alert-success text-center my-3">
+                    <div class="alert alert-success text-center">
                         {{session('UpdateLecturerMessage')}}
                     </div>
                 </div>
@@ -21,7 +21,7 @@
         @if (session('ArchiveLecturerMessage'))
             <div class="row">
                 <div class="col-12">
-                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center my-3">
+                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
                         {{session('ArchiveLecturerMessage')}}
                     </div>
                 </div>
@@ -64,11 +64,11 @@
                     <tbody>
                         @foreach($lecturers as $lecturer)
                             <tr>
-                                <td>{{$lecturer->id}}</td>
-                                <td>{{$lecturer->name}}</td>
-                                <td>{{$lecturer->username}}</td>
-                                <td>{{\App\Enums\AccountState::getState($lecturer->state)}}</td>
-                                <td class="text-center">
+                                <td class="align-baseline">{{$lecturer->id}}</td>
+                                <td class="align-baseline">{{$lecturer->name}}</td>
+                                <td class="align-baseline">{{$lecturer->username}}</td>
+                                <td class="align-baseline">{{\App\Enums\AccountState::getState($lecturer->state)}}</td>
+                                <td class="align-baseline text-center">
                                     <a class="btn btn-sm btn-outline-dark m-1" href="/control-panel/lecturers/{{$lecturer->id}}" rel="tooltip" title="مزيد من المعلومات">
                                         <i class="fa fa-info-circle"></i>
                                     </a>
@@ -142,8 +142,9 @@
             // DataTable Initialization
             $('#dtLecturers').DataTable();
             $('.dataTables_length').addClass('bs-select');
-            $("div#dtLecturers_wrapper>.row:first-child").css("direction","ltr");
-            $("div#dtLecturers_wrapper>.row:first-child").css("text-align","left");
+            let firstChild = $("div#dtLecturers_wrapper>.row:first-child");
+            firstChild.css("direction","ltr");
+            firstChild.css("text-align","left");
 
             // Tooltips Initialization
             $('[rel="tooltip"]').tooltip()

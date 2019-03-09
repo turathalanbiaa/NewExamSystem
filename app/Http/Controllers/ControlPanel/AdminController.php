@@ -50,6 +50,7 @@ class AdminController extends Controller
     public function store(Request $request)
     {
         Auth::check();
+
         //Validation
         $this->validate($request, [
             'name'                  => 'required',
@@ -72,6 +73,7 @@ class AdminController extends Controller
 
         //Transaction
         $exception = DB::transaction(function () use (&$admin){
+            //Store admin
             $admin = new Admin();
             $admin->name = Input::get("name");
             $admin->username = Input::get("username");
@@ -84,7 +86,7 @@ class AdminController extends Controller
             //Store event log
             $target = $admin->id;
             $type = EventLogType::ADMIN;
-            $event = "اضافة مدير " . $admin->name;
+            $event = "اضافة المدير " . $admin->name;
             EventLog::create($target, $type, $event);
         });
 
@@ -143,6 +145,7 @@ class AdminController extends Controller
     public function update(Request $request, Admin $admin)
     {
         Auth::check();
+
         //For change password
         if (Input::get("type") == "change-password")
         {
@@ -167,21 +170,21 @@ class AdminController extends Controller
                 //Store event log
                 $target = $admin->id;
                 $type = EventLogType::ADMIN;
-                $event = "تغيير كلمة المرور المدير " . $admin->name;
+                $event = "تغيير كلمة مرور المدير " . $admin->name;
                 EventLog::create($target, $type, $event);
             });
 
             if (is_null($exception))
                 return redirect("/control-panel/admins")->with([
-                    "UpdateAdminMessage" => "تم تغيير كلمة المرور المدير " . $admin->name
+                    "UpdateAdminMessage" => "تم تغيير كلمة مرور المدير " . $admin->name
                 ]);
             else
                 return redirect("/control-panel/admins/$admin->id/edit?type=change-password")->with([
-                    "UpdateAdminMessage" => "لم يتم تغيير كلمة المرور المدير"
+                    "UpdateAdminMessage" => "لم يتم تغيير كلمة مرور المدير"
                 ]);
         }
 
-        //For change info account
+        //For change info
         if (Input::get("type") == "change-info")
         {
             //Validation
@@ -192,7 +195,7 @@ class AdminController extends Controller
             ], [
                 'name.required'     => 'الاسم الحقيقي فارغ.',
                 'username.required' => 'اسم المستخدم فارغ.',
-                'username.unique'   => 'يوجد مستخدم اخر بنفس الاسم.',
+                'username.unique'   => 'اسم المستخدم هذا مستخدم بالفعل، يرجى استخدام اسم آخر.',
                 'state.required'    => 'يجب اختيار حالة الحساب.',
                 'state.integer'     => 'يجب اختيار حالة الحساب اما 1 او 2.',
                 'state.between'     => 'يجب اختيار حالة الحساب اما مفتوح او مغلق.'
@@ -200,7 +203,7 @@ class AdminController extends Controller
 
             //Transaction
             $exception = DB::transaction(function () use ($admin){
-                //Update Admin
+                //Update admin
                 $admin->name = Input::get("name");
                 $admin->username = Input::get("username");
                 $admin->state = Input::get("state");
@@ -209,7 +212,7 @@ class AdminController extends Controller
                 //Store event log
                 $target = $admin->id;
                 $type = EventLogType::ADMIN;
-                $event = "تعديل الحساب المدير " . $admin->name;
+                $event = "تعديل حساب المدير " . $admin->name;
                 EventLog::create($target, $type, $event);
 
                 //Update session for super admin
@@ -224,11 +227,11 @@ class AdminController extends Controller
 
             if (is_null($exception))
                 return redirect("/control-panel/admins")->with([
-                    "UpdateAdminMessage" => "تم تحديث المعلومات المدير " . $admin->name
+                    "UpdateAdminMessage" => "تم تحديث معلومات المدير " . $admin->name
                 ]);
             else
                 return redirect("/control-panel/admins/$admin->id/edit?type=change-info")->with([
-                    "UpdateAdminMessage" => "لم يتم تحديث المعلومات المدير"
+                    "UpdateAdminMessage" => "لم يتم تحديث معلومات المدير"
                 ]);
         }
 
@@ -248,7 +251,7 @@ class AdminController extends Controller
 
         //Transaction
         $exception = DB::transaction(function () use ($admin){
-            //Update Admin
+            //Archive admin
             $admin->state = AccountState::CLOSE;
             $admin->session = null;
             $admin->save();
@@ -256,7 +259,7 @@ class AdminController extends Controller
             //Store event log
             $target = $admin->id;
             $type = EventLogType::ADMIN;
-            $event = "اغلاق الحساب المدير " . $admin->name;
+            $event = "اغلاق حساب المدير " . $admin->name;
             EventLog::create($target, $type, $event);
 
             //Update session for super admin
