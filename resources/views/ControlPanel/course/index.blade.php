@@ -33,7 +33,7 @@
             <div class="col-12">
                 <a href="/control-panel/courses/create" class="btn btn-outline-default font-weight-bold">
                     <i class="fa fa-plus ml-1"></i>
-                    <span>اضافة مادة</span>
+                    <span>اضافة</span>
                 </a>
             </div>
         </div>
@@ -63,7 +63,7 @@
                         </div>
 
                         {{-- Card Content --}}
-                        <div class="card-body" style="padding-bottom: 75px;">
+                        <div class="card-body" style="padding-bottom: {{(session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER)?115:68}}px;">
                             <h5>
                                 <i class="fa fa-user-graduate"></i>
                                 {{$course->lecturer->name}}
@@ -72,25 +72,37 @@
                                 {{$course->detail}}
                             </p>
 
-                            <div class="card-body-content-fixed">
+                            <div class="extra-content fixed">
                                 <hr>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <a class="btn btn-sm btn-outline-default btn-block font-weight-bold" href="/control-panel/courses/{{$course->id}}/edit" rel="tooltip" title="تحرير المادة">
+                                            <i class="fa fa-edit ml-1"></i>
+                                            <span>تحرير المادة</span>
+                                        </a>
+                                    </div>
 
-                                <div class="btn-group w-100">
-                                    <a class="btn btn-sm btn-outline-default font-weight-bold w-50 ml-1 mr-0" href="/control-panel/courses/{{$course->id}}/edit" rel="tooltip" title="تحرير المادة">
-                                        <i class="fa fa-edit ml-1"></i>
-                                        <span>تعديل المادة</span>
-                                    </a>
-
-                                    @if($course->state == \App\Enums\CourseState::OPEN)
-                                        <a class="btn btn-sm btn-outline-default font-weight-bold w-50 ml-0 mr-1" href="#modelArchiveCourse" rel="tooltip" title="ارشفة المادة" data-toggle="modal" data-action="fillArchiveCourseForm" data-course-id="{{$course->id}}" data-course-name="{{$course->name}}">
+                                    <div class="col-6">
+                                        <a class="btn btn-sm btn-outline-default btn-block font-weight-bold" href="#modelArchiveCourse" rel="tooltip" title="ارشفة المادة" data-toggle="modal" data-action="fillArchiveCourseForm" data-course-id="{{$course->id}}" data-course-name="{{$course->name}}">
                                             <i class="fa fa-file-archive ml-1"></i>
                                             <span>ارشفة المادة</span>
                                         </a>
-                                    @else
-                                        <button class="btn btn-sm btn-outline-default font-weight-bold w-50 ml-0 mr-1" rel="tooltip" title="هذه المادة مغلقه">
-                                            <i class="fa fa-file-archive ml-1"></i>
-                                            <span>ارشفة المادة</span>
-                                        </button>
+                                    </div>
+
+                                    @if(session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER)
+                                        <div class="col-6 mt-3">
+                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold m-0" href="/control-panel/courses/{{$course->id}}/edit" rel="tooltip" title="تحرير المادة">
+                                                <i class="fa fa-edit ml-1"></i>
+                                                <span> 111111111 </span>
+                                            </a>
+                                        </div>
+
+                                        <div class="col-6 mt-3">
+                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold m-0" href="/control-panel/courses/{{$course->id}}/edit" rel="tooltip" title="تحرير المادة">
+                                                <i class="fa fa-edit ml-1"></i>
+                                                <span> 2222222222 </span>
+                                            </a>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
