@@ -75,34 +75,38 @@
                             <div class="extra-content fixed">
                                 <hr>
                                 <div class="row">
-                                    <div class="col-6">
-                                        <a class="btn btn-sm btn-outline-default btn-block font-weight-bold" href="/control-panel/courses/{{$course->id}}/edit" rel="tooltip" title="تحرير المادة">
-                                            <i class="fa fa-edit ml-1"></i>
-                                            <span>تحرير المادة</span>
-                                        </a>
-                                    </div>
-
-                                    <div class="col-6">
-                                        <a class="btn btn-sm btn-outline-default btn-block font-weight-bold" href="#modelArchiveCourse" rel="tooltip" title="ارشفة المادة" data-toggle="modal" data-action="fillArchiveCourseForm" data-course-id="{{$course->id}}" data-course-name="{{$course->name}}">
-                                            <i class="fa fa-file-archive ml-1"></i>
-                                            <span>ارشفة المادة</span>
-                                        </a>
-                                    </div>
-
                                     @if(session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER)
-                                        <div class="col-6 mt-3">
-                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold m-0" href="/control-panel/courses/{{$course->id}}/edit" rel="tooltip" title="تحرير المادة">
+                                        <div class="col-6">
+                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mb-2" href="/control-panel/courses/{{$course->id}}/edit">
                                                 <i class="fa fa-edit ml-1"></i>
-                                                <span> 111111111 </span>
+                                                <span>تحرير المادة</span>
                                             </a>
                                         </div>
 
-                                        <div class="col-6 mt-3">
-                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold m-0" href="/control-panel/courses/{{$course->id}}/edit" rel="tooltip" title="تحرير المادة">
-                                                <i class="fa fa-edit ml-1"></i>
-                                                <span> 2222222222 </span>
+                                        <div class="col-6">
+                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mb-2" href="#modelArchiveCourse" data-toggle="modal" data-action="fillArchiveCourseForm" data-course-id="{{$course->id}}" data-course-name="{{$course->name}}">
+                                                <i class="fa fa-file-archive ml-1"></i>
+                                                <span>ارشفة المادة</span>
                                             </a>
                                         </div>
+
+                                        <div class="col-6">
+                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mt-2" href="/control-panel/assessment/{{$course->id}}">
+                                                <i class="fa fa-magic ml-1"></i>
+                                                <span> تقييم الطلاب </span>
+                                            </a>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mt-2" href="#">
+                                                <i class="fas fa-chart-pie ml-1"></i>
+                                                <span> التقارير </span>
+                                            </a>
+                                        </div>
+                                    @endif
+
+                                    @if(session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::LECTURER)
+
                                     @endif
                                 </div>
                             </div>
@@ -152,9 +156,6 @@
 
 @section("script")
     <script>
-        // Tooltips Initialization
-        $('[rel="tooltip"]').tooltip();
-
         // Fill Modal & Form
         $("[data-action='fillArchiveCourseForm']").click(function () {
             //For Fill Modal

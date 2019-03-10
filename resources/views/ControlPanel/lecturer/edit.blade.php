@@ -27,7 +27,7 @@
                 <div class="view shadow mdb-color p-3">
                     <h5 class="text-center text-white m-0">
                         @if($_GET["type"] == "change-password")
-                            <span>{{"تغيير كلمة المرور الاستاذ ".$lecturer->name}}</span>
+                            <span>{{"تغيير كلمة مرور الاستاذ ".$lecturer->name}}</span>
                         @else
                             <span>{{"تحرير حساب الاستاذ ".$lecturer->name}}</span>
                         @endif

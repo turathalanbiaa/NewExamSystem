@@ -1,12 +1,46 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>{{$course->name}}</title>
+    <title>تحرير المادة</title>
 @endsection
 
 @section("content")
     <div class="container">
-        <div class="row justify-content-center">
+        {{-- Session Update Course Message --}}
+        @if (session('UpdateCourseMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger text-center">
+                        {{session('UpdateCourseMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="row">
+            {{-- Heading --}}
+            <div class="col-12 mb-3">
+                <div class="view shadow mdb-color p-3">
+                    <h5 class="text-center text-white m-0">
+                        <span>تحرير المادة </span>
+                        <span>{{$course->name}}</span>
+                    </h5>
+                </div>
+            </div>
+
+            {{-- Info --}}
+            <div class="col-lg-4">
+                {{-- Course Alert Info --}}
+                <div class="alert alert-info">
+                    <h5 class="text-center pb-2 border-bottom border-primary">تحرير المادة الدراسية</h5>
+                    <ul class="mb-0 pr-3">
+                        <li>يمكنك تعديل جميع المعلومات الخاصة بالمادة، من اسم والمستوى والاستاذ وحالة المادة والتفاصيل.</li>
+                        <li>اذا كانت حالة المادة مغلقة سوف لن يستطيع الاستاذ وضع امتحان اواضافة تقييم المادة.</li>
+                    </ul>
+                </div>
+            </div>
+
+            {{-- Edit Course --}}
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Alert Errors --}}
@@ -20,13 +54,7 @@
                         </div>
                     @endif
 
-                    {{-- Session Update Course Message --}}
-                    @if (session('UpdateCourseMessage'))
-                        <div class="alert alert-danger text-center mx-4 mt-4">
-                            {{session('UpdateCourseMessage')}}
-                        </div>
-                    @endif
-
+                    {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
                         <form method="post" action="/control-panel/courses/{{$course->id}}">
                             @method('PUT')

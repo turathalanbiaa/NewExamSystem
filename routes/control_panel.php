@@ -17,6 +17,8 @@ Route::resource('control-panel/profile', 'ControlPanel\ProfileController');
 Route::resource('control-panel/admins', 'ControlPanel\AdminController');
 Route::resource('control-panel/lecturers', 'ControlPanel\LecturerController');
 Route::resource('control-panel/courses', 'ControlPanel\CourseController');
+Route::get('control-panel/assessment/{course}', 'ControlPanel\AssessmentController@create');
+Route::post('control-panel/assessment/{course}', 'ControlPanel\AssessmentController@save');
 Route::resource('control-panel/exams', 'ControlPanel\ExamController');
 Route::resource('control-panel/questions', 'ControlPanel\QuestionController');
 Route::resource('control-panel/branches', 'ControlPanel\BranchController');

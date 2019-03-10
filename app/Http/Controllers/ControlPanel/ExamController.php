@@ -477,7 +477,7 @@ class ExamController extends Controller
                 $document->course_id = $exam->course->id;
                 $document->first_month_score = ($exam->type == ExamType::FIRST_MONTH)?$sum:0;
                 $document->second_month_score = ($exam->type == ExamType::SECOND_MONTH)?$sum:0;
-                $document->assessment_score = 0;
+                $document->assessment_score = 0; //Default Value
                 $document->final_first_score = ($exam->type == ExamType::FINAL_FIRST_ROLE)?$sum:0;
                 $document->final_second_score = ($exam->type == ExamType::FINAL_SECOND_ROLE)?$sum:0;
                 $document->year = date("Y");
