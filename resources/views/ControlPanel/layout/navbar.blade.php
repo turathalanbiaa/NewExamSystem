@@ -22,62 +22,63 @@
                         </a>
                     </li>
 
-                    {{-- For Admin --}}
-                    @if(session("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER)
-                        {{-- Super Admin --}}
-                        @if(session("EXAM_SYSTEM_ACCOUNT_ID") == 1)
-                            <li class="nav-item @if(request()->is("control-panel/admins*")) active @endif">
-                                <a class="nav-link" href="/control-panel/admins">
-                                    <span>المدراء</span>
-                                </a>
-                            </li>
-                        @endif
+                    {{-- For Super Admin --}}
+                    @if((session("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER) && (session("EXAM_SYSTEM_ACCOUNT_ID") == 1))
+                        <li class="nav-item @if(request()->is("control-panel/admins*")) active @endif">
+                            <a class="nav-link" href="/control-panel/admins">
+                                <span>المدراء</span>
+                            </a>
+                        </li>
+                    @endif
 
+                    {{-- ِ For Admin --}}
+                    @if((session("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER))
                         <li class="nav-item @if(request()->is("control-panel/lecturers*")) active @endif">
                             <a class="nav-link" href="/control-panel/lecturers">
                                 <span>الاساتذة</span>
                             </a>
                         </li>
+                    @endif
 
+                    {{-- For Admin And Lecturer --}}
+                    @if(session()->has("EXAM_SYSTEM_ACCOUNT_TYPE"))
                         <li class="nav-item @if(request()->is("control-panel/courses*")) active @endif">
                             <a class="nav-link" href="/control-panel/courses">
                                 <span>المواد الدراسية</span>
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/control-panel/exams">
+                                <span>الامتحانات</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item dropdown @if(request()->is("control-panel/profile/*")) active @endif">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span>الاعدادات</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right text-center border-top-0 border-right-0 border-bottom border-left-0 border-primary rounded-0" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}?show=info">
+                                    <span>عرض الملف الشخصي</span>
+                                </a>
+                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}?show=event-log">
+                                    <span>عرض سجل الاحدات</span>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/edit?type=change-info">
+                                    <span>تعديل الحساب</span>
+                                </a>
+                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/edit?type=change-password">
+                                    <span>تغيير كلمة المرور</span>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="/control-panel/logout">
+                                    <span>تسجيل خروج</span>
+                                </a>
+                            </div>
+                        </li>
                     @endif
-
-                    {{-- For Lecturer --}}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/control-panel/exams">
-                            <span>الامتحانات</span>
-                        </a>
-                    </li>
-
-                    {{-- For Admin And Lecturer --}}
-                    <li class="nav-item dropdown @if(request()->is("control-panel/profile/*")) active @endif">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span>الاعدادات</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right text-center border-top-0 border-right-0 border-bottom border-left-0 border-primary rounded-0" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}?show=info">
-                                <span>عرض الملف الشخصي</span>
-                            </a>
-                            <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}?show=event-log">
-                                <span>عرض سجل الاحدات</span>
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/edit?type=change-info">
-                                <span>تعديل الحساب</span>
-                            </a>
-                            <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/edit?type=change-password">
-                                <span>تغيير كلمة المرور</span>
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="/control-panel/logout">
-                                <span>تسجيل خروج</span>
-                            </a>
-                        </div>
-                    </li>
                 </ul>
             </div>
         @endif

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ControlPanel;
 
 use App\Enums\AccountState;
+use App\Enums\AccountType;
 use App\Enums\CourseState;
 use App\Enums\EventLogType;
 use App\Enums\ExamState;
@@ -27,7 +28,10 @@ class CourseController extends Controller
     public function index()
     {
         Auth::check();
-        $courses = Course::all();
+        if (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)
+            $courses = Course::all();
+        else
+            $courses = Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))->get();
         return view("ControlPanel.course.index")->with([
             "courses" => $courses
         ]);
@@ -111,7 +115,7 @@ class CourseController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Course  $course
-     * @return \Illuminate\Http\Response
+     * @return string
      */
     public function show(Course $course)
     {

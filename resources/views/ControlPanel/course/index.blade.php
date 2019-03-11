@@ -29,14 +29,16 @@
         @endif
 
         {{-- Button Create --}}
-        <div class="row">
-            <div class="col-12">
-                <a href="/control-panel/courses/create" class="btn btn-outline-default font-weight-bold">
-                    <i class="fa fa-plus ml-1"></i>
-                    <span>اضافة</span>
-                </a>
+        @if(session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::MANAGER)
+            <div class="row">
+                <div class="col-12">
+                    <a href="/control-panel/courses/create" class="btn btn-outline-default font-weight-bold">
+                        <i class="fa fa-plus ml-1"></i>
+                        <span>اضافة</span>
+                    </a>
+                </div>
             </div>
-        </div>
+        @endif
 
         {{-- Divider --}}
         <div class="row">
@@ -91,7 +93,7 @@
                                         </div>
 
                                         <div class="col-6">
-                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mt-2" href="/control-panel/assessment/{{$course->id}}">
+                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mt-2" href="/control-panel/assessments/{{$course->id}}/create">
                                                 <i class="fa fa-magic ml-1"></i>
                                                 <span> تقييم الطلاب </span>
                                             </a>
@@ -106,7 +108,19 @@
                                     @endif
 
                                     @if(session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::LECTURER)
+                                        <div class="col-6">
+                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mt-2" href="/control-panel/assessments/{{$course->id}}/create">
+                                                <i class="fa fa-magic ml-1"></i>
+                                                <span> تقييم الطلاب </span>
+                                            </a>
+                                        </div>
 
+                                        <div class="col-6">
+                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mt-2" href="#">
+                                                <i class="fas fa-chart-pie ml-1"></i>
+                                                <span> التقارير </span>
+                                            </a>
+                                        </div>
                                     @endif
                                 </div>
                             </div>

@@ -51,7 +51,7 @@ class Auth extends Controller
 
         if($accountType == AccountType::LECTURER)
         {
-            if (request()->is("control-panel/admins*") || request()->is("control-panel/lecturer*") || request()->is("control-panel/courses*"))
+            if (request()->is("control-panel/admins*") || request()->is("control-panel/lecturer*") || request()->is("control-panel/courses/*"))
                 abort(404);
         }
     }
