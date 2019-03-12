@@ -14,9 +14,11 @@ class EventLogType
     const ADMIN = 1;
     const LECTURER = 2;
     const COURSE = 3;
-    const EXAM = 4;
-    const QUESTION = 5;
-    const BRANCH = 6;
+    const ASSESSMENT = 4;
+    const EXAM = 5;
+    const QUESTION = 6;
+    const BRANCH = 7;
+
 
     public static function getType($key) {
         switch ($key) {

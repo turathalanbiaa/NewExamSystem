@@ -93,7 +93,7 @@
                                         </div>
 
                                         <div class="col-6">
-                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mt-2" href="/control-panel/assessments/{{$course->id}}/create">
+                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mt-2" href="/control-panel/assessments/{{$course->id}}">
                                                 <i class="fa fa-magic ml-1"></i>
                                                 <span> تقييم الطلاب </span>
                                             </a>
@@ -109,7 +109,7 @@
 
                                     @if(session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == \App\Enums\AccountType::LECTURER)
                                         <div class="col-6">
-                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mt-2" href="/control-panel/assessments/{{$course->id}}/create">
+                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mt-2" href="/control-panel/assessments/{{$course->id}}">
                                                 <i class="fa fa-magic ml-1"></i>
                                                 <span> تقييم الطلاب </span>
                                             </a>

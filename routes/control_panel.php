@@ -25,9 +25,11 @@ Route::resource('control-panel/questions', 'ControlPanel\QuestionController');//
 Route::resource('control-panel/branches', 'ControlPanel\BranchController');///////////////////////
 
 //Routes for manage assessments
+Route::get('control-panel/assessments/{course}', 'ControlPanel\AssessmentController@index');
 Route::get('control-panel/assessments/{course}/create', 'ControlPanel\AssessmentController@create');
 Route::post('control-panel/assessments/{course}', 'ControlPanel\AssessmentController@store');
-Route::get('control-panel/assessments/{course}', 'ControlPanel\AssessmentController@show');
+Route::put('control-panel/assessments/{course}', 'ControlPanel\AssessmentController@storeAll');
+Route::put('control-panel/assessments/{course}/{assessment}', 'ControlPanel\AssessmentController@update');
 
 
 

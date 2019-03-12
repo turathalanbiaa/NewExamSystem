@@ -66,6 +66,12 @@
                                     </li>
 
                                     <li class="nav-item mb-1">
+                                        <a class="nav-link btn btn-default btn-block" data-toggle="tab" href="#assessments-event-log" role="tab">
+                                            <span>تقييم الطلاب</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item mb-1">
                                         <a class="nav-link btn btn-default btn-block" data-toggle="tab" href="#exams-event-log" role="tab">
                                             <span>الامتحانات</span>
                                         </a>
@@ -212,6 +218,35 @@
                                             <tbody>
                                                 @foreach($events as $event)
                                                     @if($event->type == \App\Enums\EventLogType::COURSE)
+                                                        <tr>
+                                                            <td>{{$event->id}}</td>
+                                                            <td>{{$event->event}}</td>
+                                                            <td>{{$event->time}}</td>
+                                                        </tr>
+                                                    @endif
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="assessments-event-log" role="tabpanel">
+                                        <table data-table="dtEventLog" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
+                                            <thead class="default-color text-white">
+                                                <tr>
+                                                    <th class="th-sm fa d-table-cell">
+                                                        <span>رقم الحدث</span>
+                                                    </th>
+                                                    <th class="th-sm fa d-table-cell">
+                                                        <span>الحدث</span>
+                                                    </th>
+                                                    <th class="th-sm fa d-table-cell">
+                                                        <span>التاريخ والوقت</span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($events as $event)
+                                                    @if($event->type == \App\Enums\EventLogType::ASSESSMENT)
                                                         <tr>
                                                             <td>{{$event->id}}</td>
                                                             <td>{{$event->event}}</td>
