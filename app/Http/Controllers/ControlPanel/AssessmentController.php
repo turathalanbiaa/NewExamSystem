@@ -169,14 +169,14 @@ class AssessmentController extends Controller
         //Transaction
         $exception = DB::transaction(function () use ($course, $studentsEnrolled) {
             //Store assessment for all students
+            $score = abs(Input::get("score"));
             foreach ($studentsEnrolled as $student)
             {
                 //Get student
                 $student = Student::findOrFail($student);
 
                 //Store assessment for student
-                $score = abs(Input::get($student->id));
-                $assessment = Assessment::updateOrCreate(
+                Assessment::updateOrCreate(
                     ['student_id' => $student->id, 'course_id' => $course->id],
                     ['score' => ($score<=15)?$score:15]
                 );
@@ -200,22 +200,27 @@ class AssessmentController extends Controller
             ]);
     }
 
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param $course
+     * @param $assessment
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update($course, $assessment)
     {
         Auth::check();
         $course = Course::findOrFail($course);
         self::watchCourse($course);
         $assessment = Assessment::findOrFail($assessment);
+        $student = $assessment->student;
 
         //Transaction
-        $exception = DB::transaction(function () use ($course, $assessment, &$student) {
+        $exception = DB::transaction(function () use ($course, $assessment, $student) {
             //Update assessment
-            $score = Input::get("score");
+            $score = abs(Input::get("score"));
             $assessment->score = ($score<=15)?$score:15;
             $assessment->save();
-
-            //Get student
-            $student = $assessment->student;
 
             //Store event log
             $target = $assessment->id;
