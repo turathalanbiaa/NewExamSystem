@@ -186,7 +186,7 @@ class LecturerController extends Controller
         }
 
         //For change info
-        if (Input::get("type") == "change-password")
+        if (Input::get("type") == "change-info")
         {
             //Validation
             $this->validate($request, [
@@ -240,6 +240,13 @@ class LecturerController extends Controller
     public function destroy(Lecturer $lecturer)
     {
         Auth::check();
+
+        //The lecturer is already closed
+        if ($lecturer->state == AccountState::CLOSE)
+            return redirect("/control-panel/lecturers")->with([
+                "ArchiveLecturerMessage" => "تم غلق حساب الاستاذ " . $lecturer->name . " مسبقاً",
+                "TypeMessage" => "Error"
+            ]);
 
         //Transaction
         $exception = DB::transaction(function () use ($lecturer){

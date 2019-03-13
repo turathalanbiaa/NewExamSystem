@@ -132,11 +132,13 @@
                                             </thead>
                                             <tbody>
                                                 @foreach($events as $event)
-                                                    <tr>
-                                                        <td>{{$event->id}}</td>
-                                                        <td>{{$event->event}}</td>
-                                                        <td>{{$event->time}}</td>
-                                                    </tr>
+                                                    @if($event->type == \App\Enums\EventLogType::PROFILE)
+                                                        <tr>
+                                                            <td>{{$event->id}}</td>
+                                                            <td>{{$event->event}}</td>
+                                                            <td>{{$event->time}}</td>
+                                                        </tr>
+                                                    @endif
                                                 @endforeach
                                             </tbody>
                                         </table>
@@ -363,8 +365,9 @@
             // DataTable Initialization
             $('table[data-table="dtEventLog"]').DataTable({"ordering": false});
             $('.dataTables_length').addClass('bs-select');
-            $("div.dataTables_wrapper>.row:first-child").css("direction","ltr");
-            $("div.dataTables_wrapper>.row:first-child").css("text-align","left");
+            let firstChild = $("div.dataTables_wrapper>.row:first-child");
+            firstChild.css("direction","ltr");
+            firstChild.css("text-align","left");
         });
     </script>
 @endsection

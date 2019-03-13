@@ -162,10 +162,14 @@ class AdminController extends Controller
 
             //Transaction
             $exception = DB::transaction(function () use ($admin){
-                //Update admin and remove session for all managers except super admin
+                //Update admin and remove session
                 $admin->password = md5(Input::get("password"));
-                $admin->remember_token = (session()->get("EXAM_SYSTEM_ACCOUNT_ID") != 1)?null:$admin->remember_token;
+                $admin->remember_token = ($admin->id != 1)?null:$admin->remember_token;
                 $admin->save();
+
+                //Make logout for super admin (first admin)
+                if ($admin->id == 1)
+                    abort(302, '', ['Location' => "/control-panel/logout"]);
 
                 //Store event log
                 $target = $admin->id;
@@ -203,10 +207,10 @@ class AdminController extends Controller
 
             //Transaction
             $exception = DB::transaction(function () use ($admin){
-                //Update admin
+                //Update admin (always make state is open for super admin(first admin))
                 $admin->name = Input::get("name");
                 $admin->username = Input::get("username");
-                $admin->state = Input::get("state");
+                $admin->state = ($admin->id != 1)?Input::get("state"):AccountState::OPEN;
                 $admin->save();
 
                 //Store event log
@@ -220,7 +224,6 @@ class AdminController extends Controller
                 {
                     session()->put('EXAM_SYSTEM_ACCOUNT_NAME', $admin->name);
                     session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME', $admin->username);
-                    session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $admin->state);
                     session()->save();
                 }
             });
@@ -249,11 +252,25 @@ class AdminController extends Controller
     {
         Auth::check();
 
+        //Can't change state for super admin(first admin)
+        if ($admin->id == 1)
+            return redirect("/control-panel/admins")->with([
+                "ArchiveAdminMessage" => "لا يمكن غلق هذا الحساب " . $admin->name,
+                "TypeMessage" => "Error"
+            ]);
+
+        //The admin is already closed
+        if ($admin->state == AccountState::CLOSE)
+            return redirect("/control-panel/admins")->with([
+                "ArchiveAdminMessage" => "تم غلق حساب المدير " . $admin->name . " مسبقاً",
+                "TypeMessage" => "Error"
+            ]);
+
         //Transaction
         $exception = DB::transaction(function () use ($admin){
             //Archive admin
             $admin->state = AccountState::CLOSE;
-            $admin->session = null;
+            $admin->remember_token = null;
             $admin->save();
 
             //Store event log
@@ -261,13 +278,6 @@ class AdminController extends Controller
             $type = EventLogType::ADMIN;
             $event = "اغلاق حساب المدير " . $admin->name;
             EventLog::create($target, $type, $event);
-
-            //Update session for super admin
-            if ($admin->id == 1)
-            {
-                session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $admin->state);
-                session()->save();
-            }
         });
 
         if (is_null($exception))

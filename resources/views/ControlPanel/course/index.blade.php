@@ -86,10 +86,17 @@
                                         </div>
 
                                         <div class="col-6">
-                                            <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mb-2" href="#modelArchiveCourse" data-toggle="modal" data-action="fillArchiveCourseForm" data-course-id="{{$course->id}}" data-course-name="{{$course->name}}">
-                                                <i class="fa fa-file-archive ml-1"></i>
-                                                <span>ارشفة المادة</span>
-                                            </a>
+                                            @if($course->state == \App\Enums\CourseState::OPEN)
+                                                <a class="btn btn-sm btn-outline-default btn-block font-weight-bold mb-2" href="#modelArchiveCourse" data-toggle="modal" data-action="fillArchiveCourseForm" data-course-id="{{$course->id}}" data-course-name="{{$course->name}}">
+                                                    <i class="fa fa-file-archive ml-1"></i>
+                                                    <span>ارشفة المادة</span>
+                                                </a>
+                                            @else
+                                                <button class="btn btn-sm btn-outline-default btn-block font-weight-bold mb-2 disabled">
+                                                    <i class="fa fa-file-archive ml-1"></i>
+                                                    <span>المادة مؤرشفة</span>
+                                                </button>
+                                            @endif
                                         </div>
 
                                         <div class="col-6">

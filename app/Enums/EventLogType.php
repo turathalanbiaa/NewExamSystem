@@ -11,6 +11,7 @@ namespace App\Enums;
 
 class EventLogType
 {
+    const PROFILE = 0;
     const ADMIN = 1;
     const LECTURER = 2;
     const COURSE = 3;
