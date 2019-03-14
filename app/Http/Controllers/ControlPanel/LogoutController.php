@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Lecturer;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Input;
 
 class LogoutController extends Controller
 {
@@ -31,8 +32,9 @@ class LogoutController extends Controller
         if (!$account)
             return redirect("/control-panel");
 
-        //Remove remember token from account
-        $account->remember_token = null;
+        //logout from all devices
+        if (Input::get("device") == "all")
+            $account->remember_token = null;
         $account->save();
 
         //Remove session
@@ -49,6 +51,13 @@ class LogoutController extends Controller
         Cookie::queue(cookie()->forget("EXAM_SYSTEM_ACCOUNT_TYPE"));
 
         //Redirect to login page
-        return redirect("/control-panel/login");
+        if (Input::get("device") == "all")
+            return redirect("/control-panel/login")->with([
+                "LogoutMessage" => "تم تسجيل الخروج من جميع الاجهزه."
+            ]);
+        else
+            return redirect("/control-panel/login")->with([
+                "LogoutMessage" => "تم تسجيل الخروج من الجهاز الحالي."
+            ]);
     }
 }

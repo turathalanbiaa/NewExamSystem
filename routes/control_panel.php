@@ -12,17 +12,17 @@ Route::get('control-panel/login', 'ControlPanel\LoginController@login');
 Route::post('control-panel/login', 'ControlPanel\LoginController@loginValidate');
 Route::get('control-panel/logout', 'ControlPanel\LogoutController@logout');
 
-
 //Routes for manage accounts
 Route::resource('control-panel/admins', 'ControlPanel\AdminController');
 Route::resource('control-panel/lecturers', 'ControlPanel\LecturerController');
-Route::resource('control-panel/profile', 'ControlPanel\ProfileController');/////////////////////////////////////
+Route::get('control-panel/profile/{account}/show-event-log', 'ControlPanel\ProfileController@show');
+Route::get('control-panel/profile/{account}/show-info', 'ControlPanel\ProfileController@show');
+Route::get('control-panel/profile/{account}/edit/change-info', 'ControlPanel\ProfileController@edit');
+Route::get('control-panel/profile/{account}/edit/change-password', 'ControlPanel\ProfileController@edit');
+Route::post('control-panel/profile/{account}/update', 'ControlPanel\ProfileController@update');
 
-//Routes for manage courses and exams
+//Routes for manage courses
 Route::resource('control-panel/courses', 'ControlPanel\CourseController');
-Route::resource('control-panel/exams', 'ControlPanel\ExamController');////////////////////////////
-Route::resource('control-panel/questions', 'ControlPanel\QuestionController');////////////////////
-Route::resource('control-panel/branches', 'ControlPanel\BranchController');///////////////////////
 
 //Routes for manage assessments
 Route::get('control-panel/assessments/{course}', 'ControlPanel\AssessmentController@index');
@@ -30,6 +30,12 @@ Route::get('control-panel/assessments/{course}/create', 'ControlPanel\Assessment
 Route::post('control-panel/assessments/{course}', 'ControlPanel\AssessmentController@store');
 Route::put('control-panel/assessments/{course}', 'ControlPanel\AssessmentController@storeAll');
 Route::put('control-panel/assessments/{course}/{assessment}', 'ControlPanel\AssessmentController@update');
+
+//Routes for manage exams, questions and branches
+Route::resource('control-panel/exams', 'ControlPanel\ExamController');////////////////////////////
+Route::resource('control-panel/questions', 'ControlPanel\QuestionController');////////////////////
+Route::resource('control-panel/branches', 'ControlPanel\BranchController');///////////////////////
+
 
 
 

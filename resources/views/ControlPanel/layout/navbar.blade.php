@@ -59,22 +59,25 @@
                                 <span>الاعدادات</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right text-center border-top-0 border-right-0 border-bottom border-left-0 border-primary rounded-0" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}?show=info">
+                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/show-info">
                                     <span>عرض الملف الشخصي</span>
                                 </a>
-                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}?show=event-log">
+                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/show-event-log">
                                     <span>عرض سجل الاحدات</span>
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/edit?type=change-info">
+                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/edit/change-info">
                                     <span>تعديل الحساب</span>
                                 </a>
-                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/edit?type=change-password">
+                                <a class="dropdown-item" href="/control-panel/profile/{{session("EXAM_SYSTEM_ACCOUNT_ID")}}/edit/change-password">
                                     <span>تغيير كلمة المرور</span>
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="/control-panel/logout">
-                                    <span>تسجيل خروج</span>
+                                <a class="dropdown-item" href="/control-panel/logout?device=current">
+                                    <span>تسجيل خروج من جهاز الحالي</span>
+                                </a>
+                                <a class="dropdown-item" href="/control-panel/logout?device=all">
+                                    <span>تسجيل خروج من جميع الاجهزه</span>
                                 </a>
                             </div>
                         </li>

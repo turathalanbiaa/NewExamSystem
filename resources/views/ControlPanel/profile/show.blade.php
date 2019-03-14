@@ -12,7 +12,7 @@
                 <ul class="nav nav-tabs nav-justified shadow default-color p-2" role="tablist">
                     {{-- Nav Item Events Log --}}
                     <li class="nav-item">
-                        <a class="nav-link btn-default @if($_GET["show"]=="event-log") active @endif" data-toggle="tab" href="#event-log" role="tab">
+                        <a class="nav-link btn-default @if(request()->is("control-panel/profile/$account->id/show-event-log")) active @endif" data-toggle="tab" href="#event-log" role="tab">
                             <i class="fa fa-heart ml-1"></i>
                             <span>سجل الاحداث</span>
                         </a>
@@ -20,7 +20,7 @@
 
                     {{-- Nav Item Profile --}}
                     <li class="nav-item">
-                        <a class="nav-link btn-default @if($_GET["show"]=="info") active @endif" data-toggle="tab" href="#profile" role="tab">
+                        <a class="nav-link btn-default @if(request()->is("control-panel/profile/$account->id/show-info")) active @endif" data-toggle="tab" href="#profile" role="tab">
                             <i class="fa fa-user ml-1"></i>
                             <span>{{$account->name}}</span>
                         </a>
@@ -30,7 +30,7 @@
                 {{-- Tab Panels --}}
                 <div class="tab-content">
                     {{-- Panel Events Log --}}
-                    <div class="tab-pane fade @if($_GET["show"]=="event-log") in show active @endif" id="event-log" role="tabpanel">
+                    <div class="tab-pane fade @if(request()->is("control-panel/profile/$account->id/show-event-log")) in show active @endif" id="event-log" role="tabpanel">
                         <div class="row mt-2">
                             {{-- Nav Tabs --}}
                             <div class="col-md-3">
@@ -323,7 +323,7 @@
                     </div>
 
                     {{-- Panel Profile --}}
-                    <div class="tab-pane fade @if($_GET["show"]=="info") in show active @endif" id="profile" role="tabpanel">
+                    <div class="tab-pane fade @if(request()->is("control-panel/profile/$account->id/show-info")) in show active @endif" id="profile" role="tabpanel">
                         <div class="card rounded-0 py-3 shadow">
                             <div class="card-body">
                                 <h5>

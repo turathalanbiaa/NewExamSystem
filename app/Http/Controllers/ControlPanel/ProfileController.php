@@ -10,53 +10,24 @@ use App\Models\Lecturer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
+use phpDocumentor\Reflection\Types\Null_;
 
 class ProfileController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        dd(getenv("USERNAME"));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param $account
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($account)
     {
         Auth::check();
-        $account = self::getAccount($id);
+        $account = self::getAccount($account);
         return view("ControlPanel.profile.show")->with([
             "account"  => $account,
             "events" => $account->events()
@@ -66,13 +37,13 @@ class ProfileController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param $account
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($account)
     {
         Auth::check();
-        $account = self::getAccount($id);
+        $account = self::getAccount($account);
         return view("ControlPanel.profile.edit")->with([
             "account" => $account,
         ]);
@@ -82,14 +53,14 @@ class ProfileController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  int $id
+     * @param $account
      * @return \Illuminate\Http\Response
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $account)
     {
         Auth::check();
-        $account = self::getAccount($id);
+        $account = self::getAccount($account);
 
         //For change info
         if (Input::get("type") == "change-info")
@@ -128,11 +99,11 @@ class ProfileController extends Controller
             });
 
             if (is_null($exception))
-                return redirect("/control-panel/profile/$account->id/edit?type=change-info")->with([
+                return redirect("/control-panel/profile/$account->id/edit/change-info")->with([
                     "UpdateProfileMessage" => "تم تحديث معلوماتك الشخصية"
                 ]);
             else
-                return redirect("/control-panel/lecturers/$account->id/edit?type=change-info")->with([
+                return redirect("/control-panel/profile/$account->id/edit/change-info")->with([
                     "UpdateProfileMessage" => "لم يتم تحديث معلوماتك الشخصية"
                 ]);
         }
@@ -153,8 +124,11 @@ class ProfileController extends Controller
 
             //Transaction
             $exception = DB::transaction(function () use ($account){
-                //Update account
+                //Update account and logout from current device
                 $account->password = md5(Input::get("password"));
+                //logout from all devices
+                if (Input::get("logout") == true)
+                    $account->remember_token = null;
                 $account->save();
 
                 //Store event log
@@ -162,15 +136,28 @@ class ProfileController extends Controller
                 $type = EventLogType::PROFILE;
                 $event = "تغيير كلمة المرور";
                 EventLog::create($target, $type, $event);
+
+                //Remove session
+                session()->remove("EXAM_SYSTEM_ACCOUNT_ID");
+                session()->remove("EXAM_SYSTEM_ACCOUNT_NAME");
+                session()->remove("EXAM_SYSTEM_ACCOUNT_USERNAME");
+                session()->remove("EXAM_SYSTEM_ACCOUNT_STATE");
+                session()->remove("EXAM_SYSTEM_ACCOUNT_TOKEN");
+                session()->remove("EXAM_SYSTEM_ACCOUNT_TYPE");
+                session()->save();
+
+                //Remove cookies
+                Cookie::queue(cookie()->forget("EXAM_SYSTEM_ACCOUNT_TOKEN"));
+                Cookie::queue(cookie()->forget("EXAM_SYSTEM_ACCOUNT_TYPE"));
             });
 
             if (is_null($exception))
-                return redirect("/control-panel/profile/$account->id/edit?type=change-password")->with([
-                    "UpdateAccountMessage" => "تم تغيير كلمة المرور"
+                return redirect("/control-panel/login")->with([
+                    "ChangePasswordMessage" => "تم تغيير كلمة المرور، يرجى اعادة تسجيل الدخول."
                 ]);
             else
-                return redirect("/control-panel/profile/$account->id/edit?type=change-password")->with([
-                    "UpdateAccountMessage" => "لم يتم تغيير كلمة المرور"
+                return redirect("/control-panel/profile/$account->id/edit/change-password")->with([
+                    "UpdateProfileMessage" => "لم يتم تغيير كلمة المرور"
                 ]);
         }
 
@@ -179,26 +166,15 @@ class ProfileController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
-    /**
      * Get the specified resource.
      *
      * @param $id
      */
-    private static function getAccount($id){
+    private static function getAccount($account){
         if (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)
-            return Admin::findOrFail($id);
+            return Admin::findOrFail($account);
         elseif (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::LECTURER)
-            return Lecturer::findOrFail($id);
+            return Lecturer::findOrFail($account);
         else
             return abort(404);
     }
