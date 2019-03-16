@@ -32,9 +32,9 @@ Route::put('control-panel/assessments/{course}', 'ControlPanel\AssessmentControl
 Route::put('control-panel/assessments/{course}/{assessment}', 'ControlPanel\AssessmentController@update');
 
 //Routes for manage exams, questions and branches
-Route::resource('control-panel/exams', 'ControlPanel\ExamController');////////////////////////////
-Route::resource('control-panel/questions', 'ControlPanel\QuestionController');////////////////////
-Route::resource('control-panel/branches', 'ControlPanel\BranchController');///////////////////////
+Route::resource('control-panel/exams', 'ControlPanel\ExamController');
+Route::resource('control-panel/questions', 'ControlPanel\QuestionController');
+Route::resource('control-panel/branches', 'ControlPanel\BranchController');
 
 
 

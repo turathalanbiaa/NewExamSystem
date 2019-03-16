@@ -158,7 +158,8 @@ class ExamController extends Controller
         Auth::check();
         self::watchExam($exam);
         return view("ControlPanel.exam.show")->with([
-            "exam" => $exam]);
+            "exam" => $exam
+        ]);
     }
 
     /**

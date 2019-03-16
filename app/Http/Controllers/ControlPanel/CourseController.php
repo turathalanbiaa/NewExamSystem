@@ -32,6 +32,7 @@ class CourseController extends Controller
             $courses = Course::all();
         else
             $courses = Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))->get();
+
         return view("ControlPanel.course.index")->with([
             "courses" => $courses
         ]);
@@ -246,5 +247,24 @@ class CourseController extends Controller
     private static function getLecturers()
     {
         return Lecturer::all();
+    }
+
+    /**
+     * Check can watch the specified course form storage
+     *
+     * @param $course
+     */
+    public static function watchCourse($course)
+    {
+        if(session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)
+            $courses = Course::where("state", CourseState::OPEN)
+                ->get();
+        else
+            $courses = Course::where("state", CourseState::OPEN)
+                ->where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
+                ->get();
+
+        if(!in_array($course->id, $courses->pluck("id")->toArray()))
+            abort(404);
     }
 }

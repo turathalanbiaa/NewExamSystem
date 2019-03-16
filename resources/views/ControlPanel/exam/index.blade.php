@@ -80,9 +80,7 @@
                                         {{-- Card Content --}}
                                         <div class="card-body">
                                             <div class="list-group list-group-flush">
-                                                <a href="/control-panel/exams/{{$exam->id}}" class="list-group-item list-group-item-action">عرض وتصحيح النموذج الامتحاني</a>
                                                 <a href="/control-panel/exams/{{$exam->id}}/edit" class="list-group-item list-group-item-action">تعديل النموذج الامتحاني</a>
-
                                                 @if($exam->state == \App\Enums\ExamState::CLOSE)
                                                     <div class="list-group-item">
                                                         <span>الامتحان مغلق حاليا</span>
@@ -95,11 +93,12 @@
                                                     </div>
                                                 @else
                                                     <div class="list-group-item">
-                                                        <span>الامتحان منتهي حاليا</span>
+                                                        <span class="align-baseline">الامتحان منتهي حاليا</span>
                                                         <button type="button" class="btn btn-warning btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="reopen" data-toggle="modal" data-target="#modelReopenExamState">اعادة فتح الامتحان</button>
                                                     </div>
                                                 @endif
-
+                                                <a href="/control-panel/exams/{{$exam->id}}" class="list-group-item list-group-item-action">عرض وتصحيح النموذج الامتحاني</a>
+                                                <a href="#" class="list-group-item list-group-item-action">جمع درجة النموذج الامتحاني</a>
                                                 <a href="javascript:void(0)" class="list-group-item list-group-item-action" data-action="fillDeleteExamForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-toggle="modal" data-target="#modelDeleteExam">حذف النموذج الامتحاني</a>
                                             </div>
                                         </div>

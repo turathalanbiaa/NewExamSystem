@@ -38,7 +38,10 @@
                                 {{session('StoreAllMessage')}}
                             </div>
                         @endif
+                        {{-- Heading --}}
                         <h5 class="text-center pb-2 border-bottom border-primary">تقييم جميع الطلاب بدرجة متساوية</h5>
+
+                        {{-- Form --}}
                         <form class="mt-3" method="post" action="/control-panel/assessments/{{$course->id}}">
                             @csrf
                             @method("PUT")

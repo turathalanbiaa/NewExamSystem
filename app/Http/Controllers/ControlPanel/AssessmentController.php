@@ -8,9 +8,7 @@ use App\Enums\EventLogType;
 use App\Models\Assessment;
 use App\Models\Course;
 use App\Models\EventLog;
-use App\Models\ExamStudent;
 use App\Models\Student;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
@@ -27,8 +25,7 @@ class AssessmentController extends Controller
     {
         Auth::check();
         $course = Course::findOrFail($course);
-        self::watchCourse($course);
-
+        CourseController::watchCourse($course);
         $assessments = Assessment::where("course_id", $course->id)
             ->get();
 
@@ -48,35 +45,25 @@ class AssessmentController extends Controller
     {
         Auth::check();
         $course = Course::findOrFail($course);
-        self::watchCourse($course);
-
-        //Get exams ids for the course
-        $examsIds = $course->exams()
-            ->pluck("id")
-            ->toArray();
-
-        //Get students ids are enrolled to the course
-        $studentsEnrolled = ExamStudent::whereIn("exam_id", $examsIds)
-            ->distinct("student_id")
-            ->pluck("student_id")
-            ->toArray();
-
-        $noOfStudentsEnrolled = count($studentsEnrolled);
-
-        //Get students ids are resident to the course
-        $studentsResident = Assessment::where("course_id", $course->id)
-            ->pluck("student_id")
-            ->toArray();
-
-        $noOfStudentsResident = count($studentsResident);
-
-        //Get students ids are enrolled but not resident to the course
-        $studentsIds = array_values(array_diff($studentsEnrolled, $studentsResident)) ;
+        CourseController::watchCourse($course);
 
         //Get students
-        $students = Student::whereIn("id", $studentsIds)
-            ->take(10)
-            ->get();
+        $students = Student::all();
+
+        //Get students are resident for the specific course
+        $studentsIdsResident = Assessment::where("course_id", $course->id)
+            ->pluck("student_id")
+            ->toArray();
+
+        //Get students are not resident for the specific course
+        $students = $students->filter(function ($student) use ($course, $studentsIdsResident) {
+            return (!in_array($student->id, $studentsIdsResident) && $student->originalStudent->Level == $course->level);
+        });
+
+        $noOfStudentsResident = count($studentsIdsResident);
+        $noOfStudentsEnrolled = count($studentsIdsResident) + count($students);
+        $students = $students->take(10);
+
 
         return view("ControlPanel.assessment.create")->with([
             "course"   => $course,
@@ -96,7 +83,7 @@ class AssessmentController extends Controller
     {
         Auth::check();
         $course = Course::findOrFail($course);
-        self::watchCourse($course);
+        CourseController::watchCourse($course);
 
         //Transaction
         $exception = DB::transaction(function () use ($course) {
@@ -142,40 +129,33 @@ class AssessmentController extends Controller
     {
         Auth::check();
         $course = Course::findOrFail($course);
-        self::watchCourse($course);
+        CourseController::watchCourse($course);
 
         if (!is_numeric(Input::get("score")))
             return redirect("/control-panel/assessments/$course->id/create")->with([
                 "StoreAllMessage" => "يرجى ملئ الدرجه"
             ]);
 
-        //Get exams ids for the course
-        $examsIds = $course->exams()
-            ->pluck("id")
-            ->toArray();
+        //Get students
+        $students = Student::all();
 
-        //Get students ids are enrolled to the course
-        $studentsEnrolled = ExamStudent::whereIn("exam_id", $examsIds)
-            ->distinct("student_id")
-            ->pluck("student_id")
-            ->toArray();
+        //Get students for the specific course
+        $students = $students->filter(function ($student) use ($course) {
+            return ($student->originalStudent->Level == $course->level);
+        });
 
-        if (count($studentsEnrolled) == 0)
+        if (count($students) == 0)
             return redirect("/control-panel/assessments/$course->id/create")->with([
                 "CreateAssessmentMessage" => "لا يوجد طلاب مسجلين على هذه المادة لتقييمهم",
                 "TypeMessage" => "Error"
             ]);
 
         //Transaction
-        $exception = DB::transaction(function () use ($course, $studentsEnrolled) {
-            //Store assessment for all students
+        $exception = DB::transaction(function () use ($course, $students) {
+            //Store assessment for students
             $score = abs(Input::get("score"));
-            foreach ($studentsEnrolled as $student)
+            foreach ($students as $student)
             {
-                //Get student
-                $student = Student::findOrFail($student);
-
-                //Store assessment for student
                 Assessment::updateOrCreate(
                     ['student_id' => $student->id, 'course_id' => $course->id],
                     ['score' => ($score<=15)?$score:15]
@@ -211,7 +191,7 @@ class AssessmentController extends Controller
     {
         Auth::check();
         $course = Course::findOrFail($course);
-        self::watchCourse($course);
+        CourseController::watchCourse($course);
         $assessment = Assessment::findOrFail($assessment);
         $student = $assessment->student;
 
@@ -238,24 +218,5 @@ class AssessmentController extends Controller
                 "UpdateAssessmentMessage" => "لم يتم تعديل تقييم الطالب " . $student->originalStudent->Name,
                 "TypeMessage" => "Error"
             ]);
-    }
-
-    /**
-     * Check can watch the specified course form storage
-     *
-     * @param $course
-     */
-    private static function watchCourse($course)
-    {
-        if(session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)
-            $courses = Course::where("state", CourseState::OPEN)
-                ->get();
-        else
-            $courses = Course::where("state", CourseState::OPEN)
-                ->where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
-                ->get();
-
-        if(!in_array($course->id, $courses->pluck("id")->toArray()))
-            abort(404);
     }
 }
