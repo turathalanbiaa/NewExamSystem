@@ -141,7 +141,7 @@
                         @if($question->exam->state == \App\Enums\ExamState::OPEN)
                             <div class="text-center py-5">
                                 <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
-                                <h4>لا يمكنك تعديل السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح</h4>
+                                <h4>لا يمكنك تعديل السؤال الحالي لان الامتحان مفتوح حالياً</h4>
                             </div>
                         @else
                             <form method="post" action="/control-panel/questions/{{$question->id}}">

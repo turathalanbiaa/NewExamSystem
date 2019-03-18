@@ -32,7 +32,7 @@ class ExamController extends Controller
     {
         Auth::check();
         return view("ControlPanel.exam.index")->with([
-            "courses" => self::getCourses()
+            "courses" => CourseController::getCourses()
         ]);
     }
 
@@ -45,7 +45,7 @@ class ExamController extends Controller
     {
         Auth::check();
         return view("ControlPanel.exam.create")->with([
-            "courses" => self::getCoursesOpen()
+            "courses" => CourseController::getCoursesOpen()
         ]);
     }
 
@@ -60,10 +60,10 @@ class ExamController extends Controller
     {
         //Validation
         $this->validate($request, [
-            'course' => ['required', Rule::in(self::getCoursesOpen()->pluck("id")->toArray())],
+            'course' => ['required', Rule::in(CourseController::getCoursesOpen()->pluck("id")->toArray())],
             'type'   => ['required', 'integer', 'between:1,4', Rule::notIn(self::getExamTypes(Input::get("course")))],
             'title'  => ['required'],
-            'score'   => ['required', 'integer', ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
+            'score'  => ['required', 'integer', ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
             'date'   => ['required', 'date', 'after_or_equal:today']
         ], [
             'course.required'      => 'يرجى اختيار المادة',
@@ -85,30 +85,30 @@ class ExamController extends Controller
         $score = Input::get("score");
         if (Input::get("type") == ExamType::SECOND_MONTH)
         {
-            $firstMonth = Exam::where("course_id", Input::get("course"))
+            $firstMonthExam = Exam::where("course_id", Input::get("course"))
                 ->where("type", ExamType::FIRST_MONTH)
                 ->first();
 
-            if (!$firstMonth)
+            if (!$firstMonthExam)
                 return redirect("/control-panel/exams/create")->with([
                     "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لشهر الثاني الا بعد انشاء النموذج الامتحاني لشهر الاول"
                 ]);
 
-            if ($firstMonth->real_score == 25)
+            if ($firstMonthExam->real_score == 25)
                 return redirect("/control-panel/exams/create")->with([
                     "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لشهر الثاني لان درجة امتحان الشهر الاول 25 درجة"
                 ]);
 
-            $score = 25 - $firstMonth->real_score;
+            $score = 25 - $firstMonthExam->real_score;
         }
 
         if (Input::get("type") == ExamType::FINAL_SECOND_ROLE)
         {
-            $finalFirstRole = Exam::where("course_id", Input::get("course"))
+            $finalFirstRoleExam = Exam::where("course_id", Input::get("course"))
                 ->where("type", ExamType::FINAL_FIRST_ROLE)
                 ->first();
 
-            if (!$finalFirstRole)
+            if (!$finalFirstRoleExam)
                 return redirect("/control-panel/exams/create")->with([
                     "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لنهائي الدور الثاني الا بعد انشاء النموذج الامتحاني لنهائي الدور الاول"
                 ]);
@@ -225,7 +225,7 @@ class ExamController extends Controller
 
             //Transaction
             $exception = DB::transaction(function () use ($exam, $event){
-                //Make questions for current exam are uncorrected
+                //Make questions for the exam are uncorrected
                 $exam->questions()
                     ->update(array('correction' => QuestionCorrectionState::UNCORRECTED));
 
@@ -252,6 +252,13 @@ class ExamController extends Controller
         //Update curve for exam
         if (Input::get("curve"))
         {
+            if (($exam->type == ExamType::FIRST_MONTH) && ($exam->type == ExamType::SECOND_MONTH))
+                return redirect("/control-panel/exams/$exam->id")->with([
+                    "UpdateExamCurveMessage" => "لا يمكن اضافة كيرف للامتحان الحالي",
+                    "TypeMessage" => "Error"
+                ]);
+
+            //Transaction
             $exception = DB::transaction(function () use ($exam){
                 //Update exam
                 $exam->curve = (Input::get("curve") > 10) ? 10:Input::get("curve");
@@ -372,24 +379,26 @@ class ExamController extends Controller
                 "TypeMessage" => "Error"
             ]);
 
+        //Transaction
         $exception = DB::transaction(function () use ($exam) {
 
+            //Delete questions, branches and answers
             foreach ($exam->questions as $question)
             {
-                //Delete answers for branch
+                //Delete answers
                 foreach ($question->branches as $branch)
                     $branch->answers()->delete();
 
-                //Delete branches for question
+                //Delete branches
                 $question->branches()->delete();
 
                 //Delete question
                 $question->delete();
             }
 
-            //Make score is zero for current exam
-            foreach ($exam->studentEnrolled as $studentEnroll)
-                StudentDocument::where('student_id', $studentEnroll->student_id)
+            //Delete the exam from the student document
+            foreach ($exam->studentsEnrolled as $studentEnrolled)
+                StudentDocument::where('student_id', $studentEnrolled->student_id)
                     ->where("course_id", $exam->course_id)
                     ->update(
                         $exam->type == ExamType::FIRST_MONTH?["first_month_score" => 0]:
@@ -397,8 +406,8 @@ class ExamController extends Controller
                                 $exam->type == ExamType::FINAL_FIRST_ROLE?["final_first_score" => 0]:["final_second_score" => 0]
                     );
 
-            //Delete every student enrolled in current exam
-            $exam->studentEnrolled()->delete();
+            //Delete students enrolled for the exam
+            $exam->studentsEnrolled()->delete();
 
             //Delete exam
             $exam->delete();
@@ -422,10 +431,62 @@ class ExamController extends Controller
     }
 
     /**
-     * Total scores for all student
+     * Get exam types from the specified course
      *
-     * @param Exam $exam
+     * @param $course
+     * @return mixed
      */
+    private static function getExamTypes($course)
+    {
+        return Exam::where("course_id", $course)
+            ->pluck("type")
+            ->toArray();
+    }
+
+    /**
+     * Can watch the specified exam form storage
+     *
+     * @param $exam
+     */
+    public static function watchExam($exam)
+    {
+        if(!in_array($exam->course_id, CourseController::getCoursesOpen()->pluck("id")->toArray()))
+            abort(404);
+    }
+
+    /**
+     * Check the exam questions are created
+     *
+     * @param $exam
+     * @return bool
+     */
+    private static function complete($exam)
+    {
+        //Check score
+        $score = $exam->questions()->sum("score");
+        if ($exam->fake_score != $score)
+            return false;
+
+        //Check questions
+        foreach ($exam->questions as $question)
+            if ($question->no_of_branch != $question->branches()->count())
+                return false;
+
+        return true;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
     public function sum($exam)
     {
         Auth::check();
@@ -498,88 +559,6 @@ class ExamController extends Controller
         return "OK";
     }
 
-    /**
-     * Get exam types from the specified course
-     *
-     * @param $course
-     * @return mixed
-     */
-    private static function getExamTypes($course)
-    {
-        return Exam::where("course_id", $course)
-            ->pluck("type")
-            ->toArray();
-    }
-
-    /**
-     * Check can watch the specified exam form storage
-     *
-     * @param $exam
-     */
-    public static function watchExam($exam)
-    {
-        if(!in_array($exam->course_id, self::getCoursesOpen()->pluck("id")->toArray()))
-            abort(404);
-    }
-
-    /**
-     * Get all Courses form storage
-     *
-     * @return Course[]|\Illuminate\Database\Eloquent\Collection
-     */
-    private static function getCourses()
-    {
-        return (session("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)?
-            Course::all():
-            Course::where("lecturer_id", session("EXAM_SYSTEM_ACCOUNT_ID"))
-                ->get()
-            ;
-    }
-
-    /**
-     * Get all Courses open form storage
-     *
-     * @return mixed
-     */
-    private static function getCoursesOpen()
-    {
-        return (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)?
-            Course::where("state", CourseState::OPEN)
-                ->get():
-            Course::where("state", CourseState::OPEN)
-                ->where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
-                ->get()
-            ;
-    }
-
-    /**
-     * Check questions and branches is created
-     *
-     * @param $exam
-     * @return bool
-     */
-    private static function complete($exam)
-    {
-        //check question
-        $score = $exam->questions()->sum("score");
-
-        if ($exam->fake_score != $score)
-            return false;
-
-        //check question
-        foreach ($exam->questions as $question)
-            if ($question->no_of_branch != $question->branches()->count())
-                return false;
-
-            return true;
-    }
-
-    /**
-     * Check all questions are corrected for the exam
-     *
-     * @param $exam
-     * @return bool
-     */
     private static function corrected($exam)
     {
         $questions = $exam->questions;

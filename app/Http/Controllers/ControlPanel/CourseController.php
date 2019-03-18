@@ -240,7 +240,7 @@ class CourseController extends Controller
     }
 
     /**
-     * Get the specified lecturers from storage
+     * Get lecturers from storage
      *
      * @return mixed
      */
@@ -250,7 +250,37 @@ class CourseController extends Controller
     }
 
     /**
-     * Check can watch the specified course form storage
+     * Get Courses form storage
+     *
+     * @return Course[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function getCourses()
+    {
+        return (session("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)?
+            Course::all():
+            Course::where("lecturer_id", session("EXAM_SYSTEM_ACCOUNT_ID"))
+                ->get()
+            ;
+    }
+
+    /**
+     * Get Courses open form storage
+     *
+     * @return mixed
+     */
+    public static function getCoursesOpen()
+    {
+        return (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)?
+            Course::where("state", CourseState::OPEN)
+                ->get():
+            Course::where("state", CourseState::OPEN)
+                ->where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
+                ->get()
+            ;
+    }
+
+    /**
+     * Can watch the specified course form storage
      *
      * @param $course
      */
@@ -267,4 +297,5 @@ class CourseController extends Controller
         if(!in_array($course->id, $courses->pluck("id")->toArray()))
             abort(404);
     }
+
 }

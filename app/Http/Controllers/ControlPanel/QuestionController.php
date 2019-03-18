@@ -195,18 +195,19 @@ class QuestionController extends Controller
             $question->no_of_branch = ($exam->state==ExamState::CLOSE)?Input::get("noOfBranch"):$question->no_of_branch;
             $question->no_of_branch_req = Input::get("noOfBranchRequired");
 
-            //Re-correct the question
+            //Re-corrected the question
             if (($exam->state == ExamState::END) && (Input::get("reCorrectQuestion")))
             {
                 //Update question
                 $question->correction = QuestionCorrectionState::UNCORRECTED;
 
-                //Re-correct the answers
+                //Re-corrected the answers
                 foreach ($question->branches as $branch)
                     $branch->answers()
+                        ->where("correction", AnswerCorrectionState::CORRECTED)
                         ->update(array('correction' => AnswerCorrectionState::UNCORRECTED));
-            }
 
+            }
             $question->save();
 
             //Update branches score
@@ -249,12 +250,12 @@ class QuestionController extends Controller
 
         if ($exam->state == ExamState::OPEN)
             return redirect("/control-panel/questions/$question->id")->with([
-                "DeleteQuestionMessage" => "لا يمكنك حذف السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح."
+                "DeleteQuestionMessage" => "لا يمكنك حذف السؤال الحالي لان الامتحان مفتوح حالياً."
             ]);
 
         //Transaction
         $exception = DB::transaction(function () use ($question, $exam) {
-            //Delete answers for branch
+            //Delete answers
             if ($exam->state == ExamState::END)
                 foreach ($question->branches as $branch)
                     $branch->answers()->delete();

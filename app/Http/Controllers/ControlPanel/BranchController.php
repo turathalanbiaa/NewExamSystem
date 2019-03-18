@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\AnswerCorrectionState;
 use App\Enums\EventLogType;
 use App\Enums\ExamState;
+use App\Enums\QuestionCorrectionState;
 use App\Enums\QuestionType;
 use App\Models\Answer;
 use App\Models\Branch;
@@ -289,11 +291,16 @@ class BranchController extends Controller
             $branch->correct_option = $correctOption;
             $branch->save();
 
-            //Update Answers
+            //Update question
+            $branch->question()
+                ->update(array("correction" => QuestionCorrectionState::UNCORRECTED));
+
+            //Make re-corrected answers and corrected question
             if (($exam->state == ExamState::END) && (Input::get("reCorrectAnswers"))) {
-                //Update Answers
                 $branch->answers()
-                    ->update(array("re_correct" => 1));
+                    ->update(array("correction" => AnswerCorrectionState::RE_CORRECTED));
+                $branch->question()
+                    ->update(array("correction" => QuestionCorrectionState::CORRECTED));
             }
 
             //Store event log
@@ -343,7 +350,7 @@ class BranchController extends Controller
                 "TypeMessage" => "Error"
             ]);
 
-        //Delete Branch when current exam state is closed
+        //Delete Branch when the exam state is closed
         $exception = DB::transaction(function () use ($exam, $question, $branch) {
             //Delete
             $branch->delete();

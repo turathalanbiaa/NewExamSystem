@@ -95,9 +95,8 @@
                                     @if ($loop->first)
                                         <div class="list-group list-group-flush">
                                             @endif
-                                            <a href="/control-panel/questions/{{$question->id}}" class="list-group-item list-group-item-action">
-                                                {{$question->title}}
-                                                <span class="badge badge-default float-left">{{$question->score . " درجة"}}</span>
+                                            <a href="/control-panel/questions/{{$question->id}}" class="list-group-item list-group-item-action text-truncate">
+                                                <span>{{$question->title}}</span>
                                             </a>
                                             @if ($loop->last)
                                         </div>

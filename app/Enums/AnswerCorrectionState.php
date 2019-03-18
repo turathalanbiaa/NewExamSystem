@@ -11,9 +11,9 @@ namespace App\Enums;
 
 class AnswerCorrectionState
 {
-    const UNCORRECTED = 0;
-    const CORRECTED = 1;
-    const RE_CORRECTED = 2;
+    const UNCORRECTED = 1;
+    const CORRECTED = 2;
+    const RE_CORRECTED = 3;
 
     public static function getState($key)
     {
