@@ -17,17 +17,6 @@
             </div>
         @endif
 
-        {{-- Session Sum Message --}}
-        @if (session('SumMessage'))
-            <div class="row">
-                <div class="col-12">
-                    <div class="alert alert-danger text-center">
-                        {{session('SumMessage')}}
-                    </div>
-                </div>
-            </div>
-        @endif
-
         {{-- Session Delete Question Message --}}
         @if (session('DeleteQuestionMessage'))
             <div class="row">
@@ -45,6 +34,17 @@
                 <div class="col-12">
                     <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
                         {{session('QuestionCorrectionMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Session Sum Message --}}
+        @if (session('SumMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger text-center">
+                        {{session('SumMessage')}}
                     </div>
                 </div>
             </div>
@@ -205,7 +205,7 @@
                                     @if ($loop->first)
                                         <div class="list-group list-group-flush">
                                             @endif
-                                            <a href="/control-panel/questions-correction/{{(($question->type==\App\Enums\QuestionType::TRUE_OR_FALSE) || ($question->type==\App\Enums\QuestionType::SINGLE_CHOICE)?"automatically":"manually")}}/{{$question->id}}" class="list-group-item list-group-item-action text-truncate">
+                                            <a href="/control-panel/correction/{{(($question->type==\App\Enums\QuestionType::TRUE_OR_FALSE) || ($question->type==\App\Enums\QuestionType::SINGLE_CHOICE)?"automatically":"manually")}}/{{$question->id}}" class="list-group-item list-group-item-action text-truncate">
                                                 @if($question->correction == \App\Enums\QuestionCorrectionState::CORRECTED)
                                                     <span class="far fa-check-square text-default ml-1"></span>
                                                 @else

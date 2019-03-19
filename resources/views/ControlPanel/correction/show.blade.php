@@ -17,7 +17,6 @@
             </div>
         @endif
 
-
         <div class="row align-items-start">
             {{-- Show Students Answers to the current question --}}
             <div class="col-lg-6 col-sm-12">
@@ -187,7 +186,7 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: "post",
-                url: "/control-panel/questions-correction/manually",
+                url: "/control-panel/correction/manually",
                 data: {student:student, question:question, answers:answers},
                 dataType: "json",
                 success: function(result){

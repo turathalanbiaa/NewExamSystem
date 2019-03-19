@@ -36,18 +36,11 @@ Route::resource('control-panel/exams', 'ControlPanel\ExamController');
 Route::resource('control-panel/questions', 'ControlPanel\QuestionController');
 Route::resource('control-panel/branches', 'ControlPanel\BranchController');
 
-
-
-
-
-
-
-
-
-Route::get('control-panel/questions-correction/automatically/{id}', 'ControlPanel\QuestionsCorrectionController@QuestionCorrectionAutomatically');
-Route::get('control-panel/questions-correction/manually/{id}', 'ControlPanel\QuestionsCorrectionController@ShowQuestionToCorrectionManually');
-Route::post('control-panel/questions-correction/manually', 'ControlPanel\QuestionsCorrectionController@QuestionCorrectionManually');
-Route::get('control-panel/exams/{exam}/sum', 'ControlPanel\ExamController@sum');
+//Routes for correction
+Route::get('control-panel/correction/automatically/{question}', 'ControlPanel\CorrectionController@CorrectionAutomatically');
+Route::get('control-panel/correction/manually/{question}', 'ControlPanel\CorrectionController@ShowQuestionToCorrectionManually');
+Route::post('control-panel/correction/manually', 'ControlPanel\CorrectionController@CorrectionManually');
+Route::get('control-panel/sum/{exam}', 'ControlPanel\CorrectionController@sum');
 
 
 

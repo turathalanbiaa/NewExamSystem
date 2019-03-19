@@ -298,7 +298,12 @@ class BranchController extends Controller
             //Make re-corrected answers and corrected question
             if (($exam->state == ExamState::END) && (Input::get("reCorrectAnswers"))) {
                 $branch->answers()
-                    ->update(array("correction" => AnswerCorrectionState::RE_CORRECTED));
+                    ->update(
+                        array(
+                            "correction" => AnswerCorrectionState::RE_CORRECTED,
+                            "score" => $branch->score
+                        )
+                    );
                 $branch->question()
                     ->update(array("correction" => QuestionCorrectionState::CORRECTED));
             }

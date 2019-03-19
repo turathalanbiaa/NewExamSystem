@@ -62,7 +62,7 @@ class AssessmentController extends Controller
 
         $noOfStudentsResident = count($studentsIdsResident);
         $noOfStudentsEnrolled = count($studentsIdsResident) + count($students);
-        $students = $students->take(10);
+        $students = $students->take(25);
 
 
         return view("ControlPanel.assessment.create")->with([

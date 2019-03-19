@@ -23,9 +23,11 @@ class EventLogType
 
     public static function getType($key) {
         switch ($key) {
+            case self::PROFILE: return "الملف الشخصي"; break;
             case self::ADMIN: return "مدير"; break;
             case self::LECTURER: return "استاذ";  break;
             case self::COURSE: return "مادة";  break;
+            case self::ASSESSMENT: return "التقييم";  break;
             case self::EXAM: return "امتحان";  break;
             case self::QUESTION: return "سؤال";  break;
             case self::BRANCH: return "فرع من سؤال";  break;

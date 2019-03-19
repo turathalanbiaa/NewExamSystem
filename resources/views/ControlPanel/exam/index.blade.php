@@ -39,6 +39,17 @@
             </div>
         @endif
 
+        {{-- Session Sum Message --}}
+        @if (session('SumMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
+                        {{session('SumMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Burron Create--}}
         <div class="row">
             <div class="col-12 mb-3">
@@ -98,7 +109,7 @@
                                                         <button type="button" class="btn btn-warning btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="reopen" data-toggle="modal" data-target="#modelReopenExamState">اعادة فتح الامتحان</button>
                                                     </div>
                                                 @endif
-                                                <a href="#" class="list-group-item list-group-item-action">جمع درجة النموذج الامتحاني</a>
+                                                <a href="/control-panel/sum/{{$exam->id}}" class="list-group-item list-group-item-action">جمع درجة النموذج الامتحاني</a>
                                                 <a href="javascript:void(0)" class="list-group-item list-group-item-action" data-action="fillDeleteExamForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-toggle="modal" data-target="#modelDeleteExam">حذف النموذج الامتحاني</a>
                                             </div>
                                         </div>
