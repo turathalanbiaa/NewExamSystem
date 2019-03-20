@@ -54,6 +54,18 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" href="/control-panel/documents">
+                                <span>الدرجات والوثائق</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/control-panel/reports">
+                                <span>التقارير</span>
+                            </a>
+                        </li>
+
                         <li class="nav-item dropdown @if(request()->is("control-panel/profile/*")) active @endif">
                             <a class="nav-link dropdown-toggle" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span>الاعدادات</span>

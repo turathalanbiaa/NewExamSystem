@@ -42,6 +42,9 @@ Route::get('control-panel/correction/manually/{question}', 'ControlPanel\Correct
 Route::post('control-panel/correction/manually', 'ControlPanel\CorrectionController@CorrectionManually');
 Route::get('control-panel/sum/{exam}', 'ControlPanel\CorrectionController@sum');
 
+//Routes for degrees and documents
+Route::get('control-panel/documents', 'ControlPanel\DocumentController@index');
+Route::get('control-panel/documents/creation', 'ControlPanel\DocumentController@creation');
 
 
 
