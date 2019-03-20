@@ -12,6 +12,7 @@ Route::get('/', 'Website\StudentExamController@exams')->middleware('StudentAuth'
 Route::get('/next-exams', 'Website\StudentExamController@nextExams')->middleware('StudentAuth');
 Route::get('/finished-exams', 'Website\StudentExamController@finishedExams')->middleware('StudentAuth');
 Route::get('/exam/{id}', 'Website\StudentExamController@exam')->middleware('StudentAuth');
+Route::get('/finished-exam/{id}', 'Website\StudentExamController@finishedExam')->middleware('StudentAuth');
 Route::post('/store', 'Website\StudentExamController@store');
 Route::post('/finish', 'Website\StudentExamController@finish');
 

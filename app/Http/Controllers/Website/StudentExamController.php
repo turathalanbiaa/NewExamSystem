@@ -53,7 +53,15 @@ class StudentExamController extends Controller
             return $e->getMessage();
         }
     }
-
+    public function finishedExam($id)
+    {
+        try {
+            $exam = Exam::find($id);
+            return view("Website/finishedExam", compact('exam', $exam));
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
     public function store(Request $request)
     {
         try {

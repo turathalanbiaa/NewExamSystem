@@ -24,4 +24,5 @@ class Exam extends Model
     {
         return $this->hasMany("App\Models\ExamStudent");
     }
+
 }

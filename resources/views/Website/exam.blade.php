@@ -159,10 +159,10 @@
                             }
                         });
                    }
-                   else{
+                   /*else{
                        $(element).addClass('btn-outline-primary');
                        $(element).removeClass('btn-outline-success');
-                   }
+                   }*/
                 }
                 else {
                     $.ajaxSetup({

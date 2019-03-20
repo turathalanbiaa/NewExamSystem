@@ -1,22 +1,18 @@
 @extends("Website.layout.app")
 @section("title")
-    <title>الأمتحانات الحالية</title>
+    <title>الأمتحانات القادمة</title>
 @endsection
 @section("content")
     <div class="container">
         <div class="row">
-            @forelse($studentNotFinishedExams->notFinishedExams as $exam)
-                @if ($exam->state==App\Enums\ExamState::CLOSE)
+            @forelse($studentNotFinishedExams->notFinishedExams->where('state',App\Enums\ExamState::CLOSE) as $exam)
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-5">
-
                         <div class="card shadow h-100">
-
                             <div class="view shadow mdb-color px-3 py-4">
                                 <h5 class="text-center text-white mb-3">
                                     <a href="javascript:void(0)" class="text-white">{{$exam->title}}</a>
                                 </h5>
                             </div>
-
 
                             <div class="card-body" style="padding-bottom: 75px;">
                                 <h5>
@@ -40,7 +36,7 @@
                             </div>
                         </div>
                     </div>
-                @endif
+
             @empty
               <div class="col-12">
                   <div class="alert alert-primary py-5 px-3 text-center" role="alert">
