@@ -60,7 +60,7 @@ table.dataTable thead .sorting_desc_disabled:after {
     opacity: 0
 }
 
-.card-body-content-fixed {
+.extra-content.fixed {
     position: absolute;
     right: 0;
     bottom: 0;

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\AnswerCorrectionState;
 use App\Enums\EventLogType;
 use App\Enums\ExamState;
+use App\Enums\QuestionCorrectionState;
 use App\Enums\QuestionType;
 use App\Models\Answer;
 use App\Models\Branch;
@@ -24,7 +26,7 @@ class BranchController extends Controller
      */
     public function index()
     {
-     //
+        //
     }
 
     /**
@@ -53,16 +55,18 @@ class BranchController extends Controller
     {
         Auth::check();
         $question = Question::findOrFail(Input::get("question"));
-        ExamController::watchExam($question->exam);
+        $exam = $question->exam;
+        ExamController::watchExam($exam);
 
+        //Number of branches is overflow
         if ($question->branches()->count() == $question->no_of_branch)
             return redirect("control-panel/branches/create?question=$question->id")->with([
                 "CreateBranchMessage" => "تحذير، لا يمكنك اضافة نقطة الى السؤال الحالي.",
-                "TypeMessage" => "Error"
+                "TypeMessage"         => "Error"
             ]);
 
-        switch ($question->type)
-        {
+        //Validation
+        switch ($question->type) {
             case QuestionType::TRUE_OR_FALSE:
                 $this->validate($request, [
                     'title'         => ['required'],
@@ -72,7 +76,7 @@ class BranchController extends Controller
                     'correctOption.required' => 'يرجى اختيار الاجابة الصحيحة.',
                     'correctOption.in'       => 'الاجابة الصحيحة غير مقبولة.'
                 ]);
-                $options = array("صح","خطأ");
+                $options = array("صح", "خطأ");
                 $correctOption = Input::get("correctOption");
                 break;
 
@@ -81,21 +85,24 @@ class BranchController extends Controller
                     'title'         => ['required'],
                     'option-1'      => ['required'],
                     'option-2'      => ['required'],
-                    'option-3'      => ['required'],
-                    'correctOption' => ['required', Rule::in(Input::get("option-1"), Input::get("option-2"), Input::get("option-3"), (!is_null(Input::get("option-4")))?Input::get("option-4"):"")]
+                    'correctOption' => ['required', Rule::in(
+                        Input::get("option-1"),
+                        Input::get("option-2"),
+                        (!is_null(Input::get("option-3"))) ? Input::get("option-3") : "",
+                        (!is_null(Input::get("option-4"))) ? Input::get("option-4") : "")]
                 ], [
-                    'title.required'         => 'يرجى ملئ عنوان(النص) النقطة.',
-                    'option-1.required'      => 'يرجى ملئ الاختيار الاول.',
-                    'option-2.required'      => 'يرجى ملئ الاختيار الثاني.',
-                    'option-3.required'      => 'يرجى ملئ الاختيار الثالث.',
+                    'title.required'        => 'يرجى ملئ عنوان(النص) النقطة.',
+                    'option-1.required'     => 'يرجى ملئ الاختيار الاول.',
+                    'option-2.required'     => 'يرجى ملئ الاختيار الثاني.',
                     'correctOption.required' => 'يرجى اختيار الاجابة الصحيحة.',
                     'correctOption.in'       => 'الاجابة الصحيحة غير مقبولة.'
                 ]);
                 $options = array(
                     Input::get("option-1"),
-                    Input::get("option-2"),
-                    Input::get("option-3")
+                    Input::get("option-2")
                 );
+                if (!is_null(Input::get("option-3")))
+                    array_push($options, Input::get("option-3"));
                 if (!is_null(Input::get("option-4")))
                     array_push($options, Input::get("option-4"));
                 $correctOption = Input::get("correctOption");
@@ -103,9 +110,9 @@ class BranchController extends Controller
 
             case QuestionType::FILL_BLANK:
                 $this->validate($request, [
-                    'title'         => ['required']
+                    'title' => ['required']
                 ], [
-                    'title.required'         => 'يرجى ملئ عنوان(النص) النقطة.'
+                    'title.required' => 'يرجى ملئ عنوان(النص) النقطة.'
                 ]);
                 $options = null;
                 $correctOption = Input::get("correctOption", null);
@@ -113,9 +120,9 @@ class BranchController extends Controller
 
             case QuestionType::EXPLAIN:
                 $this->validate($request, [
-                    'title'         => ['required']
+                    'title' => ['required']
                 ], [
-                    'title.required'         => 'يرجى ملئ عنوان(النص) النقطة.'
+                    'title.required' => 'يرجى ملئ عنوان(النص) النقطة.'
                 ]);
                 $options = null;
                 $correctOption = Input::get("correctOption", null);
@@ -126,41 +133,45 @@ class BranchController extends Controller
                 $correctOption = null;
         }
 
-        $branch = new Branch();
-        $branch->question_id = $question->id;
-        $branch->title = Input::get("title");
-        $branch->options = (!is_null($options))?json_encode($options, JSON_UNESCAPED_UNICODE):null;
-        $branch->correct_option = $correctOption;
-        $branch->score = $question->score / $question->no_of_branch_req;
+        //Transaction
+        $exception = DB::transaction(function () use ($exam, $question, $options, $correctOption) {
+            //Store branch
+            $branch = new Branch();
+            $branch->question_id = $question->id;
+            $branch->title = Input::get("title");
+            $branch->options = (!is_null($options)) ? json_encode($options, JSON_UNESCAPED_UNICODE) : null;
+            $branch->correct_option = $correctOption;
+            $branch->score = $question->score / $question->no_of_branch_req;
+            $branch->save();
 
-        $success = $branch->save();
+            //Store event log
+            $target = $branch->id;
+            $type = EventLogType::BRANCH;
+            $event = "اضافة نقطة الى السؤال: " . $question->title . "في الامتحان " . $exam->title;
+            EventLog::create($target, $type, $event);
+        });
 
-        if (!$success)
+        if (is_null($exception)) {
+            if ($question->branches()->count() == $question->no_of_branch)
+                return redirect("control-panel/questions/$question->id")->with([
+                    "CreateBranchMessage" => "تمت اضافة جميع النقاط الى السؤال الحالي بنجاح."
+                ]);
+            else
+                return redirect("control-panel/branches/create?question=$question->id")->with([
+                    "CreateBranchMessage" => "تمت اضافة النقطة الى السؤال الحالي بنجاح."
+                ]);
+        }
+        else
             return redirect("control-panel/branches/create?question=$question->id")->with([
                 "CreateBranchMessage" => "لم يتم اضافة النقطة الى السؤال بنجاح.",
                 "TypeMessage" => "Error"
-            ]);
-
-        //Store event log
-        $target = $branch->id;
-        $type = EventLogType::BRANCH;
-        $event = "اضافة نقطة الى السؤال: " . $question->title;
-        EventLog::create($target, $type, $event);
-
-        if ($question->branches()->count() == $question->no_of_branch)
-            return redirect("control-panel/questions/$question->id")->with([
-                "CreateBranchMessage" => "تمت اضافة جميع النقاط الى السؤال الحالي بنجاح."
-            ]);
-        else
-            return redirect("control-panel/branches/create?question=$question->id")->with([
-                "CreateBranchMessage" => "تمت اضافة النقطة الى السؤال الحالي بنجاح."
             ]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Branch  $branch
+     * @param  \App\Models\Branch $branch
      * @return \Illuminate\Http\Response
      */
     public function show(Branch $branch)
@@ -171,7 +182,7 @@ class BranchController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Branch  $branch
+     * @param  \App\Models\Branch $branch
      * @return \Illuminate\Http\Response
      */
     public function edit(Branch $branch)
@@ -199,119 +210,130 @@ class BranchController extends Controller
         ExamController::watchExam($exam);
         $question = $branch->question;
 
-        if (($exam->state == ExamState::CLOSE) || ($exam->state == ExamState::END))
-        {
-            switch ($question->type)
-            {
-                case QuestionType::TRUE_OR_FALSE:
-                    $this->validate($request, [
-                        'title'         => ['required'],
-                        'correctOption' => ['required', Rule::in("صح", "خطأ")]
-                    ], [
-                        'title.required'         => 'يرجى ملئ عنوان(النص) النقطة.',
-                        'correctOption.required' => 'يرجى اختيار الاجابة الصحيحة.',
-                        'correctOption.in'       => 'الاجابة الصحيحة غير مقبولة.'
-                    ]);
-                    $options = array("صح","خطأ");
-                    $correctOption = Input::get("correctOption");
-                    break;
-
-                case QuestionType::SINGLE_CHOICE:
-                    $this->validate($request, [
-                        'title'         => ['required'],
-                        'option-1'      => ['required'],
-                        'option-2'      => ['required'],
-                        'option-3'      => ['required'],
-                        'correctOption' => ['required', Rule::in(Input::get("option-1"), Input::get("option-2"), Input::get("option-3"), (!is_null(Input::get("option-4")))?Input::get("option-4"):"")]
-                    ], [
-                        'title.required'         => 'يرجى ملئ عنوان(النص) النقطة.',
-                        'option-1.required'      => 'يرجى ملئ الاختيار الاول.',
-                        'option-2.required'      => 'يرجى ملئ الاختيار الثاني.',
-                        'option-3.required'      => 'يرجى ملئ الاختيار الثالث.',
-                        'correctOption.required' => 'يرجى اختيار الاجابة الصحيحة.',
-                        'correctOption.in'       => 'الاجابة الصحيحة غير مقبولة.'
-                    ]);
-                    $options = array(
-                        Input::get("option-1"),
-                        Input::get("option-2"),
-                        Input::get("option-3")
-                    );
-                    if (!is_null(Input::get("option-4")))
-                        array_push($options, Input::get("option-4"));
-                    $correctOption = Input::get("correctOption");
-                    break;
-
-                case QuestionType::FILL_BLANK:
-                    $this->validate($request, [
-                        'title'         => ['required']
-                    ], [
-                        'title.required'         => 'يرجى ملئ عنوان(النص) النقطة.'
-                    ]);
-                    $options = null;
-                    $correctOption = Input::get("correctOption", null);
-                    break;
-
-                case QuestionType::EXPLAIN:
-                    $this->validate($request, [
-                        'title'         => ['required']
-                    ], [
-                        'title.required'         => 'يرجى ملئ عنوان(النص) النقطة.'
-                    ]);
-                    $options = null;
-                    $correctOption = Input::get("correctOption", null);
-                    break;
-
-                default:
-                    $options = null;
-                    $correctOption = null;
-            }
-
-            $exception = DB::transaction(function () use ($exam, $question, $branch, $options, $correctOption) {
-                //Update branch
-                $branch->title = Input::get("title");
-                $branch->options = (!is_null($options))?json_encode($options, JSON_UNESCAPED_UNICODE):null;
-                $branch->correct_option = $correctOption;
-                $branch->save();
-
-                //Update Answers
-                if (($exam->state == ExamState::END) && Input::get("reCorrectOption"))
-                {
-                    //Update Answers
-                    $branch->answers()->update(array("re_correct" => 1));
-
-                    //Store event log
-                    $target = $branch->id;
-                    $type = EventLogType::BRANCH;
-                    $event = "تم اعتبار اجابة الطلبة صحيحة في النقطة: ". $branch->title . " التابعه للسؤال: " . $question->title . " في الامتحان: " . $exam->title;
-                    EventLog::create($target, $type, $event);
-                }
-
-                //Store event log
-                $target = $branch->id;
-                $type = EventLogType::BRANCH;
-                $event = "تعديل النقطة: ". $branch->title . "التابعه للسؤال: " . $question->title;
-                EventLog::create($target, $type, $event);
-            });
-
-            if (is_null($exception))
-                return redirect("control-panel/questions/$question->id")->with([
-                    "UpdateBranchMessage" => "تم تعديل النقطة: " . $branch->title . " بنجاح"
-                ]);
-            else
-                return redirect("control-panel/branches/$question->id/edit")->with([
-                    "UpdateBranchMessage" => "لم يتم تعديل النقطة بنجاح."
-                ]);
-        }
-        else
+        if ($exam->state == ExamState::OPEN)
             return redirect("control-panel/questions/$question->id")->with([
                 "UpdateBranchMessage" => "لا يمكنك تعديل اي نقطة لان الامتحان مفتوح"
+            ]);
+
+        //Validation
+        switch ($question->type) {
+            case QuestionType::TRUE_OR_FALSE:
+                $this->validate($request, [
+                    'title'         => ['required'],
+                    'correctOption' => ['required', Rule::in("صح", "خطأ")]
+                ], [
+                    'title.required'         => 'يرجى ملئ عنوان(النص) النقطة.',
+                    'correctOption.required' => 'يرجى اختيار الاجابة الصحيحة.',
+                    'correctOption.in'       => 'الاجابة الصحيحة غير مقبولة.'
+                ]);
+                $options = array("صح", "خطأ");
+                $correctOption = Input::get("correctOption");
+                break;
+
+            case QuestionType::SINGLE_CHOICE:
+                $this->validate($request, [
+                    'title'    => ['required'],
+                    'option-1' => ['required'],
+                    'option-2' => ['required'],
+                    'correctOption' => ['required', Rule::in(
+                        Input::get("option-1"),
+                        Input::get("option-2"),
+                        (!is_null(Input::get("option-3"))) ? Input::get("option-3") : "",
+                        (!is_null(Input::get("option-4"))) ? Input::get("option-4") : "")]
+                ], [
+                    'title.required' => 'يرجى ملئ عنوان(النص) النقطة.',
+                    'option-1.required' => 'يرجى ملئ الاختيار الاول.',
+                    'option-2.required' => 'يرجى ملئ الاختيار الثاني.',
+                    'correctOption.required' => 'يرجى اختيار الاجابة الصحيحة.',
+                    'correctOption.in' => 'الاجابة الصحيحة غير مقبولة.'
+                ]);
+                $options = array(
+                    Input::get("option-1"),
+                    Input::get("option-2")
+                );
+                if (!is_null(Input::get("option-3")))
+                    array_push($options, Input::get("option-3"));
+                if (!is_null(Input::get("option-4")))
+                    array_push($options, Input::get("option-4"));
+                $correctOption = Input::get("correctOption");
+                break;
+
+            case QuestionType::FILL_BLANK:
+                $this->validate($request, [
+                    'title' => ['required']
+                ], [
+                    'title.required' => 'يرجى ملئ عنوان(النص) النقطة.'
+                ]);
+                $options = null;
+                $correctOption = Input::get("correctOption", null);
+                break;
+
+            case QuestionType::EXPLAIN:
+                $this->validate($request, [
+                    'title' => ['required']
+                ], [
+                    'title.required' => 'يرجى ملئ عنوان(النص) النقطة.'
+                ]);
+                $options = null;
+                $correctOption = Input::get("correctOption", null);
+                break;
+
+            default:
+                $options = null;
+                $correctOption = null;
+        }
+
+        //Transaction
+        $exception = DB::transaction(function () use ($exam, $question, $branch, $options, $correctOption) {
+            //Update branch
+            $branch->title = Input::get("title");
+            $branch->options = (!is_null($options)) ? json_encode($options, JSON_UNESCAPED_UNICODE) : null;
+            $branch->correct_option = $correctOption;
+            $branch->save();
+
+            //Update question
+            $branch->question()
+                ->update(array("correction" => QuestionCorrectionState::UNCORRECTED));
+
+            //Make re-corrected answers and corrected question
+            if (($exam->state == ExamState::END) && (Input::get("reCorrectAnswers"))) {
+                $branch->answers()
+                    ->update(
+                        array(
+                            "correction" => AnswerCorrectionState::RE_CORRECTED,
+                            "score" => $branch->score
+                        )
+                    );
+                $branch->question()
+                    ->update(array("correction" => QuestionCorrectionState::CORRECTED));
+            }
+
+            //Store event log
+            $target = $branch->id;
+            $type = EventLogType::BRANCH;
+            if (($exam->state == ExamState::END) && Input::get("reCorrectAnswers"))
+                $event = "تعديل النقطة: " . $branch->title . " في السؤال: " . $question->title . "في امتحان " . $exam->title . "و هذا الامتحان منتهي، مع اعتبار اجوبة الطلبة اجوبة صحيحه";
+            elseif ($exam->state == ExamState::END)
+                $event = "تعديل النقطة: " . $branch->title . " في السؤال: " . $question->title . " في الامتحان: " . $exam->title . "و هذا الامتحان منتهي";
+            else
+                $event = "تعديل النقطة: " . $branch->title . " في السؤال: " . $question->title . " في الامتحان: " . $exam->title. "و هذا الامتحان مفلق";
+            EventLog::create($target, $type, $event);
+        });
+
+        if (is_null($exception))
+            return redirect("control-panel/questions/$question->id")->with([
+                "UpdateBranchMessage" => "تم تعديل النقطة: " . $branch->title . " بنجاح"
+            ]);
+        else
+            return redirect("control-panel/branches/$question->id/edit")->with([
+                "UpdateBranchMessage" => "لم يتم تعديل النقطة بنجاح."
             ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Branch  $branch
+     * @param  \App\Models\Branch $branch
      * @return \Illuminate\Http\Response
      */
     public function destroy(Branch $branch)
@@ -321,45 +343,37 @@ class BranchController extends Controller
         ExamController::watchExam($exam);
         $question = $branch->question;
 
-        if (($exam->state == ExamState::CLOSE) || ($exam->state == ExamState::END))
-        {
-            $exception = DB::transaction(function () use ($exam, $question, $branch) {
-                //Delete
-                $branch->delete();
-
-                //Update Answers
-                if ($exam->state == ExamState::END)
-                {
-                    //Delete Answers
-                    $branch->answers()->delete();
-
-                    //Store event log
-                    $target = $branch->id;
-                    $type = EventLogType::BRANCH;
-                    $event = "تم حذف اجوبة الطلبة على النقطة: ". $branch->title . " التابعه للسؤال: " . $question->title . " في الامتحان: " . $exam->title;
-                    EventLog::create($target, $type, $event);
-                }
-
-                //Store event log
-                $target = $branch->id;
-                $type = EventLogType::BRANCH;
-                $event = "حذف النقطة: ". $branch->title . "التابعه للسؤال: " . $question->title;
-                EventLog::create($target, $type, $event);
-            });
-
-            if (is_null($exception))
-                return redirect("control-panel/questions/$question->id")->with([
-                    "DeleteBranchMessage" => "تم حذف النقطة: " . $branch->title . " بنجاح"
-                ]);
-            else
-                return redirect("control-panel/branches/$question->id")->with([
-                    "DeleteBranchMessage" => "لم يتم حذف النقطة بنجاح.",
-                    "TypeMessage" => "Error"
-                ]);
-        }
-        else
+        if ($exam->state == ExamState::OPEN)
             return redirect("control-panel/questions/$question->id")->with([
                 "DeleteBranchMessage" => "لا يمكنك حذف اي نقطة لان الامتحان مفتوح",
+                "TypeMessage" => "Error"
+            ]);
+
+        if ($exam->state == ExamState::END)
+            return redirect("control-panel/questions/$question->id")->with([
+                "DeleteBranchMessage" => "لا يمكنك حذف اي نقطة لان الامتحان منتهي",
+                "TypeMessage" => "Error"
+            ]);
+
+        //Delete Branch when the exam state is closed
+        $exception = DB::transaction(function () use ($exam, $question, $branch) {
+            //Delete
+            $branch->delete();
+
+            //Store event log
+            $target = $branch->id;
+            $type = EventLogType::BRANCH;
+            $event = "حذف النقطة: " . $branch->title . "في السؤال: " . $question->title . "في الامتحان " . $exam->title;
+            EventLog::create($target, $type, $event);
+        });
+
+        if (is_null($exception))
+            return redirect("control-panel/questions/$question->id")->with([
+                "DeleteBranchMessage" => "تم حذف النقطة: " . $branch->title . " بنجاح"
+            ]);
+        else
+            return redirect("control-panel/branches/$question->id")->with([
+                "DeleteBranchMessage" => "لم يتم حذف النقطة بنجاح.",
                 "TypeMessage" => "Error"
             ]);
     }

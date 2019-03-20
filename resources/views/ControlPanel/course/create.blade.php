@@ -6,7 +6,40 @@
 
 @section("content")
     <div class="container">
-        <div class="row justify-content-center">
+        {{-- Session Create Course Message --}}
+        @if (session('CreateCourseMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert {{(session('TypeMessage') == "Error" ? "alert-danger":"alert-success")}} text-center">
+                        {{session('CreateCourseMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="row">
+            {{-- Heading --}}
+            <div class="col-12 mb-3">
+                <div class="view shadow mdb-color p-3">
+                    <h5 class="text-center text-white m-0">اضافة مادة دراسية</h5>
+                </div>
+            </div>
+
+            {{-- Info --}}
+            <div class="col-lg-4">
+                {{-- Course Alert Info --}}
+                <div class="alert alert-info">
+                    <h5 class="text-center pb-2 border-bottom border-primary">اضافة مادة دراسية</h5>
+                    <ul class="mb-0 pr-3">
+                        <li>لكل مادة مستوى مستوى دراسي تابعه له.</li>
+                        <li>لكل مادة استاذ يقوم بوضع الامتحانات التابعه لهذه المادة، كما يقوم بتقييم الطلبة حسب كل مادة.</li>
+                        <li>يمكن للاستاذ مشاهدة تقرير عن المادة.</li>
+                        <li>اذا كانت حالة المادة مغلقة سوف لن يستطيع الاستاذ وضع امتحان اواضافة تقييم المادة.</li>
+                    </ul>
+                </div>
+            </div>
+
+            {{-- Create Course --}}
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Alert Errors --}}
@@ -20,13 +53,7 @@
                         </div>
                     @endif
 
-                    {{-- Session Create Course Message --}}
-                    @if (session('CreateCourseMessage'))
-                        <div class="alert {{(session('TypeMessage') == "Error" ? "alert-danger":"alert-success")}} text-center mx-4 mt-4">
-                            {{session('CreateCourseMessage')}}
-                        </div>
-                    @endif
-
+                    {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
                         <form method="post" action="/control-panel/courses">
                             @csrf

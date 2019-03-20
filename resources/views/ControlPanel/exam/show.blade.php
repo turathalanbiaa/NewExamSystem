@@ -39,6 +39,17 @@
             </div>
         @endif
 
+        {{-- Session Sum Message --}}
+        @if (session('SumMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger text-center">
+                        {{session('SumMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Burron Create--}}
         <div class="row">
             <div class="col-12 mb-3">
@@ -103,39 +114,6 @@
                     </div>
                 </div>
 
-                {{-- Questions --}}
-                <div class="row">
-                    {{-- Heading --}}
-                    <div class="col-12 mb-3">
-                        <a class="bg-light h5 p-3 m-0 d-block" data-toggle="collapse" data-target="#questions" aria-expanded="false" aria-controls="collapseQuestions">
-                            <i class="fa fa-caret-left text-default ml-1"></i>
-                            <span>جميع الاسئلة</span>
-                        </a>
-                    </div>
-
-                    {{-- Collapes --}}
-                    <div class="col-12 mb-3 collapse" id="questions">
-                        <div class="card">
-                            <div class="card-body border-bottom border-default">
-                                @forelse($exam->questions as $question)
-                                    @if ($loop->first)
-                                        <div class="list-group list-group-flush">
-                                            @endif
-                                            <a href="/control-panel/questions/{{$question->id}}" class="list-group-item list-group-item-action">
-                                                {{$question->title}}
-                                                <span class="badge badge-default float-left">{{$question->score . " درجة"}}</span>
-                                            </a>
-                                            @if ($loop->last)
-                                        </div>
-                                    @endif
-                                @empty
-                                    <h5 class="text-center mb-0">لاتوجد اسئلة</h5>
-                                @endforelse
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 {{-- Exam Curve --}}
                 <div class="row">
                     {{-- Heading --}}
@@ -176,6 +154,39 @@
                     </div>
                 </div>
 
+                {{-- Questions --}}
+                <div class="row">
+                    {{-- Heading --}}
+                    <div class="col-12 mb-3">
+                        <a class="bg-light h5 p-3 m-0 d-block" data-toggle="collapse" data-target="#questions" aria-expanded="false" aria-controls="collapseQuestions">
+                            <i class="fa fa-caret-left text-default ml-1"></i>
+                            <span>جميع الاسئلة</span>
+                        </a>
+                    </div>
+
+                    {{-- Collapes --}}
+                    <div class="col-12 mb-3 collapse" id="questions">
+                        <div class="card">
+                            <div class="card-body border-bottom border-default">
+                                @forelse($exam->questions as $question)
+                                    @if ($loop->first)
+                                        <div class="list-group list-group-flush">
+                                            @endif
+                                            <a href="/control-panel/questions/{{$question->id}}" class="list-group-item list-group-item-action text-truncate">
+                                                <span>السؤال: </span>
+                                                <span>{{$question->title}}</span>
+                                            </a>
+                                            @if ($loop->last)
+                                        </div>
+                                    @endif
+                                @empty
+                                    <h5 class="text-center mb-0">لاتوجد اسئلة</h5>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Manual Correction Questions --}}
                 <div class="row">
                     {{-- Heading --}}
@@ -194,7 +205,7 @@
                                     @if ($loop->first)
                                         <div class="list-group list-group-flush">
                                             @endif
-                                            <a href="/control-panel/questions-correction/{{(($question->type==\App\Enums\QuestionType::TRUE_OR_FALSE) || ($question->type==\App\Enums\QuestionType::SINGLE_CHOICE)?"automatically":"manually")}}/{{$question->id}}" class="list-group-item list-group-item-action">
+                                            <a href="/control-panel/correction/{{(($question->type==\App\Enums\QuestionType::TRUE_OR_FALSE) || ($question->type==\App\Enums\QuestionType::SINGLE_CHOICE)?"automatically":"manually")}}/{{$question->id}}" class="list-group-item list-group-item-action text-truncate">
                                                 @if($question->correction == \App\Enums\QuestionCorrectionState::CORRECTED)
                                                     <span class="far fa-check-square text-default ml-1"></span>
                                                 @else

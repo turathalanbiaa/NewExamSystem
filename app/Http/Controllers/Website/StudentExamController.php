@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Website;
 
+use App\Enums\AnswerCorrectionState;
 use App\Models\Answer;
 use App\Models\Exam;
 use App\Models\ExamStudent;
@@ -76,9 +77,8 @@ class StudentExamController extends Controller
                 $answer->branch_id = $request->id;
                 $answer->text = $request->val;
                 $answer->time = Carbon::now();
-                $answer->score = 0.0000; //Default 0.00000
-                $answer->re_correct = 0; //Default 0
-                $answer->correction = 0; //Default 0
+                $answer->score = 0.00000; //Default 0.00000
+                $answer->correction = AnswerCorrectionState::UNCORRECTED; //Default 1
                 $answer->save();
             }
             return response()->json('ok');

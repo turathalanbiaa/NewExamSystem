@@ -95,9 +95,8 @@
                                     @if ($loop->first)
                                         <div class="list-group list-group-flush">
                                             @endif
-                                            <a href="/control-panel/questions/{{$question->id}}" class="list-group-item list-group-item-action">
-                                                {{$question->title}}
-                                                <span class="badge badge-default float-left">{{$question->score . " درجة"}}</span>
+                                            <a href="/control-panel/questions/{{$question->id}}" class="list-group-item list-group-item-action text-truncate">
+                                                <span>{{$question->title}}</span>
                                             </a>
                                             @if ($loop->last)
                                         </div>
@@ -158,10 +157,12 @@
                                                 <i class="fa fa-edit ml-1"></i>
                                                 <span>تحرير</span>
                                             </a>
-                                            <a href="#modelDeleteBranch" data-toggle="modal" class="text-danger text-decoration mr-1" rel="tooltip" title="حذف النقطة" data-action="fillDeleteBranchForm" data-branch-id="{{$branch->id}}" data-branch-title="{{$branch->title}}">
-                                                <i class="fa fa-trash-alt ml-1"></i>
-                                                <span>حذف</span>
-                                            </a>
+                                            @if($currentQuestion->exam->state == \App\Enums\ExamState::CLOSE)
+                                                <a href="#modelDeleteBranch" data-toggle="modal" class="text-danger text-decoration mr-1" rel="tooltip" title="حذف النقطة" data-action="fillDeleteBranchForm" data-branch-id="{{$branch->id}}" data-branch-title="{{$branch->title}}">
+                                                    <i class="fa fa-trash-alt ml-1"></i>
+                                                    <span>حذف</span>
+                                                </a>
+                                            @endif
                                         </span><br>
 
                                         {{-- Options --}}

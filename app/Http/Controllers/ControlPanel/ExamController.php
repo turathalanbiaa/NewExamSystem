@@ -8,10 +8,12 @@ use App\Enums\EventLogType;
 use App\Enums\ExamState;
 use App\Enums\ExamType;
 use App\Enums\QuestionCorrectionState;
+use App\Models\Answer;
 use App\Models\Course;
 use App\Models\EventLog;
 use App\Models\Exam;
 use App\Models\ExamStudent;
+use App\Models\Student;
 use App\Models\StudentDocument;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -30,7 +32,7 @@ class ExamController extends Controller
     {
         Auth::check();
         return view("ControlPanel.exam.index")->with([
-            "courses" => self::getCourses()
+            "courses" => CourseController::getCourses()
         ]);
     }
 
@@ -43,7 +45,7 @@ class ExamController extends Controller
     {
         Auth::check();
         return view("ControlPanel.exam.create")->with([
-            "courses" => self::getCoursesOpen()
+            "courses" => CourseController::getCoursesOpen()
         ]);
     }
 
@@ -56,11 +58,12 @@ class ExamController extends Controller
      */
     public function store(Request $request)
     {
+        //Validation
         $this->validate($request, [
-            'course' => ['required', Rule::in(self::getCoursesOpen()->pluck("id")->toArray())],
+            'course' => ['required', Rule::in(CourseController::getCoursesOpen()->pluck("id")->toArray())],
             'type'   => ['required', 'integer', 'between:1,4', Rule::notIn(self::getExamTypes(Input::get("course")))],
             'title'  => ['required'],
-            'score'   => ['required', 'integer', ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
+            'score'  => ['required', 'integer', ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
             'date'   => ['required', 'date', 'after_or_equal:today']
         ], [
             'course.required'      => 'يرجى اختيار المادة',
@@ -82,62 +85,65 @@ class ExamController extends Controller
         $score = Input::get("score");
         if (Input::get("type") == ExamType::SECOND_MONTH)
         {
-            $firstMonth = Exam::where("course_id", Input::get("course"))
+            $firstMonthExam = Exam::where("course_id", Input::get("course"))
                 ->where("type", ExamType::FIRST_MONTH)
                 ->first();
 
-            if (!$firstMonth)
+            if (!$firstMonthExam)
                 return redirect("/control-panel/exams/create")->with([
                     "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لشهر الثاني الا بعد انشاء النموذج الامتحاني لشهر الاول"
                 ]);
 
-            if ($firstMonth->real_score == 25)
+            if ($firstMonthExam->real_score == 25)
                 return redirect("/control-panel/exams/create")->with([
                     "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لشهر الثاني لان درجة امتحان الشهر الاول 25 درجة"
                 ]);
 
-            $score = 25 - $firstMonth->real_score;
+            $score = 25 - $firstMonthExam->real_score;
         }
 
         if (Input::get("type") == ExamType::FINAL_SECOND_ROLE)
         {
-            $finalFirstRole = Exam::where("course_id", Input::get("course"))
+            $finalFirstRoleExam = Exam::where("course_id", Input::get("course"))
                 ->where("type", ExamType::FINAL_FIRST_ROLE)
                 ->first();
 
-            if (!$finalFirstRole)
+            if (!$finalFirstRoleExam)
                 return redirect("/control-panel/exams/create")->with([
                     "CreateExamMessage" => "لا يمكنك انشاء النموذج الامتحاني لنهائي الدور الثاني الا بعد انشاء النموذج الامتحاني لنهائي الدور الاول"
                 ]);
         }
 
-        //Add new exam
-        $exam = new Exam();
-        $exam->title = Input::get("title");
-        $exam->course_id = Input::get("course");
-        $exam->type = Input::get("type");
-        $exam->state = ExamState::CLOSE;
-        $exam->real_score = $score;
-        $exam->fake_score = 100; //Default Value 100
-        $exam->curve = 0;       //Default Value 0
-        $exam->date = Input::get("date");
-        $success = $exam->save();
+        //Transaction
+        $exception = DB::transaction(function () use ($score, &$exam) {
+            //Store exam
+            $exam = new Exam();
+            $exam->title = Input::get("title");
+            $exam->course_id = Input::get("course");
+            $exam->type = Input::get("type");
+            $exam->state = ExamState::CLOSE;
+            $exam->real_score = $score;
+            $exam->fake_score = 100; //Default Value 100
+            $exam->curve = 0;       //Default Value 0
+            $exam->date = Input::get("date");
+            $exam->save();
 
-        if (!$success)
+            //Store event log
+            $target = $exam->id;
+            $type = EventLogType::EXAM;
+            $event = "انشاء النموذج الامتحاني " . $exam->title;
+            EventLog::create($target, $type, $event);
+        });
+
+        if (is_null($exception))
+            return redirect("/control-panel/exams/create")->with([
+                "CreateExamMessage" => "تم انشاء النموذج الامتحاني " . $exam->title
+            ]);
+        else
             return redirect("/control-panel/exams/create")->with([
                 "CreateExamMessage" => "لم يتم انشاء النموذج الامتحاني",
                 "TypeMessage" => "Error"
             ]);
-
-        //Store event log
-        $target = $exam->id;
-        $type = EventLogType::EXAM;
-        $event = "انشاء النموذج الامتحاني " . $exam->title;
-        EventLog::create($target, $type, $event);
-
-        return redirect("/control-panel/exams/create")->with([
-            "CreateExamMessage" => "تم انشاء النموذج الامتحاني " . $exam->title
-        ]);
     }
 
     /**
@@ -152,7 +158,8 @@ class ExamController extends Controller
         Auth::check();
         self::watchExam($exam);
         return view("ControlPanel.exam.show")->with([
-            "exam" => $exam]);
+            "exam" => $exam
+        ]);
     }
 
     /**
@@ -186,12 +193,13 @@ class ExamController extends Controller
         //Update state for exam
         if (Input::get("state"))
         {
+            //change exam state
             switch (Input::get("state"))
             {
                 case "open":
                     if (!self::complete($exam))
                         return redirect("/control-panel/exams")->with([
-                            "UpdateExamStateMessage" => "لا يمكن فتح النموذج الامتحاني " . $exam->title . " لان رفع الاسئلة لم يكتمل",
+                            "UpdateExamStateMessage" => "لا يمكن فتح النموذج الامتحاني " . $exam->title . " لان النموذج الامتحاني غير جاهز",
                             "TypeMessage" => "Error"
                         ]);
                     $exam->state = ExamState::OPEN;
@@ -204,7 +212,7 @@ class ExamController extends Controller
                 case "reopen":
                     if (!self::complete($exam))
                         return redirect("/control-panel/exams")->with([
-                            "UpdateExamStateMessage" => "لا يمكن اعادة فتح النموذج الامتحاني " . $exam->title . " لان رفع الاسئلة لم يكتمل",
+                            "UpdateExamStateMessage" => "لا يمكن اعادة فتح النموذج الامتحاني " . $exam->title . " لان النموذج الامتحاني غير جاهز",
                             "TypeMessage" => "Error"
                         ]);
                     $exam->state = ExamState::OPEN;
@@ -215,50 +223,69 @@ class ExamController extends Controller
                     $event = "غلق النموذج الامتحاني " . $exam->title . " بسبب تلاعب المستخدم بالبيانات";
             }
 
-            $success = $exam->save();
+            //Transaction
+            $exception = DB::transaction(function () use ($exam, $event){
+                //Make questions for the exam are uncorrected
+                $exam->questions()
+                    ->update(array('correction' => QuestionCorrectionState::UNCORRECTED));
 
-            if (!$success)
+                //Update exam
+                $exam->save();
+
+                //Store event log
+                $target = $exam->id;
+                $type = EventLogType::EXAM;
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("/control-panel/exams")->with([
+                    "UpdateExamStateMessage" => "تم " . $event
+                ]);
+            else
                 return redirect("/control-panel/exams")->with([
                     "UpdateExamStateMessage" => "لم يتم تغيير حالة النموذج الامتحاني " . $exam->title,
                     "TypeMessage" => "Error"
                 ]);
-
-            //Store event log
-            $target = $exam->id;
-            $type = EventLogType::EXAM;
-            EventLog::create($target, $type, $event);
-
-            return redirect("/control-panel/exams")->with([
-                "UpdateExamStateMessage" => "تم " . $event
-            ]);
         }
 
         //Update curve for exam
         if (Input::get("curve"))
         {
-            $exam->curve = (Input::get("curve") > 10) ? 10:Input::get("curve");
-            $success = $exam->save();
+            if (($exam->type == ExamType::FIRST_MONTH) && ($exam->type == ExamType::SECOND_MONTH))
+                return redirect("/control-panel/exams/$exam->id")->with([
+                    "UpdateExamCurveMessage" => "لا يمكن اضافة كيرف للامتحان الحالي",
+                    "TypeMessage" => "Error"
+                ]);
 
-            if (!$success)
+            //Transaction
+            $exception = DB::transaction(function () use ($exam){
+                //Update exam
+                $exam->curve = (Input::get("curve") > 10) ? 10:Input::get("curve");
+                $exam->save();
+
+                //Store event log
+                $target = $exam->id;
+                $type = EventLogType::EXAM;
+                $event = "اضافة كيرف للنموذج الامتحاني " . $exam->title;
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("/control-panel/exams/$exam->id")->with([
+                    "UpdateExamCurveMessage" => "تم اضافة الكيرف للامتحان الحالي"
+                ]);
+            else
                 return redirect("/control-panel/exams/$exam->id")->with([
                     "UpdateExamCurveMessage" => "لم يتم اضافة الكيرف للامتحان الحالي",
                     "TypeMessage"       => "Error"
                 ]);
-
-            //Store event log
-            $target = $exam->id;
-            $type = EventLogType::EXAM;
-            $event = "اضافة كيرف للنموذج الامتحاني " . $exam->title;
-            EventLog::create($target, $type, $event);
-
-            return redirect("/control-panel/exams/$exam->id")->with([
-                "UpdateExamCurveMessage" => "تم اضافة الكيرف للامتحان الحالي"
-            ]);
         }
 
         //General update for exam
         if (Input::get("general"))
         {
+            //Validation
             $this->validate($request, [
                 'title' => ['required'],
                 'score' => ['required', 'integer', (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
@@ -272,6 +299,7 @@ class ExamController extends Controller
                 'date.date'      => 'تاريخ الامتحان غير مقبولة.',
             ]);
 
+            //Generate score for exam
             $score = Input::get("score");
             if ($exam->type == ExamType::FIRST_MONTH)
             {
@@ -306,27 +334,32 @@ class ExamController extends Controller
                 $firstMonthExam->save();
             }
 
-            $exam->title = Input::get("title");
-            $exam->real_score = $score;
-            $exam->date = Input::get("date");
-            $success = $exam->save();
+            //Transaction
+            $exception = DB::transaction(function () use ($exam, $score){
+                //Update exam
+                $exam->title = Input::get("title");
+                $exam->real_score = $score;
+                $exam->date = Input::get("date");
+                $exam->save();
 
-            if (!$success)
+                //Store event log
+                $target = $exam->id;
+                $type = EventLogType::EXAM;
+                $event = "تعديل النموذج الامتحاني " . $exam->title;
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("/control-panel/exams")->with([
+                    "UpdateExamMessage" => "تم تعديل النموذج الامتحاني " . $exam->title
+                ]);
+            else
                 return redirect("/control-panel/exams/$exam->id/edit")->with([
                     "UpdateExamMessage" => "لم يتم نعديل النموذج الامتحاني " . $exam->title
                 ]);
-
-            //Store event log
-            $target = $exam->id;
-            $type = EventLogType::EXAM;
-            $event = "تعديل النموذج الامتحاني " . $exam->title;
-            EventLog::create($target, $type, $event);
-
-            return redirect("/control-panel/exams")->with([
-                "UpdateExamMessage" => "تم تعديل النموذج الامتحاني " . $exam->title
-            ]);
         }
 
+        //Otherwise
         return abort(404);
     }
 
@@ -346,24 +379,26 @@ class ExamController extends Controller
                 "TypeMessage" => "Error"
             ]);
 
+        //Transaction
         $exception = DB::transaction(function () use ($exam) {
 
+            //Delete questions, branches and answers
             foreach ($exam->questions as $question)
             {
-                //Delete answers for branch
+                //Delete answers
                 foreach ($question->branches as $branch)
                     $branch->answers()->delete();
 
-                //Delete branches for question
+                //Delete branches
                 $question->branches()->delete();
 
                 //Delete question
                 $question->delete();
             }
 
-            //Make score is zero for current exam
-            foreach ($exam->studentEnrolled as $studentEnroll)
-                StudentDocument::where('student_id', $studentEnroll->student_id)
+            //Delete the exam from the student document
+            foreach ($exam->studentsEnrolled as $studentEnrolled)
+                StudentDocument::where('student_id', $studentEnrolled->student_id)
                     ->where("course_id", $exam->course_id)
                     ->update(
                         $exam->type == ExamType::FIRST_MONTH?["first_month_score" => 0]:
@@ -371,8 +406,8 @@ class ExamController extends Controller
                                 $exam->type == ExamType::FINAL_FIRST_ROLE?["final_first_score" => 0]:["final_second_score" => 0]
                     );
 
-            //Delete every student enrolled in current exam
-            $exam->studentEnrolled()->delete();
+            //Delete students enrolled for the exam
+            $exam->studentsEnrolled()->delete();
 
             //Delete exam
             $exam->delete();
@@ -409,65 +444,34 @@ class ExamController extends Controller
     }
 
     /**
-     * Check can watch the specified exam form storage
+     * Can watch the specified exam form storage
      *
      * @param $exam
      */
     public static function watchExam($exam)
     {
-        if(!in_array($exam->course_id, self::getCoursesOpen()->pluck("id")->toArray()))
+        if(!in_array($exam->course_id, CourseController::getCoursesOpen()->pluck("id")->toArray()))
             abort(404);
     }
 
     /**
-     * Get all Courses form storage
-     *
-     * @return Course[]|\Illuminate\Database\Eloquent\Collection
-     */
-    private static function getCourses()
-    {
-        return (session("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)?
-            Course::all():
-            Course::where("lecturer_id", session("EXAM_SYSTEM_ACCOUNT_ID"))
-                ->get()
-            ;
-    }
-
-    /**
-     * Get all Courses open form storage
-     *
-     * @return mixed
-     */
-    private static function getCoursesOpen()
-    {
-        return (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)?
-            Course::where("state", CourseState::OPEN)
-                ->get():
-            Course::where("state", CourseState::OPEN)
-                ->where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
-                ->get()
-            ;
-    }
-
-    /**
-     * Check questions and branches is created
+     * Check the exam questions are created
      *
      * @param $exam
      * @return bool
      */
     private static function complete($exam)
     {
-        //check question
+        //Check score
         $score = $exam->questions()->sum("score");
-
         if ($exam->fake_score != $score)
             return false;
 
-        //check question
+        //Check questions
         foreach ($exam->questions as $question)
             if ($question->no_of_branch != $question->branches()->count())
                 return false;
 
-            return true;
+        return true;
     }
 }

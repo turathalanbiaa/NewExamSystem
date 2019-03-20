@@ -7,9 +7,11 @@ use App\Enums\AccountType;
 use App\Enums\EventLogType;
 use App\Models\EventLog;
 use App\Models\Lecturer;
+use function GuzzleHttp\Promise\exception_for;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
 
@@ -50,6 +52,8 @@ class LecturerController extends Controller
     public function store(Request $request)
     {
         Auth::check();
+
+        //Validation
         $this->validate($request, [
             'name'                  => 'required',
             'username'              => 'required|unique:lecturer,username',
@@ -59,7 +63,7 @@ class LecturerController extends Controller
         ], [
             'name.required'                       => 'الاسم الحقيقي فارغ.',
             'username.required'                   => 'اسم المستخدم فارغ.',
-            'username.unique'                     => 'يوجد مستخدم اخر بنفس الاسم.',
+            'username.unique'                     => 'اسم المستخدم هذا مستخدم بالفعل، يرجى استخدام اسم آخر.',
             'password.required'                   => 'كلمة المرور فارغ.',
             'password.min'                        => 'كلمة المرور يجب ان لاتقل عن 8 حروف.',
             'password_confirmation.required_with' => 'يرجى اعادة كتابة كلمة المرور.',
@@ -69,32 +73,34 @@ class LecturerController extends Controller
             'state.between'                       => 'يجب اختيار حالة الحساب اما مفتوح او مغلق.'
         ]);
 
-        $lecturer = new Lecturer();
-        $lecturer->name = Input::get("name");
-        $lecturer->username = Input::get("username");
-        $lecturer->password = md5(Input::get("password"));
-        $lecturer->state = Input::get("state");
-        $lecturer->session = null;
-        $lecturer->date = date("Y-m-d");
-        $success = $lecturer->save();
+        //Transaction
+        $exception = DB::transaction(function () use (&$lecturer) {
+            //Store lecturer
+            $lecturer = new Lecturer();
+            $lecturer->name = Input::get("name");
+            $lecturer->username = Input::get("username");
+            $lecturer->password = md5(Input::get("password"));
+            $lecturer->state = Input::get("state");
+            $lecturer->remember_token = null;
+            $lecturer->date = date("Y-m-d");
+            $lecturer->save();
 
-        if (!$success)
+            //Store event log
+            $target = $lecturer->id;
+            $type = EventLogType::LECTURER;
+            $event = "اضافة الاستاذ " . $lecturer->name;
+            EventLog::create($target, $type, $event);
+        });
+
+        if (is_null($exception))
             return redirect("/control-panel/lecturers/create")->with([
-                "CreateLecturerMessage" => "لم تتم عملية الاضافة الاستاذ بنجاح",
+                "CreateLecturerMessage" => "تمت عملية اضافة الاستاذ " . $lecturer->name . " بنجاح"
+            ]);
+        else
+            return redirect("/control-panel/lecturers/create")->with([
+                "CreateLecturerMessage" => "لم تتم عملية اضافة الاستاذ بنجاح",
                 "TypeMessage" => "Error"
             ]);
-
-        /**
-         * Keep event log
-         */
-        $target = $lecturer->id;
-        $type = EventLogType::LECTURER;
-        $event = "اضافة حساب استاذ - " . $lecturer->name;
-        EventLog::create($target, $type, $event);
-
-        return redirect("/control-panel/lecturers/create")->with([
-            "CreateLecturerMessage" => "تمت عملية الاضافة الاستاذ بنجاح - " . $lecturer->name
-        ]);
     }
 
     /**
@@ -141,11 +147,10 @@ class LecturerController extends Controller
     public function update(Request $request, Lecturer $lecturer)
     {
         Auth::check();
-        /**
-         * For change password
-         */
+        //For change password
         if (Input::get("type") == "change-password")
         {
+            //Validation
             $this->validate($request, [
                 'password'              => 'required|min:8',
                 'password_confirmation' => 'required_with:password|same:password'
@@ -156,31 +161,34 @@ class LecturerController extends Controller
                 'password_confirmation.same'          => 'كلمتا المرور ليس متطابقتان.'
             ]);
 
-            $lecturer->password = md5(Input::get("password"));
-            $lecturer->session = null;
-            $success = $lecturer->save();
+            //Transaction
+            $exception = DB::transaction(function () use ($lecturer){
+                //Update lecturer and remove session
+                $lecturer->password = md5(Input::get("password"));
+                $lecturer->remember_token = null;
+                $lecturer->save();
 
-            if (!$success)
-                return redirect("/control-panel/lecturers/$lecturer->id/edit?type=change-password")->with([
-                    "UpdateLecturerMessage" => "لم يتم تغيير كلمة المرور الاستاذ"
+                //Store event log
+                $target = $lecturer->id;
+                $type = EventLogType::LECTURER;
+                $event = "تغيير كلمة مرور الاستاذ " . $lecturer->name;
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("/control-panel/lecturers")->with([
+                    "UpdateLecturerMessage" => "تم تغيير كلمة مرور الاستاذ " . $lecturer->name
                 ]);
-
-            /**
-             * Keep event log
-             */
-            $target = $lecturer->id;
-            $type = EventLogType::LECTURER;
-            $event = "تغيير كلمة المرور الاستاذ - " . $lecturer->name;
-            EventLog::create($target, $type, $event);
-
-            return redirect("/control-panel/lecturers")->with([
-                "UpdateLecturerMessage" => "تم تغيير كلمة المرور الاستاذ - " . $lecturer->name
-            ]);
+            else
+                return redirect("/control-panel/lecturers/$lecturer->id/edit?type=change-password")->with([
+                    "UpdateLecturerMessage" => "لم يتم تغيير كلمة مرور الاستاذ"
+                ]);
         }
-        /**
-         * For change info account
-         */
-        else {
+
+        //For change info
+        if (Input::get("type") == "change-info")
+        {
+            //Validation
             $this->validate($request, [
                 'name'     => 'required',
                 'username' => ["required", Rule::unique('lecturer')->ignore($lecturer->id)],
@@ -188,34 +196,39 @@ class LecturerController extends Controller
             ], [
                 'name.required'     => 'الاسم الحقيقي فارغ.',
                 'username.required' => 'اسم المستخدم فارغ.',
-                'username.unique'   => 'يوجد مستخدم اخر بنفس الاسم.',
+                'username.unique'   => 'اسم المستخدم هذا مستخدم بالفعل، يرجى استخدام اسم آخر.',
                 'state.required'    => 'يجب اختيار حالة الحساب.',
                 'state.integer'     => 'يجب اختيار حالة الحساب اما 1 او 2.',
                 'state.between'     => 'يجب اختيار حالة الحساب اما مفتوح او مغلق.'
             ]);
 
-            $lecturer->name = Input::get("name");
-            $lecturer->username = Input::get("username");
-            $lecturer->state = Input::get("state");
-            $success = $lecturer->save();
+            //Transaction
+            $exception = DB::transaction(function () use ($lecturer){
+                //Update lecturer
+                $lecturer->name = Input::get("name");
+                $lecturer->username = Input::get("username");
+                $lecturer->state = Input::get("state");
+                $lecturer->save();
 
-            if (!$success)
-                return redirect("/control-panel/lecturers/$lecturer->id/edit?type=change-info")->with([
-                    "UpdateLecturerMessage" => "لم يتم تحديث المعلومات الاستاذ"
+                //Store event log
+                $target = $lecturer->id;
+                $type = EventLogType::LECTURER;
+                $event = "تعديل حساب الاستاذ " . $lecturer->name;
+                EventLog::create($target, $type, $event);
+            });
+
+            if (is_null($exception))
+                return redirect("/control-panel/lecturers")->with([
+                    "UpdateLecturerMessage" => "تم تحديث معلومات الاستاذ " . $lecturer->name
                 ]);
-
-            /**
-             * Keep event log
-             */
-            $target = $lecturer->id;
-            $type = EventLogType::LECTURER;
-            $event = "تعديل الحساب الاستاذ - " . $lecturer->name;
-            EventLog::create($target, $type, $event);
-
-            return redirect("/control-panel/lecturers")->with([
-                "UpdateLecturerMessage" => "تم تحديث المعلومات الاستاذ - " . $lecturer->name
-            ]);
+            else
+                return redirect("/control-panel/lecturers/$lecturer->id/edit?type=change-info")->with([
+                    "UpdateLecturerMessage" => "لم يتم تحديث معلومات الاستاذ"
+                ]);
         }
+
+        //Otherwise
+        return abort(404);
     }
 
     /**
@@ -227,25 +240,35 @@ class LecturerController extends Controller
     public function destroy(Lecturer $lecturer)
     {
         Auth::check();
-        $lecturer->state = AccountState::CLOSE;
-        $success = $lecturer->save();
 
-        if (!$success)
+        //The lecturer is already closed
+        if ($lecturer->state == AccountState::CLOSE)
             return redirect("/control-panel/lecturers")->with([
-                "ArchiveLecturerMessage" => "لم يتم غلق حساب الاستاذ - " . $lecturer->name,
+                "ArchiveLecturerMessage" => "تم غلق حساب الاستاذ " . $lecturer->name . " مسبقاً",
                 "TypeMessage" => "Error"
             ]);
 
-        /**
-         * Keep event log
-         */
-        $target = $lecturer->id;
-        $type = EventLogType::LECTURER;
-        $event = "اغلاق الحساب الاستاذ - " . $lecturer->name;
-        EventLog::create($target, $type, $event);
+        //Transaction
+        $exception = DB::transaction(function () use ($lecturer){
+            //Archive lecturer
+            $lecturer->state = AccountState::CLOSE;
+            $lecturer->save();
 
-        return redirect("/control-panel/lecturers")->with([
-            "ArchiveLecturerMessage" => "تم غلق حساب الاستاذ - " . $lecturer->name
-        ]);
+            //Store event log
+            $target = $lecturer->id;
+            $type = EventLogType::LECTURER;
+            $event = "اغلاق حساب الاستاذ - " . $lecturer->name;
+            EventLog::create($target, $type, $event);
+        });
+
+        if (is_null($exception))
+            return redirect("/control-panel/lecturers")->with([
+                "ArchiveLecturerMessage" => "تم غلق حساب الاستاذ " . $lecturer->name
+            ]);
+        else
+            return redirect("/control-panel/lecturers")->with([
+                "ArchiveLecturerMessage" => "لم يتم غلق حساب الاستاذ " . $lecturer->name,
+                "TypeMessage" => "Error"
+            ]);
     }
 }

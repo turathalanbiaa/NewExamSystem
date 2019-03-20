@@ -23,7 +23,7 @@ class Auth extends Controller
      */
     private static function isLoggedIn()
     {
-        if (!session()->has("EXAM_SYSTEM_ACCOUNT_SESSION"))
+        if (!session()->has("EXAM_SYSTEM_ACCOUNT_TOKEN"))
             abort(302, '', ['Location' => "/control-panel/login"]);
     }
 
@@ -51,7 +51,7 @@ class Auth extends Controller
 
         if($accountType == AccountType::LECTURER)
         {
-            if (request()->is("control-panel/admins*") || request()->is("control-panel/lecturer*") || request()->is("control-panel/courses*"))
+            if (request()->is("control-panel/admins*") || request()->is("control-panel/lecturer*") || request()->is("control-panel/courses/*"))
                 abort(404);
         }
     }

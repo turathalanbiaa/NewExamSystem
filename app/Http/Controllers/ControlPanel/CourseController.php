@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ControlPanel;
 
 use App\Enums\AccountState;
+use App\Enums\AccountType;
 use App\Enums\CourseState;
 use App\Enums\EventLogType;
 use App\Enums\ExamState;
@@ -27,7 +28,11 @@ class CourseController extends Controller
     public function index()
     {
         Auth::check();
-        $courses = Course::all();
+        if (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)
+            $courses = Course::all();
+        else
+            $courses = Course::where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))->get();
+
         return view("ControlPanel.course.index")->with([
             "courses" => $courses
         ]);
@@ -56,6 +61,8 @@ class CourseController extends Controller
     public function store(Request $request)
     {
         Auth::check();
+
+        //Validation
         $this->validate($request, [
             'name'     => 'required',
             'level'    => 'required|integer|between:1,7',
@@ -75,39 +82,41 @@ class CourseController extends Controller
             'detail.required'   => 'لايوجد تفاصيل حول المادة.'
         ]);
 
-        $course = new Course();
-        $course->name = Input::get("name");
-        $course->level = Input::get("level");
-        $course->lecturer_id = Input::get("lecturer");
-        $course->state = Input::get("state");
-        $course->detail = Input::get("detail");
-        $course->date = date("Y-m-d");
-        $success = $course->save();
+        //Transaction
+        $exception = DB::transaction(function () use (&$course){
+            //Store course
+            $course = new Course();
+            $course->name = Input::get("name");
+            $course->level = Input::get("level");
+            $course->lecturer_id = Input::get("lecturer");
+            $course->state = Input::get("state");
+            $course->detail = Input::get("detail");
+            $course->date = date("Y-m-d");
+            $course->save();
 
-        if (!$success)
+            //Store event log
+            $target = $course->id;
+            $type = EventLogType::COURSE;
+            $event = "اضافة المادة " . $course->name;
+            EventLog::create($target, $type, $event);
+        });
+
+        if (is_null($exception))
+            return redirect("/control-panel/courses/create")->with([
+                "CreateCourseMessage" => "تمت عملية اضافة المادة " . $course->name . " بنجاح"
+            ]);
+        else
             return redirect("/control-panel/courses/create")->with([
                 "CreateCourseMessage" => "لم تتم عملية اضافة المادة بنجاح",
                 "TypeMessage" => "Error"
             ]);
-
-        /**
-         * Keep event log
-         */
-        $target = $course->id;
-        $type = EventLogType::COURSE;
-        $event = "اضافة مادة - " . $course->name;
-        EventLog::create($target, $type, $event);
-
-        return redirect("/control-panel/courses/create")->with([
-            "CreateCourseMessage" => "تمت عملية اضافة المادة بنجاح - " . $course->name
-        ]);
     }
 
     /**
      * Display the specified resource.
      *
      * @param  \App\Models\Course  $course
-     * @return \Illuminate\Http\Response
+     * @return string
      */
     public function show(Course $course)
     {
@@ -141,6 +150,8 @@ class CourseController extends Controller
     public function update(Request $request, Course $course)
     {
         Auth::check();
+
+        //Validation
         $this->validate($request, [
             'name'     => 'required',
             'level'    => 'required|integer|between:1,7',
@@ -160,29 +171,31 @@ class CourseController extends Controller
             'detail.required'   => 'لايوجد تفاصيل حول المادة.'
         ]);
 
-        $course->name = Input::get("name");
-        $course->level = Input::get("level");
-        $course->lecturer_id = Input::get("lecturer");
-        $course->state = Input::get("state");
-        $course->detail = Input::get("detail");
-        $success = $course->save();
+        //Transaction
+        $exception = DB::transaction(function () use ($course){
+            //Update course
+            $course->name = Input::get("name");
+            $course->level = Input::get("level");
+            $course->lecturer_id = Input::get("lecturer");
+            $course->state = Input::get("state");
+            $course->detail = Input::get("detail");
+            $success = $course->save();
 
-        if (!$success)
-            return redirect("/control-panel/courses/$course->id/edit")->with([
-                "UpdateCourseMessage" => "لم يتم تعديل المادة - " . $course->name
+            //Store event log
+            $target = $course->id;
+            $type = EventLogType::COURSE;
+            $event = "تعديل المادة " . $course->name;
+            EventLog::create($target, $type, $event);
+        });
+
+        if (is_null($exception))
+            return redirect("/control-panel/courses")->with([
+                "UpdateCourseMessage" => "تم تعديل المادة " . $course->name
             ]);
-
-        /**
-         * Keep event log
-         */
-        $target = $course->id;
-        $type = EventLogType::COURSE;
-        $event = "تعديل المادة - " . $course->name;
-        EventLog::create($target, $type, $event);
-
-        return redirect("/control-panel/courses")->with([
-            "UpdateCourseMessage" => "تم تعديل المادة - " . $course->name
-        ]);
+        else
+            return redirect("/control-panel/courses/$course->id/edit")->with([
+                "UpdateCourseMessage" => "لم يتم تعديل المادة " . $course->name
+            ]);
     }
 
     /**
@@ -194,30 +207,40 @@ class CourseController extends Controller
     public function destroy(Course $course)
     {
         Auth::check();
-        $course->state = CourseState::CLOSE;
-        $success = $course->save();
 
-        if (!$success)
+        //The course is already closed
+        if ($course->state == CourseState::CLOSE)
             return redirect("/control-panel/courses")->with([
-                "ArchiveCourseMessage" => "لم يتم غلق المادة  - " . $course->name,
+                "ArchiveCourseMessage" => "تم غلق المادة " . $course->name . " مسبقاً",
                 "TypeMessage" => "Error"
             ]);
 
-        /**
-         * Keep event log
-         */
-        $target = $course->id;
-        $type = EventLogType::COURSE;
-        $event = "اغلاق المادة - " . $course->name;
-        EventLog::create($target, $type, $event);
+        //Transaction
+        $exception = DB::transaction(function () use ($course){
+            //Archive course
+            $course->state = CourseState::CLOSE;
+            $course->save();
 
-        return redirect("/control-panel/courses")->with([
-            "ArchiveCourseMessage" => "تم غلق المادة - " . $course->name
-        ]);
+            //Store event log
+            $target = $course->id;
+            $type = EventLogType::COURSE;
+            $event = "اغلاق المادة " . $course->name;
+            EventLog::create($target, $type, $event);
+        });
+
+        if (is_null($exception))
+            return redirect("/control-panel/courses")->with([
+                "ArchiveCourseMessage" => "تم غلق المادة " . $course->name
+            ]);
+        else
+            return redirect("/control-panel/courses")->with([
+                "ArchiveCourseMessage" => "لم يتم غلق المادة " . $course->name,
+                "TypeMessage" => "Error"
+            ]);
     }
 
     /**
-     * Get the specified lecturers from storage
+     * Get lecturers from storage
      *
      * @return mixed
      */
@@ -225,4 +248,54 @@ class CourseController extends Controller
     {
         return Lecturer::all();
     }
+
+    /**
+     * Get Courses form storage
+     *
+     * @return Course[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function getCourses()
+    {
+        return (session("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)?
+            Course::all():
+            Course::where("lecturer_id", session("EXAM_SYSTEM_ACCOUNT_ID"))
+                ->get()
+            ;
+    }
+
+    /**
+     * Get Courses open form storage
+     *
+     * @return mixed
+     */
+    public static function getCoursesOpen()
+    {
+        return (session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)?
+            Course::where("state", CourseState::OPEN)
+                ->get():
+            Course::where("state", CourseState::OPEN)
+                ->where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
+                ->get()
+            ;
+    }
+
+    /**
+     * Can watch the specified course form storage
+     *
+     * @param $course
+     */
+    public static function watchCourse($course)
+    {
+        if(session()->get("EXAM_SYSTEM_ACCOUNT_TYPE") == AccountType::MANAGER)
+            $courses = Course::where("state", CourseState::OPEN)
+                ->get();
+        else
+            $courses = Course::where("state", CourseState::OPEN)
+                ->where("lecturer_id", session()->get("EXAM_SYSTEM_ACCOUNT_ID"))
+                ->get();
+
+        if(!in_array($course->id, $courses->pluck("id")->toArray()))
+            abort(404);
+    }
+
 }

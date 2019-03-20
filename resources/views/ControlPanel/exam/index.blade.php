@@ -39,6 +39,17 @@
             </div>
         @endif
 
+        {{-- Session Sum Message --}}
+        @if (session('SumMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert {{(session('TypeMessage')=="Error")?"alert-danger":"alert-success"}} text-center">
+                        {{session('SumMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Burron Create--}}
         <div class="row">
             <div class="col-12 mb-3">
@@ -80,26 +91,25 @@
                                         {{-- Card Content --}}
                                         <div class="card-body">
                                             <div class="list-group list-group-flush">
-                                                <a href="/control-panel/exams/{{$exam->id}}" class="list-group-item list-group-item-action">عرض النموذج الامتحاني</a>
+                                                <a href="/control-panel/exams/{{$exam->id}}" class="list-group-item list-group-item-action">عرض وتصحيح النموذج الامتحاني</a>
                                                 <a href="/control-panel/exams/{{$exam->id}}/edit" class="list-group-item list-group-item-action">تعديل النموذج الامتحاني</a>
-
                                                 @if($exam->state == \App\Enums\ExamState::CLOSE)
-                                                    <div class="list-group-item">
-                                                        <span>الامتحان مغلق حاليا</span>
+                                                    <div class="list-group-item d-flex justify-content-between">
+                                                        <div class="d-flex align-items-center">الامتحان مغلق حاليا</div>
                                                         <button type="button" class="btn btn-success btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="open" data-toggle="modal" data-target="#modelOpenExamState">فتح الامتحان</button>
                                                     </div>
                                                 @elseif($exam->state == \App\Enums\ExamState::OPEN)
-                                                    <div class="list-group-item">
-                                                        <span>الامتحان مفتوح حاليا</span>
+                                                    <div class="list-group-item d-flex justify-content-between">
+                                                        <div class="d-flex align-items-center">الامتحان مفتوح حاليا</div>
                                                         <button type="button" class="btn btn-danger btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="end" data-toggle="modal" data-target="#modelEndExamState">انهاء الامتحان</button>
                                                     </div>
                                                 @else
-                                                    <div class="list-group-item">
-                                                        <span>الامتحان منتهي حاليا</span>
+                                                    <div class="list-group-item d-flex justify-content-between">
+                                                        <div class="d-flex align-items-center">الامتحان منتهي حاليا</div>
                                                         <button type="button" class="btn btn-warning btn-sm m-0 mr-2" data-action="fillExamStateForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-exam-state="reopen" data-toggle="modal" data-target="#modelReopenExamState">اعادة فتح الامتحان</button>
                                                     </div>
                                                 @endif
-
+                                                <a href="/control-panel/sum/{{$exam->id}}" class="list-group-item list-group-item-action">جمع درجة النموذج الامتحاني</a>
                                                 <a href="javascript:void(0)" class="list-group-item list-group-item-action" data-action="fillDeleteExamForm" data-exam-id="{{$exam->id}}" data-exam-title="{{$exam->title}}" data-toggle="modal" data-target="#modelDeleteExam">حذف النموذج الامتحاني</a>
                                             </div>
                                         </div>

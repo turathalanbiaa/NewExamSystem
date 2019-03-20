@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
+use phpDocumentor\Reflection\Types\Integer;
 
 class LoginController extends Controller
 {
@@ -21,44 +22,55 @@ class LoginController extends Controller
      */
     public function login()
     {
-        if (session()->has("EXAM_SYSTEM_ACCOUNT_SESSION"))
+        //Redirect to main page
+        if (session()->has("EXAM_SYSTEM_ACCOUNT_TOKEN"))
             return redirect("/control-panel");
 
-        if ((Cookie::has("EXAM_SYSTEM_ACCOUNT_SESSION")) && (Cookie::has("EXAM_SYSTEM_ACCOUNT_TYPE")))
+        //Auto login
+        if ((Cookie::has("EXAM_SYSTEM_ACCOUNT_TOKEN")) && (Cookie::has("EXAM_SYSTEM_ACCOUNT_TYPE")))
         {
-            $accountType = Cookie::get("EXAM_SYSTEM_ACCOUNT_TYPE");
+            //Find account
+            $accountType = (int) Cookie::get("EXAM_SYSTEM_ACCOUNT_TYPE");
             switch ($accountType)
             {
                 case (AccountType::MANAGER):
-                    $account = Admin::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                    $account = Admin::where("remember_token", Cookie::get("EXAM_SYSTEM_ACCOUNT_TOKEN"))
                         ->first();
                     break;
                 case (AccountType::LECTURER):
-                    $account = Lecturer::where("session", Cookie::get("EXAM_SYSTEM_ACCOUNT_SESSION"))
+                    $account = Lecturer::where("remember_token", Cookie::get("EXAM_SYSTEM_ACCOUNT_TOKEN"))
                         ->first();
                     break;
                 default: $account = false;
             }
 
-            if ($account)
+            //Account is not found
+            if (!$account)
             {
-                session()->put('EXAM_SYSTEM_ACCOUNT_ID', $account->id);
-                session()->put('EXAM_SYSTEM_ACCOUNT_NAME' , $account->name);
-                session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME' , $account->username);
-                session()->put('EXAM_SYSTEM_ACCOUNT_STATE' , $account->state);
-                session()->put('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session);
-                session()->put('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType);
-                session()->save();
+                //Remove cookies
+                Cookie::queue(cookie()->forget("EXAM_SYSTEM_ACCOUNT_TOKEN"));
+                Cookie::queue(cookie()->forget("EXAM_SYSTEM_ACCOUNT_TYPE"));
 
-                return redirect("/control-panel");
+                return view("ControlPanel.login");
             }
+
+            //Make sessions
+            session()->put('EXAM_SYSTEM_ACCOUNT_ID', $account->id);
+            session()->put('EXAM_SYSTEM_ACCOUNT_NAME', $account->name);
+            session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME', $account->username);
+            session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $account->state);
+            session()->put('EXAM_SYSTEM_ACCOUNT_TOKEN', $account->remember_token);
+            session()->put('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType);
+            session()->save();
+
+            return redirect("/control-panel");
         }
 
         return view("ControlPanel.login");
     }
 
     /**
-     * Login validate
+     * Login validation
      *
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -66,6 +78,7 @@ class LoginController extends Controller
      */
     public function loginValidate(Request $request)
     {
+        //Validation
         $this->validate($request, [
             "username"    => "required",
             "password"    => "required",
@@ -78,10 +91,12 @@ class LoginController extends Controller
             'accountType.between'  => 'يجب اختيار نوع الحساب اما مدير او استاذ.'
         ]);
 
+        //get inputs values
         $username = Input::get("username");
         $password = md5(Input::get("password"));
-        $accountType = Input::get("accountType");
+        $accountType = (int) Input::get("accountType");
 
+        //Fina account
         switch ($accountType)
         {
             case (AccountType::MANAGER):
@@ -99,27 +114,30 @@ class LoginController extends Controller
             default: $account = false;
         }
 
+        //Redirect to login page with error message if account is not found
         if (!$account)
             return redirect("/control-panel/login")
                 ->with('ErrorLoginMessage', "فشل تسجيل الدخول !!! أعد المحاولة مرة أخرى");
 
-        /**
-         * Store login from multi devises.
-         */
-        if (is_null($account->session))
-            $account->session = md5(uniqid());
+        //Store login from multi devises
+        if (is_null($account->remember_token))
+            $account->remember_token = md5(uniqid());
         $account->save();
 
+        //Make sessions
         session()->put('EXAM_SYSTEM_ACCOUNT_ID', $account->id);
         session()->put('EXAM_SYSTEM_ACCOUNT_NAME', $account->name);
         session()->put('EXAM_SYSTEM_ACCOUNT_USERNAME', $account->username);
         session()->put('EXAM_SYSTEM_ACCOUNT_STATE', $account->state);
-        session()->put('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session);
+        session()->put('EXAM_SYSTEM_ACCOUNT_TOKEN', $account->remember_token);
         session()->put('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType);
         session()->save();
 
-        return redirect("/control-panel")
-            ->withCookie(cookie()->forever('EXAM_SYSTEM_ACCOUNT_SESSION', $account->session))
-            ->withCookie(cookie()->forever('EXAM_SYSTEM_ACCOUNT_TYPE', $accountType));
+        //Make cookies
+        Cookie::queue(cookie()->forever("EXAM_SYSTEM_ACCOUNT_TOKEN",$account->remember_token));
+        Cookie::queue(cookie()->forever("EXAM_SYSTEM_ACCOUNT_TYPE",$accountType));
+
+        //Redirect to main page
+        return redirect("/control-panel");
     }
 }

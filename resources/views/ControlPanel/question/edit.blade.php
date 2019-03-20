@@ -138,7 +138,12 @@
 
                     {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-primary">
-                        @if(($question->exam->state == \App\Enums\ExamState::CLOSE) || ($question->exam->state == \App\Enums\ExamState::END))
+                        @if($question->exam->state == \App\Enums\ExamState::OPEN)
+                            <div class="text-center py-5">
+                                <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
+                                <h4>لا يمكنك تعديل السؤال الحالي لان الامتحان مفتوح حالياً</h4>
+                            </div>
+                        @else
                             <form method="post" action="/control-panel/questions/{{$question->id}}">
                                 @csrf
                                 @method("PUT")
@@ -158,20 +163,26 @@
                                     <input type="number" name="noOfBranch" id="noOfBranch" class="form-control" value="{{$question->no_of_branch}}" {{($question->exam->state == \App\Enums\ExamState::END)?"readonly":""}}>
                                 </div>
 
-                                <div class="mb-5">
+                                <div class="mb-4">
                                     <label for="noOfBranchRequired">عدد النقاط المطلوبة</label>
                                     <input type="number" name="noOfBranchRequired" id="noOfBranchRequired" class="form-control" value="{{$question->no_of_branch_req}}">
                                 </div>
+
+                                @if($question->exam->state == \App\Enums\ExamState::END)
+                                    <div class="mb-5">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" name="reCorrectQuestion" id="reCorrectQuestion" class="custom-control-input" value="true">
+                                            <label class="custom-control-label" for="reCorrectQuestion">اذا كنت تريد اعادة تصحيح السؤال فعل هذا الاختيار.</label>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="pb-4"></div>
+                                @endif
 
                                 <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">
                                     <span>حفظ المعلومات</span>
                                 </button>
                             </form>
-                        @else
-                            <div class="text-center py-5">
-                                <i class="fa fa-lightbulb fa-4x mb-3 text-warning animated shake"></i>
-                                <h4>لا يمكنك تعديل السؤال الحالي لان الامتحان التابع له هذا السؤال مفتوح</h4>
-                            </div>
                         @endif
                     </div>
                 </div>

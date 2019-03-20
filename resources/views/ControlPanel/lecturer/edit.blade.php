@@ -2,15 +2,53 @@
 
 @section("title")
     @if($_GET["type"] == "change-password")
-        <title>{{"تغيير كلمة المرور-".$lecturer->name}}</title>
+        <title>تغيير كلمة المرور</title>
     @else
-        <title>{{"تعديل الحساب-".$lecturer->name}}</title>
+        <title>تحرير الحساب</title>
     @endif
 @endsection
 
 @section("content")
     <div class="container">
-        <div class="row justify-content-center">
+        {{-- Session Update Lecturer Message --}}
+        @if (session('UpdateLecturerMessage'))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        {{session('UpdateLecturerMessage')}}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="row">
+            {{-- Heading --}}
+            <div class="col-12 mb-3">
+                <div class="view shadow mdb-color p-3">
+                    <h5 class="text-center text-white m-0">
+                        @if($_GET["type"] == "change-password")
+                            <span>{{"تغيير كلمة مرور الاستاذ ".$lecturer->name}}</span>
+                        @else
+                            <span>{{"تحرير حساب الاستاذ ".$lecturer->name}}</span>
+                        @endif
+                    </h5>
+                </div>
+            </div>
+
+            {{-- Info --}}
+            <div class="col-lg-4">
+                {{-- Lecturer Alert Info --}}
+                <div class="alert alert-info">
+                    <h5 class="text-center pb-2 border-bottom border-primary">معلومات حول امكانيات الاستاذ</h5>
+                    <ul class="mb-0 pr-3">
+                        <li>يمكنك تعديل كل بيانات الاستاذ.</li>
+                        <li>اذا قمت بتغيير كلمة المرور سوف يتم تسجيل خروج تلقائي للحساب.</li>
+                        <li>اذا قمت بتغيير حالة الحساب الى مفلق فيستطيع صاحب الحساب تسجيل الدخول فقط.</li>
+                    </ul>
+                </div>
+            </div>
+
+            {{-- Edit Lecturer --}}
             <div class="col-lg-8 col-sm-12">
                 <div class="card">
                     {{-- Alert Errors --}}
@@ -24,14 +62,7 @@
                         </div>
                     @endif
 
-                    {{-- Session Update Lecturer Message --}}
-                    @if (session('UpdateLecturerMessage'))
-                        <div class="alert alert-danger text-center mx-4 mt-4">
-                            {{session('UpdateLecturerMessage')}}
-                        </div>
-                    @endif
-
-
+                    {{-- Card Body --}}
                     <div class="card-body px-4 border-bottom border-default">
                         <form method="post" action="/control-panel/lecturers/{{$lecturer->id}}">
                             @method('PUT')
@@ -47,6 +78,7 @@
                                     <label for="password_confirmation">اعد كتابة كلمة المرور الجديدة</label>
                                     <input type="password" name="password_confirmation" id="password_confirmation" class="form-control">
                                 </div>
+
                                 <input type="hidden" name="type" value="change-password">
                             @else
                                 <div class="mb-4">
@@ -71,6 +103,8 @@
                                         </option>
                                     </select>
                                 </div>
+
+                                <input type="hidden" name="type" value="change-info">
                             @endif
 
                             <button class="btn btn-outline-default btn-block mb-4 font-weight-bold" type="submit">

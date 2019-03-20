@@ -8,29 +8,51 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 col-sm-12">
-                {{-- Card Login --}}
-                <div class="card mt-4">
+                <div class="card">
+                    {{-- Heading --}}
+                    <p class="h4 text-center text-default py-4 m-0">Login</p>
+
+                    {{-- Alert Errors --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger mx-4 my-3">
+                            <ul class="mb-0 pr-3">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    {{-- Session Error Login Message --}}
+                    @if (session('ErrorLoginMessage'))
+                        <div class="px-4 my-3">
+                            <div class="alert alert-danger text-center">
+                                {{session('ErrorLoginMessage')}}
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Session Change Password Message --}}
+                    @if (session('ChangePasswordMessage'))
+                        <div class="px-4 my-3">
+                            <div class="alert alert-success text-center">
+                                {{session('ChangePasswordMessage')}}
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Session Logout Message --}}
+                    @if (session('LogoutMessage'))
+                        <div class="px-4 my-3">
+                            <div class="alert alert-success text-center">
+                                {{session('LogoutMessage')}}
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Card Body --}}
                     <div class="card-body">
                         <form method="post" action="/control-panel/login" class="text-left" dir="ltr">
-                            <p class="h4 text-center text-default py-4">Login</p>
-                            {{-- Errors --}}
-                            @if ($errors->any())
-                                <div class="alert alert-info" style="direction: rtl; text-align: right;">
-                                    <ul class="mb-0 pr-3">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
-
-                            {{-- Session Error Login Message --}}
-                            @if (session('ErrorLoginMessage'))
-                                <div class="alert alert-danger text-center">
-                                    {{ session('ErrorLoginMessage') }}
-                                </div>
-                            @endif
-
                             @csrf
 
                             <div class="md-form">

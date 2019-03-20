@@ -17,27 +17,44 @@
             </div>
         @endif
 
-
         <div class="row align-items-start">
             {{-- Show Students Answers to the current question --}}
             <div class="col-lg-6 col-sm-12">
                 <div class="row">
-                    @foreach($students as $student)
+                    @foreach($studentsCollections as $studentCollections)
+                        @php
+                            $student = $studentCollections["student"];
+                            $answers = $studentCollections["answers"];
+                        @endphp
                         <div class="col-12 mb-4">
                             <div class="card">
                                 {{-- Heading --}}
-                                <div class="view shadow mdb-color p-3">
-                                    <h5 class="text-center text-white m-0">
-                                        <span>اجوبة الطالب </span>
-                                        <span>{{$student["info"]->originalStudent->Name}}</span>
-                                    </h5>
+                                <div class="view shadow mdb-color p-3" data-toggle="collapse" data-target="#collapse-{{$student->id}}" aria-expanded="false" aria-controls="collapseStudentAnswers">
+                                    <a class="h5 text-center text-white d-block m-0">
+                                        <div class="d-inline-block text-truncate w-75 pl-1">
+                                            <span>اجوبة الطالب </span>
+                                            <span>{{$student->originalStudent->Name}}</span>
+                                        </div>
+
+                                        {{-- If Correction Is Success--}}
+                                        <div class="float-left success d-none w-25">
+                                            <span class="far fa-check-square text-white ml-1"></span>
+                                            <span>تم التصحيح</span>
+                                        </div>
+
+                                        {{-- If Correction Is Fail--}}
+                                        <div class="float-left fail d-none w-25">
+                                            <span class="far fa-minus-square text-white ml-1"></span>
+                                            <span>اعد المحاولة</span>
+                                        </div>
+                                    </a>
                                 </div>
 
                                 {{-- Body --}}
-                                <div class="card-body border-bottom border-primary">
+                                <div class="card-body border-bottom border-primary collapse" id="collapse-{{$student->id}}">
                                     <div class="form">
                                         {{-- Question Answers --}}
-                                        @foreach($student["answers"] as $answer)
+                                        @foreach($answers as $answer)
                                             @if ($loop->first)
                                                 <ul class="mb-0 pr-4">
                                                     @endif
@@ -67,13 +84,23 @@
                                         @endforeach
 
                                         <hr>
-                                        <input type="hidden" name="student" value="{{$student["info"]->id}}">
+                                        <input type="hidden" name="student" value="{{$student->id}}">
                                         <input type="hidden" name="question" value="{{$question->id}}">
                                         <button class="btn btn-block btn-outline-dark-green font-weight-bold" data-action="save-scores">حفظ الدرجات</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        {{-- Button Load More --}}
+                        @if($loop->last)
+                            <div class="col-12 text-center">
+                                <button class="btn btn-link font-weight-bold" value="Refresh Page" onClick="window.location.reload()">
+                                    <i class="fa fa-cloud-download-alt ml-1"></i>
+                                    <span>تحميل المزيد</span>
+                                </button>
+                            </div>
+                        @endif
                     @endforeach
                 </div>
             </div>
@@ -151,7 +178,7 @@
                 };
             }).get();
             let currentStudentCard = $(this).parent().parent().parent();
-            let currentStudentCardHeading = currentStudentCard.find(".view");
+            let currentStudentCardView = currentStudentCard.find(".view");
             let currentStudentCardBody = currentStudentCard.find(".card-body");
 
             $.ajax({
@@ -159,24 +186,38 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: "post",
-                url: "/control-panel/questions-correction/manually",
+                url: "/control-panel/correction/manually",
                 data: {student:student, question:question, answers:answers},
                 dataType: "json",
                 success: function(result){
                     console.log(result);
                     if (result["correction"] == "success")
                     {
-                        currentStudentCardBody.addClass("animated zoomOut");
+                        currentStudentCardBody.collapse("hide");
+
                         setTimeout(function () {
-                            currentStudentCardBody.addClass("d-none");
-                        },750);
+                            currentStudentCardView.removeClass("mdb-color").addClass("success-color");
+                            setTimeout(function () {
+                                currentStudentCardView.find(".float-left.success").removeClass("d-none").addClass("animated bounceIn");
+                            }, 750);
+                        }, 500);
+
+                    }
+
+                    if (result["correction"] == "fail")
+                    {
+                        currentStudentCardBody.collapse("hide");
+
+                        setTimeout(function () {
+                            currentStudentCardView.removeClass("mdb-color").addClass("danger-color");
+                            setTimeout(function () {
+                                currentStudentCardView.find(".float-left.fail").removeClass("d-none").addClass("animated bounceIn");
+                            }, 750);
+                        }, 500);
                     }
                 },
                 error: function () {
-                    
-                },
-                complete: function () {
-
+                    alert("Some Error Is Occur, Please Refresh Page.");
                 }
             });
         });
