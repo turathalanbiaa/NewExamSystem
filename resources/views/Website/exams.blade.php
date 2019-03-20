@@ -5,8 +5,10 @@
 @section("content")
     <div class="container">
         <div class="row">
-            @forelse($studentNotFinishedExams->notFinishedExams as $exam)
-                @if ($exam->state==App\Enums\ExamState::OPEN)
+            @forelse($studentNotFinishedExams->notFinishedExams->where('state',App\Enums\ExamState::OPEN) as $exam)
+                @if ($exam->type==4)
+                    {{--Second Final Exam--}}
+                    @else
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-5">
                         <div class="card shadow h-100">
                             <div class="view shadow mdb-color px-3 py-4">
@@ -34,6 +36,7 @@
                         </div>
                     </div>
                 @endif
+
             @empty
                 <div class="col-12">
                     <div class="alert alert-primary py-5 px-3 text-center" role="alert">
