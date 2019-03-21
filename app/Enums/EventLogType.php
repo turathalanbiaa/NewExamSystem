@@ -9,6 +9,8 @@
 namespace App\Enums;
 
 
+use phpDocumentor\Reflection\Types\Self_;
+
 class EventLogType
 {
     const PROFILE = 0;
@@ -19,6 +21,7 @@ class EventLogType
     const EXAM = 5;
     const QUESTION = 6;
     const BRANCH = 7;
+    const DOCUMENT = 8;
 
 
     public static function getType($key) {
@@ -31,6 +34,7 @@ class EventLogType
             case self::EXAM: return "امتحان";  break;
             case self::QUESTION: return "سؤال";  break;
             case self::BRANCH: return "فرع من سؤال";  break;
+            case self::DOCUMENT: return "الوثائق"; break;
         }
 
         return "";

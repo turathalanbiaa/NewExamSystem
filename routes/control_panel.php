@@ -45,6 +45,8 @@ Route::get('control-panel/sum/{exam}', 'ControlPanel\CorrectionController@sum');
 //Routes for degrees and documents
 Route::get('control-panel/documents', 'ControlPanel\DocumentController@index');
 Route::get('control-panel/documents/creation', 'ControlPanel\DocumentController@creation');
+Route::get('control-panel/documents/search', 'ControlPanel\DocumentController@search');
+Route::get('control-panel/documents/{student}', 'ControlPanel\DocumentController@show');
 
 
 

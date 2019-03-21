@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\EventLogType;
 use App\Enums\ExamType;
+use App\Models\Assessment;
+use App\Models\EventLog;
 use App\Models\ExamStudent;
+use App\Models\Student;
 use App\Models\StudentDocument;
-use Illuminate\Http\Request;
+use App\Models\SystemVariables;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class DocumentController extends Controller
 {
@@ -17,44 +22,121 @@ class DocumentController extends Controller
     }
 
     /**
-     *  Relay students' grades to their documents
+     * Relay students' grades to their documents
      *
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function creation()
     {
-        $examsStudents = ExamStudent::all();
+        Auth::check();
+        $sys_vars = SystemVariables::find(1);
 
-        foreach ($examsStudents as $examStudent)
+        //Transaction
+        $exception = DB::transaction(function () use ($sys_vars){
+            //Relay students' grades in exams to their documents
+            $examsStudents = ExamStudent::all();
+            foreach ($examsStudents as $examStudent)
+            {
+                $document = StudentDocument::where('student_id', $examStudent->student->id)
+                    ->where('course_id', $examStudent->exam->course->id)
+                    ->where('season', $sys_vars->current_season)
+                    ->where('year', $sys_vars->current_year)
+                    ->first();
+
+                //Update document
+                if ($document)
+                {
+                    $document->first_month_score = ($examStudent->exam->type == ExamType::FIRST_MONTH)?$examStudent->score:$document->first_month_score;
+                    $document->second_month_score = ($examStudent->exam->type == ExamType::SECOND_MONTH)?$examStudent->score:$document->second_month_score;
+                    $document->final_first_score = ($examStudent->exam->type == ExamType::FINAL_FIRST_ROLE)?$examStudent->score:$document->final_first_score;
+                    $document->final_second_score = ($examStudent->exam->type == ExamType::FINAL_SECOND_ROLE)?$examStudent->score:$document->final_second_score;
+                }
+
+                //Create document
+                if (!$document)
+                {
+                    $document = new StudentDocument();
+                    $document->student_id = $examStudent->student->id;
+                    $document->course_id = $examStudent->exam->course->id;
+                    $document->first_month_score = ($examStudent->exam->type == ExamType::FIRST_MONTH)?$examStudent->score:0.0;
+                    $document->second_month_score = ($examStudent->exam->type == ExamType::SECOND_MONTH)?$examStudent->score:0.0;
+                    $document->assessment_score = 0.00000; //Default 0.00000
+                    $document->final_first_score = ($examStudent->exam->type == ExamType::FINAL_FIRST_ROLE)?$examStudent->score:0;
+                    $document->final_second_score = ($examStudent->exam->type == ExamType::FINAL_SECOND_ROLE)?$examStudent->score:0.00;
+                    $document->season = $sys_vars->current_season;
+                    $document->year = $sys_vars->current_year;
+                }
+                $document->save();
+
+                //Store event log
+                $target = $document->id;
+                $type = EventLogType::DOCUMENT;
+                $event = "ترحيل درجة الطالب " . $examStudent->student->originalStudent->Name . " في امتحان " . $examStudent->exam->title . " الى وثيقته";
+                EventLog::create($target, $type, $event);
+            }
+
+            //Relay students' grades in assessment to their documents
+            $assessments = Assessment::all();
+            foreach ($assessments as $assessment)
+            {
+                $document = StudentDocument::updateOrCreate(
+                    [
+                        "student_id" => $assessment->student_id,
+                        "course_id"  => $assessment->course_id,
+                        'season'     => $sys_vars->current_season,
+                        'year'       => $sys_vars->current_year
+                    ],
+                    [
+                        "assessment_score" => $assessment->score
+                    ]
+                );
+
+                //Store event log
+                $target = $document->id;
+                $type = EventLogType::DOCUMENT;
+                $event = "ترحيل درجة تقييم الطالب " . $assessment->student->originalStudent->Name . " في المادة " . $assessment->course->name . " الى وثيقته";
+                EventLog::create($target, $type, $event);
+            }
+        });
+
+        if (is_null($exception))
+            return redirect("/control-panel/documents")->with([
+                "DocumentCreationMessage" => "تم ترحيل درجات الطلاب الى وثائقهم"
+            ]);
+        else
+            return redirect("/control-panel/documents")->with([
+                "DocumentCreationMessage" => "لم يتم ترحيل درجات الطلاب الى وثائقهم",
+                "TypeMessage" => "Error"
+            ]);
+    }
+
+    /**
+     * Display students
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function search()
+    {
+        Auth::check();
+        $students = Student::all();
+        return view("ControlPanel.document.search")->with([
+            "students" => $students
+        ]);
+    }
+
+    public function show($student)
+    {
+        Auth::check();
+        $student = Student::findOrFail($student);
+
+        $documentsGroupingByYear = $student->documents->groupBy("year");
+        foreach ($documentsGroupingByYear as $documents)
         {
-            $document = StudentDocument::where('student_id', $examStudent->student->id)
-                ->where('course_id', $examStudent->exam->course->id)
-                ->first();
-
-            //Update document
-            if ($document)
-            {
-                $document->first_month_score = ($examStudent->exam->type == ExamType::FIRST_MONTH)?$examStudent->score:$document->first_month_score;
-                $document->second_month_score = ($examStudent->exam->type == ExamType::SECOND_MONTH)?$examStudent->score:$document->second_month_score;
-                $document->final_first_score = ($examStudent->exam->type == ExamType::FINAL_FIRST_ROLE)?$examStudent->score:$document->final_first_score;
-                $document->final_second_score = ($examStudent->exam->type == ExamType::FINAL_SECOND_ROLE)?$examStudent->score:$document->final_second_score;
-            }
-
-            //Create document
-            if (!$document)
-            {
-                $document = new StudentDocument();
-                $document->student_id = $examStudent->student->id;
-                $document->course_id = $examStudent->exam->course->id;
-                $document->first_month_score = ($examStudent->exam->type == ExamType::FIRST_MONTH)?$examStudent->score:0.0;
-                $document->second_month_score = ($examStudent->exam->type == ExamType::SECOND_MONTH)?$examStudent->score:0.0;
-                $document->final_first_score = ($examStudent->exam->type == ExamType::FINAL_FIRST_ROLE)?$examStudent->score:0;
-                $document->final_second_score = ($examStudent->exam->type == ExamType::FINAL_SECOND_ROLE)?$examStudent->score:0.00;
-                $document->year = date("Y");
-            }
-
-            $document->save();
+            $documentsGroupingBySeason = $documents->groupBy("season");
         }
 
-        dd("OK");
+        return view("ControlPanel.document.show")->with([
+            "student" => $student
+        ]);
     }
 }
