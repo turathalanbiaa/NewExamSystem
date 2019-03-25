@@ -58,14 +58,19 @@ class DocumentController extends Controller
                     $document = new StudentDocument();
                     $document->student_id = $examStudent->student->id;
                     $document->course_id = $examStudent->exam->course->id;
-                    $document->first_month_score = ($examStudent->exam->type == ExamType::FIRST_MONTH)?$examStudent->score:0.0;
-                    $document->second_month_score = ($examStudent->exam->type == ExamType::SECOND_MONTH)?$examStudent->score:0.0;
-                    $document->assessment_score = 0.00000; //Default 0.00000
-                    $document->final_first_score = ($examStudent->exam->type == ExamType::FINAL_FIRST_ROLE)?$examStudent->score:0;
-                    $document->final_second_score = ($examStudent->exam->type == ExamType::FINAL_SECOND_ROLE)?$examStudent->score:0.00;
+                    $document->first_month_score = ($examStudent->exam->type == ExamType::FIRST_MONTH)?$examStudent->score:null;
+                    $document->second_month_score = ($examStudent->exam->type == ExamType::SECOND_MONTH)?$examStudent->score:null;
+                    $document->assessment_score = null;
+                    $document->final_first_score = ($examStudent->exam->type == ExamType::FINAL_FIRST_ROLE)?$examStudent->score:null;
+                    $document->final_second_score = ($examStudent->exam->type == ExamType::FINAL_SECOND_ROLE)?$examStudent->score:null;
+                    $document->total = null;
+                    $document->decision_score = null;
+                    $document->final_score = null;
                     $document->season = $sys_vars->current_season;
                     $document->year = $sys_vars->current_year;
                 }
+
+                //Store document
                 $document->save();
 
                 //Store event log
@@ -96,6 +101,32 @@ class DocumentController extends Controller
                 $type = EventLogType::DOCUMENT;
                 $event = "ترحيل درجة تقييم الطالب " . $assessment->student->originalStudent->Name . " في المادة " . $assessment->course->name . " الى وثيقته";
                 EventLog::create($target, $type, $event);
+            }
+
+            //documents
+            $documents = StudentDocument::where("season", $sys_vars->current_season)
+                ->where("year", $sys_vars->current_year)
+                ->get();
+            foreach ($documents as $document)
+            {
+                //Find total
+                $total = $document->first_month_score + $document->second_month_score + $document->assessment_score;
+                if (is_null($document->final_second_score))
+                    $total += $document->final_first_score;
+                else
+                    $total += $document->final_second_score;
+                $total = ceil($total);
+                $document->total = $total;
+
+                //Find final score
+                $document->final_score = $total;
+                if ($total == 50)
+                {
+                    $document->final_score = $total + 1;
+                    $document->decision_score = null;
+                }
+
+                $document->save();
             }
         });
 

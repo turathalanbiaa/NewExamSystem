@@ -19,7 +19,7 @@
 
        <div class="row bg-light p-5">
            <div class="col-lg-4 col-md-6 col-sm-12 my-3">
-               <a class="btn btn-block btn-outline-deep-purple py-4">
+               <a href="/control-panel/decision" class="btn btn-block btn-outline-deep-purple py-4">
                    <span class="h3-responsive">تطبيق نظام القرار</span>
                </a>
            </div>
