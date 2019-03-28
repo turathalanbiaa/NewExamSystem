@@ -18,14 +18,19 @@ class StudentAuthMiddleware
                 return $next($request);
             }
             else{
+
                 $student=Student::where('remember_token',Cookie::get('remember_me'))->first();
                 $eduStudent=EduStudent::find($student->edu_student_id);
                 $courseExamsByLevel = Course::where(['level' => $eduStudent->Level, 'state' => 1])->with('exams')->has('exams')->get(['id']);
-                $examsIds = collect();
+                $newExamsIds = collect();
                 foreach ($courseExamsByLevel as $course) {
-                    $examsIds->push($course->exams->pluck('id'));
+                    $newExamsIds->push($course->exams()->where('type','!=',4)->pluck('id'));
                 }
-                $student->exams()->sync($examsIds->collapse(),['date'=>Carbon::now()]);
+                $oldExamsIds =$student->exams->pluck('id');
+                $examsIdsDiff =$newExamsIds->collapse()->diff($oldExamsIds);
+                if ($examsIdsDiff->isNotEmpty()){
+                    $student->exams()->attach($examsIdsDiff,['date' => Carbon::now()]);
+                }
                 Session::put('newExamsChecked',true);
                 return $next($request);
             }

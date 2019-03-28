@@ -29,22 +29,27 @@ class StudentAuthController extends Controller
             $courseExamsByLevel = Course::where(['level' => $eduStudent->Level, 'state' => 1])->with('exams')->has('exams')->get(['id']);
             $examsIds = collect();
             foreach ($courseExamsByLevel as $course) {
-                $examsIds->push($course->exams->pluck('id'));
+                $examsIds->push($course->exams()->where('type','!=',4)->pluck('id'));
             }
             $student->exams()->attach($examsIds->collapse(),['date'=>Carbon::now()]);
             Cookie::queue(cookie()->forever('remember_me', $remember_token));
-            session('newExamsChecked',true);
+            Session::put('newExamsChecked',true);
             return redirect('/');
         }
         else
         {
             $student=Student::where('edu_student_id',$eduStudent->ID)->first();
             $courseExamsByLevel = Course::where(['level' => $eduStudent->Level, 'state' => 1])->with('exams')->has('exams')->get(['id']);
-            $examsIds = collect();
+            $newExamsIds = collect();
             foreach ($courseExamsByLevel as $course) {
-                $examsIds->push($course->exams->pluck('id'));
+                $newExamsIds->push($course->exams()->where('type','!=',4)->pluck('id'));
             }
-            $student->exams()->sync($examsIds->collapse(),['date' => Carbon::now()]);
+            $oldExamsIds =$student->exams->pluck('id');
+            $examsIdsDiff =$newExamsIds->collapse()->diff($oldExamsIds);
+            if ($examsIdsDiff->isNotEmpty()){
+                $student->exams()->attach($examsIdsDiff,['date' => Carbon::now()]);
+            }
+            Session::put('newExamsChecked',true);
             Cookie::queue(cookie()->forever('remember_me', $student->remember_token));
             Session::put('newExamsChecked',true);
             return redirect('/');
