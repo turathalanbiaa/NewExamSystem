@@ -15,4 +15,9 @@ class Assessment extends Model
     {
         return $this->belongsTo("App\Models\Student", "student_id", "id");
     }
+
+    public function course()
+    {
+        return $this->belongsTo("App\Models\Course", "course_id", "id");
+    }
 }

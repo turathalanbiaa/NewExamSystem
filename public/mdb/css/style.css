@@ -93,3 +93,8 @@ table.dataTable thead .sorting_desc_disabled:after {
     right: -1.5rem;
     left: 0;
 }
+
+.blockquote.right{
+    border-right: .25rem solid #eceeef;
+    border-left: none!important;
+}

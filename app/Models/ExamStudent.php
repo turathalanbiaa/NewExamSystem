@@ -9,4 +9,14 @@ class ExamStudent extends Model
     protected $table = "exam_student";
     protected $primaryKey = "id";
     public $timestamps = false;
+
+    public function student()
+    {
+        return $this->belongsTo("App\Models\Student", "student_id", "id");
+    }
+
+    public function exam()
+    {
+        return $this->belongsTo("App\Models\Exam", "exam_id", "id");
+    }
 }

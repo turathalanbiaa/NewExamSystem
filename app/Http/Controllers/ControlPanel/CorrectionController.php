@@ -231,9 +231,14 @@ class CorrectionController extends Controller
 
         //Transaction
         $exception = DB::transaction(function () use ($exam){
-            //Get exam students
+            //Find ratio
+            $ratio = $exam->real_score / $exam->fake_score;
+
+            //Students
             $examStudents = ExamStudent::where("exam_id", $exam->id)
                 ->get();
+
+            //Questions
             $questions = $exam->questions;
 
             //Find sum degree for each student
@@ -251,6 +256,12 @@ class CorrectionController extends Controller
                         ->get();
                     $sum = $sum + $answers->sum("score");
                 }
+
+                //Convert fake score to real real score
+                $sum = $sum * $ratio;
+
+                //Add curve to sum
+                $sum = $sum + $exam->curve;
 
                 //Update exam student
                 $examStudent->score = $sum;

@@ -42,6 +42,21 @@ Route::get('control-panel/correction/manually/{question}', 'ControlPanel\Correct
 Route::post('control-panel/correction/manually', 'ControlPanel\CorrectionController@CorrectionManually');
 Route::get('control-panel/sum/{exam}', 'ControlPanel\CorrectionController@sum');
 
+//Routes for degrees and documents
+Route::get('control-panel/documents', 'ControlPanel\DocumentController@index');
+
+
+//Routes for decision
+Route::get('control-panel/decision', 'ControlPanel\DecisionController@index');
+Route::get('control-panel/decision/{level}', 'ControlPanel\DecisionController@show');
+Route::post('control-panel/decision/{level}', 'ControlPanel\DecisionController@excute');
+
+
+
+Route::get('control-panel/documents/creation', 'ControlPanel\DocumentController@creation');
+Route::get('control-panel/documents/search', 'ControlPanel\DocumentController@search');
+Route::get('control-panel/documents/{student}', 'ControlPanel\DocumentController@show');
+Route::get('control-panel/pdf/{student}/{year}/{season}', 'ControlPanel\DynamicPDFController@pdf');
 
 
 

@@ -26,4 +26,11 @@ class Student extends Model
     {
         return $this->belongsTo("App\Models\EduStudent", "edu_student_id", "ID");
     }
+
+    public function documents()
+    {
+        return $this->hasMany("App\Models\StudentDocument","student_id", "id")
+            ->orderBy("year", "ASC")
+            ->orderBy("season", "ASC");
+    }
 }

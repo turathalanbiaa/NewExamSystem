@@ -9,6 +9,7 @@ class StudentDocument extends Model
     protected $table = "student_document";
     protected $primaryKey = "id";
     public $timestamps = false;
+    protected $fillable = ["assessment_score"];
 
     public function course()
     {
