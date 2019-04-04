@@ -52,6 +52,8 @@
     <script type="text/javascript" src="{{asset("mdb/js/mdb.min.js")}}"></script>
     {{-- MDBootstrap Datatables --}}
     <script type="text/javascript" src="{{asset("mdb/js/addons/datatables.min.js")}}"></script>
+    {{-- Chart JS --}}
+    <script type="text/javascript" src="{{asset("mdb/js/modules/chart.js")}}"></script>
     {{-- My Custom Script --}}
     @yield("script")
 </body>

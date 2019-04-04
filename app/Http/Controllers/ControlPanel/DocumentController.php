@@ -72,12 +72,6 @@ class DocumentController extends Controller
 
                 //Store document
                 $document->save();
-
-                //Store event log
-                $target = $document->id;
-                $type = EventLogType::DOCUMENT;
-                $event = "ترحيل درجة الطالب " . $examStudent->student->originalStudent->Name . " في امتحان " . $examStudent->exam->title . " الى وثيقته";
-                EventLog::create($target, $type, $event);
             }
 
             //Relay students' grades in assessment to their documents
@@ -95,21 +89,14 @@ class DocumentController extends Controller
                         "assessment_score" => $assessment->score
                     ]
                 );
-
-                //Store event log
-                $target = $document->id;
-                $type = EventLogType::DOCUMENT;
-                $event = "ترحيل درجة تقييم الطالب " . $assessment->student->originalStudent->Name . " في المادة " . $assessment->course->name . " الى وثيقته";
-                EventLog::create($target, $type, $event);
             }
 
-            //documents
+            //Find total for the documents
             $documents = StudentDocument::where("season", $sys_vars->current_season)
                 ->where("year", $sys_vars->current_year)
                 ->get();
             foreach ($documents as $document)
             {
-                //Find total
                 $total = $document->first_month_score + $document->second_month_score + $document->assessment_score;
                 if (is_null($document->final_second_score))
                     $total += $document->final_first_score;
@@ -123,11 +110,17 @@ class DocumentController extends Controller
                 if ($total == 50)
                 {
                     $document->final_score = $total + 1;
-                    $document->decision_score = null;
+                    $document->decision_score = 0;
                 }
 
                 $document->save();
             }
+
+            //Store event log
+            $target = null;
+            $type = EventLogType::DOCUMENT;
+            $event = "ترحيل درجات الطلاب الى وثائقيهم";
+            EventLog::create($target, $type, $event);
         });
 
         if (is_null($exception))
@@ -160,11 +153,13 @@ class DocumentController extends Controller
         Auth::check();
         $student = Student::findOrFail($student);
 
-        $documentsGroupingByYear = $student->documents->groupBy("year");
+        $documentsGroupingByYear = $student->documents
+            ->SortByDesc("year")
+            ->groupBy("year");
         foreach ($documentsGroupingByYear as $documents)
-        {
-            $documentsGroupingBySeason = $documents->groupBy("season");
-        }
+            $documentsGroupingBySeason = $documents
+                ->SortByDesc("season")
+                ->groupBy("season");
 
         return view("ControlPanel.document.show")->with([
             "student" => $student

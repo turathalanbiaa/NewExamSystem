@@ -6,7 +6,7 @@ use App\Enums\Level;
 use App\Models\Student;
 use App\Models\StudentDocument;
 use App\Http\Controllers\Controller;
-use PDF;
+use niklasravnsborg\LaravelPdf\Facades\Pdf;
 
 class DynamicPDFController extends Controller
 {
@@ -19,8 +19,32 @@ class DynamicPDFController extends Controller
             ->where("season", $season)
             ->get();
 
-        $pdf = PDF::loadView('ControlPanel.pdf.document', array("documents" => $documents));
+//        $mpdf->SetWatermarkImage(public_path("logo.png"));
+//        $mpdf->showWatermarkImage = true;
+
+        //Custom config
+        $config = [
+            'format'      => 'A4',
+            'orientation' => 'P',
+            'instanceConfigurator' => function($mpdf) use ($student) {
+                $mpdf->SetTitle($student->originalStudent->Name);
+                $mpdf->SetAuthor("Turath Al-Alanbiaa");
+                $mpdf->SetSubject("Certificate");
+                $mpdf->SetCreator("Emad Al-Kabi");
+
+                $mpdf->SetWatermarkImage(public_path("document-cover.png"),1.0);
+                $mpdf->showWatermarkImage = true;
+            }];
+
+        $pdf = PDF::loadView('ControlPanel.pdf.document',
+            array("documents" => $documents),
+            [],
+            $config
+        );
+
+
+
         $pdfName = $student->originalStudent->Name."_".Level::get($documents[0]->course->level)."_".$year."_".$season;
-        $pdf->stream($pdfName);
+        return $pdf->stream($pdfName);
     }
 }
