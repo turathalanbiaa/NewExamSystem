@@ -46,17 +46,9 @@ Route::get('control-panel/sum/{exam}', 'ControlPanel\CorrectionController@sum');
 Route::get('control-panel/documents', 'ControlPanel\DocumentController@index');
 Route::get('control-panel/documents/creation', 'ControlPanel\DocumentController@creation');
 Route::get('control-panel/execute-decision-system', 'ControlPanel\DecisionController@execute');
-
-
-
-
-
-
-
-
 Route::get('control-panel/documents/search', 'ControlPanel\DocumentController@search');
 Route::get('control-panel/documents/{student}', 'ControlPanel\DocumentController@show');
-Route::get('control-panel/pdf/{student}/{year}/{season}', 'ControlPanel\DynamicPDFController@pdf');
+Route::get('control-panel/pdf/{student}/{year}/{season}/{type}', 'ControlPanel\DynamicPDFController@studentDocument');
 
 
 

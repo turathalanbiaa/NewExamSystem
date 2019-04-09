@@ -10,7 +10,7 @@ use niklasravnsborg\LaravelPdf\Facades\Pdf;
 
 class DynamicPDFController extends Controller
 {
-    public function pdf($student, $year, $season)
+    public function studentDocument($student, $year, $season, $type)
     {
         Auth::check();
         $student = Student::findOrFail($student);
@@ -19,8 +19,9 @@ class DynamicPDFController extends Controller
             ->where("season", $season)
             ->get();
 
-//        $mpdf->SetWatermarkImage(public_path("logo.png"));
-//        $mpdf->showWatermarkImage = true;
+        $numberOfFailedCourses = $documents->filter(function ($document) {
+            return $document->final_score < 50;
+        })->count();
 
         //Custom config
         $config = [
@@ -31,19 +32,21 @@ class DynamicPDFController extends Controller
                 $mpdf->SetAuthor("Turath Al-Alanbiaa");
                 $mpdf->SetSubject("Certificate");
                 $mpdf->SetCreator("Emad Al-Kabi");
-
-                $mpdf->SetWatermarkImage(public_path("document-cover.png"),1.0);
-                $mpdf->showWatermarkImage = true;
             }];
-
-        $pdf = PDF::loadView('ControlPanel.pdf.document',
-            array("documents" => $documents),
+        $pdf = PDF::loadView('ControlPanel.pdf.student.final_scores',
+            array(
+                "documents" => $documents,
+                "studentName" => $student->OriginalStudent->Name,
+                "level" => $documents[0]->course->level,
+                "year" => $year,
+                "role" => (($documents->filter(function ($document) {
+                        return !is_null($document->final_second_score);
+                    })->count() == 0)?"الاول":"الثاني"),
+                "result" => (($numberOfFailedCourses == 0)?"ناجح":($numberOfFailedCourses <= 2)?"مكمل":"راسب")
+            ),
             [],
             $config
         );
-
-
-
         $pdfName = $student->originalStudent->Name."_".Level::get($documents[0]->course->level)."_".$year."_".$season;
         return $pdf->stream($pdfName);
     }

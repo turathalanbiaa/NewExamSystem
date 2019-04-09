@@ -83,19 +83,19 @@
                                         <span>{{$document->course->name}}</span>
                                     </td>
                                     <td class="th-sm">
-                                        <span>{{($document->first_month_score != null)?$document->first_month_score:"---"}}</span>
+                                        <span>{{(!is_null($document->first_month_score))?$document->first_month_score:"---"}}</span>
                                     </td>
                                     <td class="th-sm">
                                         <span>{{($document->second_month_score != null)?$document->second_month_score:"---"}}</span>
                                     </td>
                                     <td class="th-sm">
-                                        <span>{{($document->assessment_score != null)?$document->assessment_score:"---"}}</span>
+                                        <span>{{(!is_null($document->assessment_score))?$document->assessment_score:"---"}}</span>
                                     </td>
                                     <td class="th-sm">
-                                        <span>{{($document->final_first_score != null)?$document->final_first_score:"---"}}</span>
+                                        <span>{{(!is_null($document->final_first_score))?$document->final_first_score:"---"}}</span>
                                     </td>
                                     <td class="th-sm">
-                                        <span>{{($document->final_second_score != null)?$document->final_second_score:"---"}}</span>
+                                        <span>{{(!is_null($document->final_second_score))?$document->final_second_score:"---"}}</span>
                                     </td>
                                     <td class="th-sm">
                                         <span>{{$document->total}}</span>
@@ -113,11 +113,11 @@
 
                     {{-- Footer --}}
                     <div class="col-12 mb-5">
-                        <a class="btn btn-danger font-weight-bold" href="/control-panel/pdf/{{$student->id}}/{{$year}}/{{$season}}" data-toggle="tooltip"  title="بكل الدرجات">
+                        <a class="btn btn-danger font-weight-bold" href="/control-panel/pdf/{{$student->id}}/{{$year}}/{{$season}}/all-scores" data-toggle="tooltip"  title="بكل الدرجات">
                             <span class="far fa-file-pdf ml-1"></span>
                             <span>تصدير ملف pdf</span>
                         </a>
-                        <a class="btn btn-outline-danger font-weight-bold" href="/control-panel/pdf/{{$student->id}}/{{$year}}/{{$season}}" data-toggle="tooltip" title="بالدرجات النهائية فقط">
+                        <a class="btn btn-outline-danger font-weight-bold" href="/control-panel/pdf/{{$student->id}}/{{$year}}/{{$season}}/final-scores" data-toggle="tooltip" title="بالدرجات النهائية فقط">
                             <span class="far fa-file-pdf ml-1"></span>
                             <span>تصدير ملف pdf</span>
                         </a>
