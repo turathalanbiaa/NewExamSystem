@@ -86,6 +86,18 @@ class StudentExamController extends Controller
             return $e->getMessage();
         }
     }
+    public function delete(Request $request)
+    {
+        try {
+            $student = Student::where('remember_token', Cookie::get('remember_me'))->first();
+            if (Answer::where(['student_id' => $student->id, 'branch_id' => $request->id])->first()) {
+                Answer::where(['student_id' => $student->id, 'branch_id' => $request->id])->delete();
+            }
+            return response()->json('ok');
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
 
     public function finish(Request $request)
     {

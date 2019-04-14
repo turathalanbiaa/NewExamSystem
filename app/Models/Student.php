@@ -15,7 +15,7 @@ class Student extends Model
     }
 
     public function finishedExams(){
-        return $this->belongsToMany('App\Models\Exam', 'exam_student', 'student_id', 'exam_id')->wherePivot('state', \App\Enums\ExamStudentState::FINISHED);
+        return $this->belongsToMany('App\Models\Exam', 'exam_student', 'student_id', 'exam_id')->wherePivot('state', \App\Enums\ExamStudentState::FINISHED)->withPivot('score');
     }
 
     public function exams(){

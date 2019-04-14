@@ -14,6 +14,7 @@ Route::get('/finished-exams', 'Website\StudentExamController@finishedExams')->mi
 Route::get('/exam/{id}', 'Website\StudentExamController@exam')->middleware('StudentAuth');
 Route::get('/finished-exam/{id}', 'Website\StudentExamController@finishedExam')->middleware('StudentAuth');
 Route::post('/store', 'Website\StudentExamController@store');
+Route::post('/delete', 'Website\StudentExamController@delete');
 Route::post('/finish', 'Website\StudentExamController@finish');
 
 
