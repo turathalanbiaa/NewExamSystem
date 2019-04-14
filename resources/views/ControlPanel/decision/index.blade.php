@@ -18,13 +18,13 @@
             </div>
 
             <div class="col-lg-4 col-md-6 col-sm-12 my-3">
-                <a class="btn btn-block btn-outline-deep-purple py-4">
+                <a href="/control-panel/decision/2" class="btn btn-block btn-outline-deep-purple py-4">
                     <span class="h3-responsive">المستوى الاول</span>
                 </a>
             </div>
 
             <div class="col-lg-4 col-md-6 col-sm-12 my-3">
-                <a class="btn btn-block btn-outline-deep-purple py-4">
+                <a href="/control-panel/decision/3" class="btn btn-block btn-outline-deep-purple py-4">
                     <span class="h3-responsive">المستوى الثاني</span>
                 </a>
             </div>

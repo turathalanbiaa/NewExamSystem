@@ -1,7 +1,7 @@
 @extends("ControlPanel.layout.app")
 
 @section("title")
-    <title>اصدار الوثائق</title>
+    <title>بحث عن طالب</title>
 @endsection
 
 @section("content")

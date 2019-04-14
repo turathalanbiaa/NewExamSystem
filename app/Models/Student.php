@@ -29,8 +29,17 @@ class Student extends Model
 
     public function documents()
     {
+        return $this->hasMany("App\Models\StudentDocument","student_id", "id");
+
+    }
+
+    public function documentsForCurrentSeason()
+    {
+        $sys_vars = SystemVariables::find(1);
         return $this->hasMany("App\Models\StudentDocument","student_id", "id")
-            ->orderBy("year", "ASC")
-            ->orderBy("season", "ASC");
+            ->where("season", $sys_vars->current_season)
+            ->where("year", $sys_vars->current_year)
+            ->orderBy("course_id")
+            ->get();
     }
 }

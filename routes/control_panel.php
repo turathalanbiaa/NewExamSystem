@@ -44,21 +44,15 @@ Route::get('control-panel/sum/{exam}', 'ControlPanel\CorrectionController@sum');
 
 //Routes for degrees and documents
 Route::get('control-panel/documents', 'ControlPanel\DocumentController@index');
-
-
-//Routes for decision
-Route::get('control-panel/decision', 'ControlPanel\DecisionController@index');
-Route::get('control-panel/decision/{level}', 'ControlPanel\DecisionController@show');
-Route::post('control-panel/decision/{level}', 'ControlPanel\DecisionController@excute');
-
-
-
 Route::get('control-panel/documents/creation', 'ControlPanel\DocumentController@creation');
+Route::get('control-panel/execute-decision-system', 'ControlPanel\DecisionController@execute');
 Route::get('control-panel/documents/search', 'ControlPanel\DocumentController@search');
 Route::get('control-panel/documents/{student}', 'ControlPanel\DocumentController@show');
-Route::get('control-panel/pdf/{student}/{year}/{season}', 'ControlPanel\DynamicPDFController@pdf');
+Route::get('control-panel/pdf/{student}/{year}/{season}/{type}', 'ControlPanel\DynamicPDFController@studentDocument');
 
-
+Route::get('control-panel/documents/export/{type}', 'ControlPanel\DocumentController@exportDocument');
+Route::get('control-panel/documents/export/{type}/{value}', 'ControlPanel\DocumentController@showExportDocument');
+Route::get('control-panel/pdf/{type}/{value}', 'ControlPanel\DynamicPDFController@exportDocument');
 
 
 

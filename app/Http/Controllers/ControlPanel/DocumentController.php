@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\ControlPanel;
 
+use App\Enums\CourseState;
 use App\Enums\EventLogType;
 use App\Enums\ExamType;
 use App\Models\Assessment;
+use App\Models\Course;
 use App\Models\EventLog;
+use App\Models\Exam;
 use App\Models\ExamStudent;
 use App\Models\Student;
 use App\Models\StudentDocument;
@@ -15,6 +18,11 @@ use Illuminate\Support\Facades\DB;
 
 class DocumentController extends Controller
 {
+    /**
+     * Display all operation
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function index()
     {
         Auth::check();
@@ -64,7 +72,7 @@ class DocumentController extends Controller
                     $document->final_first_score = ($examStudent->exam->type == ExamType::FINAL_FIRST_ROLE)?$examStudent->score:null;
                     $document->final_second_score = ($examStudent->exam->type == ExamType::FINAL_SECOND_ROLE)?$examStudent->score:null;
                     $document->total = null;
-                    $document->decision_score = null;
+                    $document->decision_score = 0;
                     $document->final_score = null;
                     $document->season = $sys_vars->current_season;
                     $document->year = $sys_vars->current_year;
@@ -72,12 +80,6 @@ class DocumentController extends Controller
 
                 //Store document
                 $document->save();
-
-                //Store event log
-                $target = $document->id;
-                $type = EventLogType::DOCUMENT;
-                $event = "ترحيل درجة الطالب " . $examStudent->student->originalStudent->Name . " في امتحان " . $examStudent->exam->title . " الى وثيقته";
-                EventLog::create($target, $type, $event);
             }
 
             //Relay students' grades in assessment to their documents
@@ -95,21 +97,14 @@ class DocumentController extends Controller
                         "assessment_score" => $assessment->score
                     ]
                 );
-
-                //Store event log
-                $target = $document->id;
-                $type = EventLogType::DOCUMENT;
-                $event = "ترحيل درجة تقييم الطالب " . $assessment->student->originalStudent->Name . " في المادة " . $assessment->course->name . " الى وثيقته";
-                EventLog::create($target, $type, $event);
             }
 
-            //documents
+            //Find total for the documents
             $documents = StudentDocument::where("season", $sys_vars->current_season)
                 ->where("year", $sys_vars->current_year)
                 ->get();
             foreach ($documents as $document)
             {
-                //Find total
                 $total = $document->first_month_score + $document->second_month_score + $document->assessment_score;
                 if (is_null($document->final_second_score))
                     $total += $document->final_first_score;
@@ -123,11 +118,17 @@ class DocumentController extends Controller
                 if ($total == 50)
                 {
                     $document->final_score = $total + 1;
-                    $document->decision_score = null;
+                    $document->decision_score = 0;
                 }
 
                 $document->save();
             }
+
+            //Store event log
+            $target = null;
+            $type = EventLogType::DOCUMENT;
+            $event = "ترحيل درجات الطلاب الى وثائقيهم";
+            EventLog::create($target, $type, $event);
         });
 
         if (is_null($exception))
@@ -155,19 +156,95 @@ class DocumentController extends Controller
         ]);
     }
 
+    /**
+     * Display documents for student
+     *
+     * @param $student
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function show($student)
     {
         Auth::check();
         $student = Student::findOrFail($student);
 
-        $documentsGroupingByYear = $student->documents->groupBy("year");
-        foreach ($documentsGroupingByYear as $documents)
-        {
-            $documentsGroupingBySeason = $documents->groupBy("season");
-        }
-
         return view("ControlPanel.document.show")->with([
             "student" => $student
         ]);
+    }
+
+
+    public function exportDocument($type)
+    {
+        Auth::check();
+
+        if ($type == "levels")
+            return view("ControlPanel.document.export.level.index");
+
+        if ($type == "courses")
+            return view("ControlPanel.document.export.course.index")->with([
+               "courses" => CourseController::getCoursesOpen()
+            ]);
+
+        if ($type == "exams")
+            return view("ControlPanel.document.export.exam.index")->with([
+                "exams" => Exam::all()->filter(function ($exam){
+                    return ($exam->course->state == CourseState::OPEN);
+                })
+            ]);
+
+        return abort(404);
+    }
+
+    public function showExportDocument($type, $value)
+    {
+        Auth::check();
+
+        if ($type == "level")
+        {
+            $courses = Course::where("level", $value)
+                ->where("state", CourseState::OPEN)
+                ->orderBy("id")
+                ->get();
+            $students = Student::all();
+            $students = $students->filter(function ($student) use ($value){
+                return ($student->originalStudent->Level == $value);
+            });
+
+            return view("ControlPanel.document.export.level.show")->with([
+                "level" => $value,
+                "courses" => $courses,
+                "students" => $students
+            ]);
+        }
+
+        if ($type == "course")
+        {
+            $course = Course::findOrFail($value);
+            $students = Student::all();
+            $students = $students->filter(function ($student) use ($course){
+                return ($student->originalStudent->Level == $course->level);
+            });
+
+            return view("ControlPanel.document.export.course.show")->with([
+                "course" => $course,
+                "students" => $students
+            ]);
+        }
+
+        if ($type == "exam")
+        {
+            $exam = Exam::findOrFail($value);
+            $students = Student::all();
+            $students = $students->filter(function ($student) use ($exam){
+                return ($student->originalStudent->Level == $exam->course->level);
+            });
+
+            return view("ControlPanel.document.export.exam.show")->with([
+                "exam" => $exam,
+                "students" => $students
+            ]);
+        }
+
+        return abort(404);
     }
 }
