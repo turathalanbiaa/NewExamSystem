@@ -102,8 +102,9 @@
                                     </td>
                                     <td class="th-sm">
                                         <span>{{$document->decision_score}}</span>
-                                    </td><td class="th-sm">
-                                        <span>{{$document->final_score}}</span>
+                                    </td>
+                                    <td class="th-sm">
+                                        <span class="{{($document->final_score <50)?"text-decoration":""}}">{{$document->final_score}}</span>
                                     </td>
                                 </tr>
                             @endforeach

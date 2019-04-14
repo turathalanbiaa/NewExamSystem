@@ -50,7 +50,9 @@ Route::get('control-panel/documents/search', 'ControlPanel\DocumentController@se
 Route::get('control-panel/documents/{student}', 'ControlPanel\DocumentController@show');
 Route::get('control-panel/pdf/{student}/{year}/{season}/{type}', 'ControlPanel\DynamicPDFController@studentDocument');
 
-
+Route::get('control-panel/documents/export/{type}', 'ControlPanel\DocumentController@exportDocument');
+Route::get('control-panel/documents/export/{type}/{value}', 'ControlPanel\DocumentController@showExportDocument');
+Route::get('control-panel/pdf/{type}/{value}', 'ControlPanel\DynamicPDFController@exportDocument');
 
 
 

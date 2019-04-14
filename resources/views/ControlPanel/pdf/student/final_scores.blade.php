@@ -13,37 +13,25 @@
         }
 
         table th {
-           font-size: 0.9rem;
+           font-size: 1.0rem;
            font-weight: 400;
         }
 
         table td {
-           font-size: 0.9rem;
+           font-size: 1.0rem;
            font-weight: 300;
         }
 
         .table th,
         .table td {
-           padding: 0.75rem;
+           padding: 0.6rem;
            vertical-align: middle;
-           border-top: 1px solid #dee2e6;
-        }
-
-        table.table th,
-        table.table td {
-           padding-top: 1.1rem;
-           padding-bottom: 1rem;
+           border-top: 1px solid #9da1a5;
         }
 
         .table-sm th,
         .table-sm td {
            padding: 0.3rem;
-        }
-
-        table.table-sm th,
-        table.table-sm td {
-           padding-top: 0.6rem;
-           padding-bottom: 0.6rem;
         }
 
         .table-bordered {
@@ -95,7 +83,7 @@
     </p>
 
     {{-- Datatable --}}
-    <table class="table table-sm table-bordered" cellspacing="0">
+    <table class="table table-bordered" cellspacing="0">
         {{-- Table Head --}}
         <tr>
             <th rowspan="2">
@@ -137,7 +125,7 @@
                 </td>
 
                 <td width="200px">
-
+                    <span>{{\App\Enums\Number::getWrite($document->final_score)}}</span>
                 </td>
             </tr>
             @if($loop->last)
@@ -159,20 +147,20 @@
     <table class="table table-sm table-bordered" cellspacing="0">
         {{-- Table Head --}}
         <tr>
-            <th width="33.333%">
+            <td width="33.333%">
                 <span>المجموع: </span>
                 <span>{{$documents->sum("final_score")}}</span>
-            </th>
+            </td>
 
-            <th width="33.333%">
+            <td width="33.333%">
                 <span>المعدل: </span>
                 <span>{{round($documents->avg("final_score"),3) . "%"}}</span>
-            </th>
+            </td>
 
-            <th width="33.333%">
+            <td width="33.333%">
                 <span>النتيجة: </span>
                 <span>{{$result}}</span>
-            </th>
+            </td>
         </tr>
     </table>
 

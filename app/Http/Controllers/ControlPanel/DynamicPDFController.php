@@ -33,21 +33,55 @@ class DynamicPDFController extends Controller
                 $mpdf->SetSubject("Certificate");
                 $mpdf->SetCreator("Emad Al-Kabi");
             }];
-        $pdf = PDF::loadView('ControlPanel.pdf.student.final_scores',
-            array(
-                "documents" => $documents,
-                "studentName" => $student->OriginalStudent->Name,
-                "level" => $documents[0]->course->level,
-                "year" => $year,
-                "role" => (($documents->filter(function ($document) {
-                        return !is_null($document->final_second_score);
-                    })->count() == 0)?"الاول":"الثاني"),
-                "result" => (($numberOfFailedCourses == 0)?"ناجح":($numberOfFailedCourses <= 2)?"مكمل":"راسب")
-            ),
-            [],
-            $config
-        );
+
+        if ($type == "final-scores")
+            $pdf = PDF::loadView('ControlPanel.pdf.student.final_scores',
+                array(
+                    "documents" => $documents,
+                    "studentName" => $student->OriginalStudent->Name,
+                    "level" => $documents[0]->course->level,
+                    "year" => $year,
+                    "role" => (($documents->filter(function ($document) {
+                            return !is_null($document->final_second_score);
+                        })->count() == 0)?"الاول":"الثاني"),
+                    "result" => (($numberOfFailedCourses == 0)?"ناجح":($numberOfFailedCourses <= 2)?"مكمل":"راسب")
+                ),
+                [],
+                $config
+            );
+        else
+            $pdf = PDF::loadView('ControlPanel.pdf.student.all_scores',
+                array(
+                    "documents" => $documents,
+                    "studentName" => $student->OriginalStudent->Name,
+                    "level" => $documents[0]->course->level,
+                    "year" => $year,
+                    "role" => (($documents->filter(function ($document) {
+                            return !is_null($document->final_second_score);
+                        })->count() == 0)?"الاول":"الثاني"),
+                    "result" => (($numberOfFailedCourses == 0)?"ناجح":($numberOfFailedCourses <= 2)?"مكمل":"راسب")
+                ),
+                [],
+                $config
+            );
+
         $pdfName = $student->originalStudent->Name."_".Level::get($documents[0]->course->level)."_".$year."_".$season;
         return $pdf->stream($pdfName);
+    }
+
+    public function exportDocument($type, $value)
+    {
+        Auth::check();
+
+        if ($type == "level")
+        {
+
+        }
+
+        if ($type == "course")
+        {}
+
+        if ($type == "exam")
+        {}
     }
 }
