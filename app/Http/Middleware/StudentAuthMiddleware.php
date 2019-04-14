@@ -24,7 +24,7 @@ class StudentAuthMiddleware
                 $courseExamsByLevel = Course::where(['level' => $eduStudent->Level, 'state' => 1])->with('exams')->has('exams')->get(['id']);
                 $newExamsIds = collect();
                 foreach ($courseExamsByLevel as $course) {
-                    $newExamsIds->push($course->exams()->where('type','!=',4)->pluck('id'));
+                    $newExamsIds->push($course->exams->pluck('id'));
                 }
                 $oldExamsIds =$student->exams->pluck('id');
                 $examsIdsDiff =$newExamsIds->collapse()->diff($oldExamsIds);
