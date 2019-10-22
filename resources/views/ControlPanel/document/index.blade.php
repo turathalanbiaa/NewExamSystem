@@ -28,7 +28,7 @@
             </div>
         @endif
 
-       <div class="row bg-light p-5">
+       <div class="row bg-light p-5 justify-content-center">
            <div class="col-lg-4 col-md-6 col-sm-12 my-3">
                <a href="/control-panel/documents/creation" class="btn btn-block btn-outline-deep-purple py-4">
                    <span class="h4-responsive">ترحيل درجات الطلاب الى وثائقهم</span>

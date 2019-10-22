@@ -50,7 +50,13 @@
                                         <span class="{{($document->final_score <50)?"text-decoration":""}}">{{$document->final_score}}</span>
                                     </td>
                                 @endif
+                                @if($loop->last)
+                                    @php $i = $loop->iteration; @endphp
+                                @endif
                             @endforeach
+                            @for($i;$i<$courses->count();$i++)
+                                <td>---</td>
+                            @endfor
                         </tr>
                     @endforeach
                     </tbody>

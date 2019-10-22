@@ -41,7 +41,7 @@
         {{-- Admins DataTable --}}
         <div class="row">
             <div class="col-12">
-                <table id="dtAdmins" class="table table-striped table-bordered table-hover w-100" cellspacing="0">
+                <table id="dtAdmins" class="table table-striped table-bordered table-hover table-responsive-sm" cellspacing="0">
                     <thead class="default-color text-white">
                         <tr>
                             <th class="th-sm fa d-table-cell">
@@ -145,6 +145,7 @@
             let firstChild = $("div#dtAdmins_wrapper>.row:first-child");
             firstChild.css("direction","ltr");
             firstChild.css("text-align","left");
+
 
             // Tooltips Initialization
             $('[rel="tooltip"]').tooltip()

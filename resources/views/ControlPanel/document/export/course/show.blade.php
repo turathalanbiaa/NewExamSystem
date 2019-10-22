@@ -49,6 +49,7 @@
                                     </td>
                                 @endif
                             @endforeach
+
                         </tr>
                     @endforeach
                     </tbody>
