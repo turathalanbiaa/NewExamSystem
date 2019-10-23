@@ -6246,7 +6246,7 @@ defaults._set('global', {
 	// Element defaults defined in element extensions
 	elements: {},
 
-	// Layout options such as padding
+	// layout options such as padding
 	layout: {
 		padding: {
 			top: 0,
