@@ -123,7 +123,7 @@
 
                                             <div class="mb-3">
                                                 <label for="option-4">الاختيار الرابع (اختياري)</label>
-                                                <input type="text" name="option-4" id="option-4" class="form-control" value="{{$options[3]}}" data-action="change">
+                                                <input type="text" name="option-4" id="option-4" class="form-control" value="{{@$options[3]}}" data-action="change">
                                             </div>
                                         </div>
                                     </div>

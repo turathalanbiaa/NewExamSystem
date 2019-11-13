@@ -108,17 +108,7 @@ class BranchController extends Controller
                 $correctOption = Input::get("correctOption");
                 break;
 
-            case QuestionType::FILL_BLANK:
-                $this->validate($request, [
-                    'title' => ['required']
-                ], [
-                    'title.required' => 'يرجى ملئ عنوان(النص) النقطة.'
-                ]);
-                $options = null;
-                $correctOption = Input::get("correctOption", null);
-                break;
-
-            case QuestionType::EXPLAIN:
+            case (QuestionType::EXPLAIN || QuestionType::FILL_BLANK):
                 $this->validate($request, [
                     'title' => ['required']
                 ], [

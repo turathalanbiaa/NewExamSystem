@@ -9,6 +9,7 @@ class Question extends Model
     protected $table = "question";
     protected $primaryKey = "id";
     public $timestamps = false;
+	protected $fillable = ['correction'];
 
     public function branches()
     {
