@@ -23,7 +23,7 @@
                             الحوزويه الالكترونيه</strong></h2>
                     <p class="mx-5 mb-5">لتسجيل الدخول يرجى التوجه الى موقع المعهد الدراسي
                     </p>
-                    <a href="https://turathalanbiaa.com" class="btn btn-outline-white btn-md"><i
+                    <a href="https://edu.turathalanbiaa.com" class="btn btn-outline-white btn-md"><i
                                 class="fas fa-sign-in-alt left"></i> تسجيل الدخول</a>
                 </div>
             </div>
