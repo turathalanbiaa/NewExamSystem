@@ -86,6 +86,7 @@
                                             <a class="h5 text-center text-white d-block mb-0" href="/control-panel/exams/{{$exam->id}}">
                                                 {{$exam->title}}
                                             </a>
+                                            <p class="text-center text-white mb-0">{{$exam->date}}</p>
                                         </div>
 
                                         {{-- Card Content --}}
