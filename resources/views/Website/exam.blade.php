@@ -16,8 +16,10 @@
                             @if ($question->type== \App\Enums\QuestionType::TRUE_OR_FALSE)
 								@php $i=1; @endphp
                                 @foreach($question->branches as $branch)
-									{{ $i++ }}
-                                    <h5 class="card-title"><a>{{$branch->title}}</a></h5>
+                                    <h5 class="card-title">
+										<span>{{ $i++ }}</span>
+										<a>{{$branch->title}}</a>
+									</h5>
                                     <div id="{{$branch->id}}">
                                         @foreach(json_decode($branch->options) as $option)
                                             <div class="custom-control custom-radio">
