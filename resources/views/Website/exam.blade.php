@@ -43,9 +43,12 @@
                             @endif
                             {{--singal choice--}}
                             @if ($question->type==\App\Enums\QuestionType::SINGLE_CHOICE)
+								@php $i=1; @endphp
                                 @foreach($question->branches as $branch)
-
-                                    <h5 class="card-title"><a>{{$branch->title}}</a></h5>
+                                    <h5 class="card-title">
+										<span>{{ $i++ . "-" }}</span>
+										<a>{{$branch->title}}</a>
+									</h5>
                                     <div id="{{$branch->id}}">
                                         @foreach(json_decode($branch->options) as $option)
                                             <div class="custom-control custom-radio">
@@ -69,11 +72,15 @@
                             @endif
                             {{--fill in the blanck--}}
                             @if ($question->type==\App\Enums\QuestionType::FILL_BLANK)
+								@php $i=1; @endphp
                                 @foreach($question->branches as $branch)
                                     <div class="md-form">
                                         <input type="text" id="txt{{$branch->id}}" class="form-control"
                                                value="@if(!empty($branch->getStudentAnswer)){{$branch->getStudentAnswer->text}}@endif">
-                                        <label class="w-100" for="txt{{$branch->id}}">{{$branch->title}}</label>
+                                        <label class="w-100" for="txt{{$branch->id}}">
+											<span>{{ $i++ . "-" }}</span>
+											{{$branch->title}}
+										</label>
                                     </div>
                                     <button type="button"
                                             id="btn{{$branch->id}}"
@@ -89,11 +96,15 @@
                             @endif
                             {{--expalin--}}
                             @if ($question->type==\App\Enums\QuestionType::EXPLAIN)
+								@php $i=1; @endphp
                                 @foreach($question->branches as $branch)
                                     <div class="md-form">
                                         <input type="text" id="txt{{$branch->id}}" class="form-control"
                                                value="@if(!empty($branch->getStudentAnswer)){{$branch->getStudentAnswer->text}}@endif">
-                                        <label class="w-100" for="txt{{$branch->id}}">{{$branch->title}}</label>
+                                        <label class="w-100" for="txt{{$branch->id}}">
+											<span>{{ $i++ . "-" }}</span>
+											{{$branch->title}}
+										</label>
                                     </div>
                                     <button type="button"
                                             id="btn{{$branch->id}}"
