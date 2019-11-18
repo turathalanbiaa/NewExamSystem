@@ -17,7 +17,7 @@
 								@php $i=1; @endphp
                                 @foreach($question->branches as $branch)
                                     <h5 class="card-title">
-										<span>{{ $i++ }}</span>
+										<span>{{ $i++ . "-" }}</span>
 										<a>{{$branch->title}}</a>
 									</h5>
                                     <div id="{{$branch->id}}">
