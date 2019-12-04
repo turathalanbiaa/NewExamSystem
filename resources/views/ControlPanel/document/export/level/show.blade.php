@@ -44,7 +44,7 @@
                             <td class="th-sm">
                                 <span>{{$student->OriginalStudent->Name}}</span>
                             </td>
-                            @foreach($student->documentsForCurrentSeason() as $document)
+                            @forelse($student->documentsForCurrentSeason() as $document)
                                 @if($document->course->state == \App\Enums\CourseState::OPEN)
                                     <td class="th-sm">
                                         <span class="{{($document->final_score <50)?"text-decoration":""}}">{{$document->final_score}}</span>
@@ -53,7 +53,13 @@
                                 @if($loop->last)
                                     @php $i = $loop->iteration; @endphp
                                 @endif
-                            @endforeach
+
+                            @empty
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            @endforelse
                             @for($i;$i<$courses->count();$i++)
                                 <td>---</td>
                             @endfor
