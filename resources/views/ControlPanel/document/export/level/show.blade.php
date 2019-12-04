@@ -48,7 +48,7 @@
                                 @if($document->course->state == \App\Enums\CourseState::OPEN)
                                     <td class="th-sm">
                                         @php $magicScore = round($document->final_score * (100/60), 2); @endphp
-                                        <span class="{{($magicScore <50)?"text-decoration":""}}">{{$magicScore}}</span>
+                                        <span class="{{($document->final_score <50)?"text-decoration":""}}">{{$document->final_score}}</span>
                                     </td>
                                 @endif
                                 @if($loop->last)
