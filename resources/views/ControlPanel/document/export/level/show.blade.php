@@ -47,7 +47,8 @@
                             @forelse($student->documentsForCurrentSeason() as $document)
                                 @if($document->course->state == \App\Enums\CourseState::OPEN)
                                     <td class="th-sm">
-                                        <span class="{{($document->final_score <50)?"text-decoration":""}}">{{$document->final_score}}</span>
+                                        @php $magicScore = $document->final_score * (100/60); @endphp
+                                        <span class="{{($magicScore <50)?"text-decoration":""}}">{{$magicScore}}</span>
                                     </td>
                                 @endif
                                 @if($loop->last)
