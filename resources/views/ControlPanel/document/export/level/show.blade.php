@@ -56,8 +56,7 @@
 
                             @empty
                                 @php
-                                    use App\Models\Course;
-                                    $count = Course::where("level", $student->OriginalStudent->Level)->count();
+                                    $count = \App\Models\Course::where("level", $student->OriginalStudent->Level)->count();
                                 @endphp
                                 @for($i=0;$i<$count;$i++)
                                     <td>---</td>
