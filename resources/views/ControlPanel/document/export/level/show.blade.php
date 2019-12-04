@@ -39,7 +39,7 @@
                     @foreach($students as $student)
                         <tr>
                             <td class="th-sm">
-                                <span>{{$loop->iteration}}</span>
+                                <span>{{$loop->iteration - $student->OriginalStudent->ID}}</span>
                             </td>
                             <td class="th-sm">
                                 <span>{{$student->OriginalStudent->Name}}</span>
@@ -47,7 +47,6 @@
                             @forelse($student->documentsForCurrentSeason() as $document)
                                 @if($document->course->state == \App\Enums\CourseState::OPEN)
                                     <td class="th-sm">
-                                        @php $magicScore = round($document->final_score * (100/60), 2); @endphp
                                         <span class="{{($document->final_score <50)?"text-decoration":""}}">{{$document->final_score}}</span>
                                     </td>
                                 @endif
