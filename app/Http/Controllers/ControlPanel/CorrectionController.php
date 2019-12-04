@@ -258,7 +258,7 @@ class CorrectionController extends Controller
                 }
 
                 //Convert fake score to real real score
-                $sum = $sum * $ratio;
+//                $sum = $sum * $ratio;
 
                 //Add curve to sum
                 $sum = $sum + $exam->curve;
