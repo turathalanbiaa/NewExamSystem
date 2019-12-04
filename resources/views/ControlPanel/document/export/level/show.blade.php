@@ -51,7 +51,8 @@
                                     </td>
                                 @endif
                                 @if($loop->last)
-                                    @php $i = $loop->iteration; @endphp
+{{--                                    @php $i = $loop->iteration; @endphp--}}
+                                    @php $i = 1; @endphp
                                 @endif
                             @endforeach
                             @for($i;$i<$courses->count();$i++)
