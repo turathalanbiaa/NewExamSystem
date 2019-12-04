@@ -55,10 +55,13 @@
                                 @endif
 
                             @empty
-                                <td>---</td>
-                                <td>---</td>
-                                <td>---</td>
-                                <td>---</td>
+                                @php
+                                    use App\Models\Course;
+                                    $count = Course::where("level", $student->OriginalStudent->Level)->count();
+                                @endphp
+                                @for($i=0;$i<$count;$i++)
+                                    <td>---</td>
+                                @endfor
                             @endforelse
                             @for($i;$i<$courses->count();$i++)
                                 <td>---</td>
