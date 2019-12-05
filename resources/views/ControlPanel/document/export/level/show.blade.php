@@ -39,7 +39,7 @@
                     @foreach($students as $student)
                         <tr>
                             <td class="th-sm">
-                                <span>{{$loop->iteration}} - {{$student->id}}</span>
+                                <span>{{$loop->iteration}}</span>
                             </td>
                             <td class="th-sm">
                                 <span>{{$student->OriginalStudent->Name}}</span>
