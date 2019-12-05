@@ -205,6 +205,14 @@ class DocumentController extends Controller
                 ->where("state", CourseState::OPEN)
                 ->orderBy("id")
                 ->get();
+
+            $CoursesIdInDocuments = StudentDocument::whereIn("course_id", $courses->pluck('id')->toArray())->distinct()->pluck('course_id')->toArray();
+
+            $coursesInDocuments = Course::whereIn("id", $CoursesIdInDocuments)
+                ->where("state", CourseState::OPEN)
+                ->orderBy("id")
+                ->get();
+
             $students = Student::all();
             $students = $students->filter(function ($student) use ($value){
                 return ($student->originalStudent->Level == $value);
@@ -212,7 +220,7 @@ class DocumentController extends Controller
 
             return view("ControlPanel.document.export.level.show")->with([
                 "level" => $value,
-                "courses" => $courses,
+                "courses" => $coursesInDocuments,
                 "students" => $students
             ]);
         }
