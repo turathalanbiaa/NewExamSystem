@@ -221,7 +221,8 @@ class DocumentController extends Controller
             return view("ControlPanel.document.export.level.show")->with([
                 "level" => $value,
                 "courses" => $coursesInDocuments,
-                "students" => $students
+                "students" => $students,
+                "numberOfCourses" => count($CoursesIdInDocuments)
             ]);
         }
 

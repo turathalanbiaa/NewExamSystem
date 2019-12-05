@@ -55,10 +55,7 @@
                                 @endif
 
                             @empty
-                                @php
-                                    $count = \App\Models\Course::where("level", $student->OriginalStudent->Level)->count();
-                                @endphp
-                                @for($i=0;$i<$count;$i++)
+                                @for($i=0;$i<$numberOfCourses;$i++)
                                     <td>---</td>
                                 @endfor
                             @endforelse
