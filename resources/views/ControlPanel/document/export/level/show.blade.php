@@ -69,12 +69,12 @@
             </div>
 
             {{-- Footer --}}
-            <div class="col-12 mb-5">
-                <a class="btn btn-outline-danger font-weight-bold" href="/control-panel/pdf/level/{{$level}}">
-                    <span class="far fa-file-pdf ml-1"></span>
-                    <span>تصدير ملف pdf</span>
-                </a>
-            </div>
+{{--            <div class="col-12 mb-5">--}}
+{{--                <a class="btn btn-outline-danger font-weight-bold" href="/control-panel/pdf/level/{{$level}}">--}}
+{{--                    <span class="far fa-file-pdf ml-1"></span>--}}
+{{--                    <span>تصدير ملف pdf</span>--}}
+{{--                </a>--}}
+{{--            </div>--}}
         </div>
     </div>
 @endsection
