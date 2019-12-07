@@ -74,7 +74,7 @@
                                                             {{-- Score --}}
                                                             <p class="d-flex mb-0 justify-content-end">
                                                                 <label for="answer-{{$answer->id}}" class="text-success my-auto ml-1">الدرجة: </label>
-                                                                <input type="number" class="form-control d-inline" id="answer-{{$answer->id}}" name="{{$answer->id}}" value="{{$answer->score}}">
+                                                                <input type="number" class="form-control d-inline" style="width: 65px" id="answer-{{$answer->id}}" name="{{$answer->id}}" value="{{$answer->score}}">
                                                             </p>
                                                         </div>
                                                     </li>
