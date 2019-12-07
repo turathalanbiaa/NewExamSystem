@@ -72,7 +72,7 @@
                                                             </p>
 
                                                             {{-- Score --}}
-                                                            <p class="d-flex mb-0 justify-content-end">
+                                                            <p class="d-flex mb-0 justify-content-end" style="min-width: 150px">
                                                                 <label for="answer-{{$answer->id}}" class="text-success my-auto ml-1">الدرجة: </label>
                                                                 <input type="number" class="form-control d-inline w-25" id="answer-{{$answer->id}}" name="{{$answer->id}}" value="{{$answer->score}}">
                                                             </p>
