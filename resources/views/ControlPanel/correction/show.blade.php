@@ -66,7 +66,7 @@
                                                         {{-- Answer --}}
                                                         <div class="d-flex justify-content-between">
                                                             {{-- Text --}}
-                                                            <p class="mb-0">
+                                                            <p class="mb-0 pl-3">
                                                                 <span class="text-success">الجواب: </span>
                                                                 <span>{{$answer->text}}</span>
                                                             </p>
