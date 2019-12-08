@@ -23,13 +23,13 @@ class Level
     {
         switch ($level)
         {
-            case self::BEGINNER: return "المستوى التمهيدي"; break;
-            case self::FIRST: return "المستوى الاول"; break;
-            case self::SECOND: return "المستوى الثاني"; break;
-            case self::THIRD: return "المستوى الثالث"; break;
-            case self::FOURTH: return "المستوى الرابع"; break;
-            case self::FIFTH: return "المستوى الخامس"; break;
-            case self::SIXTH: return "المستوى السادس"; break;
+            case self::BEGINNER: return "المرحلة التمهيدية"; break;
+            case self::FIRST: return "المرحلة الاولى المستوى الاول"; break;
+            case self::SECOND: return "المرحلة الاولى المستوى الثاني"; break;
+            case self::THIRD: return "المرحلة الثانية المستوى الاول"; break;
+            case self::FOURTH: return "المرحلة الثانية المستوى الثاني"; break;
+            case self::FIFTH: return "المرحلة الثالثة المستوى الاول"; break;
+            case self::SIXTH: return "المرحلة الثالثة المستوى الثاني"; break;
 
             default: return "";
         }
