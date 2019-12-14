@@ -33,6 +33,14 @@
                                 <span>{{$course->name}}</span>
                             </th>
                         @endforeach
+
+                        <th class="th-sm font-weight-bold align-middle">
+                            <span>المجموع</span>
+                        </th>
+
+                        <th class="th-sm font-weight-bold align-middle">
+                            <span>المعدل</span>
+                        </th>
                     </tr>
                     </thead>
                     <tbody>
@@ -41,9 +49,11 @@
                             <td class="th-sm">
                                 <span>{{$loop->iteration}}</span>
                             </td>
+
                             <td class="th-sm">
                                 <span>{{$student->OriginalStudent->Name}}</span>
                             </td>
+
                             @forelse($student->documentsForCurrentSeason() as $document)
                                 @if($document->course->state == \App\Enums\CourseState::OPEN)
                                     <td class="th-sm">
@@ -53,7 +63,6 @@
                                 @if($loop->last)
                                     @php $i = $loop->iteration; @endphp
                                 @endif
-
                             @empty
                                 @for($i=0;$i<$numberOfCourses;$i++)
                                     <td>---</td>
@@ -62,6 +71,13 @@
                             @for($i;$i<$courses->count();$i++)
                                 <td>---</td>
                             @endfor
+
+                            <td>
+                                {{$student->documentsForCurrentSeason()->sum("final_score")}}
+                            </td>
+                            <td>
+                                {{$student->documentsForCurrentSeason()->sum("final_score")/$numberOfCourses}}
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>
