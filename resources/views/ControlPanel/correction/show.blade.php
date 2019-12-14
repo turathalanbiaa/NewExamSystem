@@ -64,7 +64,7 @@
                                                         <p class="mb-1">{{$answer->branch->title}}</p>
 
                                                         {{-- Answer --}}
-                                                        <div class="d-flex justify-content-between">
+                                                        <div class="d-block d-md-flex justify-content-between pt-1">
                                                             {{-- Text --}}
                                                             <p class="mb-0 pl-3">
                                                                 <span class="text-success">الجواب: </span>

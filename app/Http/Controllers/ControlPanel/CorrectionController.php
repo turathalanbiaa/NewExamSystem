@@ -264,7 +264,7 @@ class CorrectionController extends Controller
                 $sum = $sum + $exam->curve;
 
                 //Update exam student
-                $examStudent->score = $sum;
+                $examStudent->score = ($sum>=100? 100:$sum);
                 $examStudent->save();
 
                 //Get student
