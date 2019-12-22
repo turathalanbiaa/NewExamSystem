@@ -118,7 +118,7 @@
 
                                             <div class="mb-3">
                                                 <label for="option-3">الاختيار الثالث</label>
-                                                <input type="text" name="option-3" id="option-3" class="form-control" value="{{$options[2]}}" data-action="change">
+                                                <input type="text" name="option-3" id="option-3" class="form-control" value="{{@$options[2]}}" data-action="change">
                                             </div>
 
                                             <div class="mb-3">
