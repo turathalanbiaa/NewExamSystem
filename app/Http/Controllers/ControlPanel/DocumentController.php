@@ -200,6 +200,7 @@ class DocumentController extends Controller
     {
         Auth::check();
 
+        $value = (Integer) $value;
         if ($type == "level")
         {
             $courses = Course::where("level", $value)

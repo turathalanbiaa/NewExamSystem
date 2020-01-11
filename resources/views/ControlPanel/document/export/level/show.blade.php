@@ -63,7 +63,7 @@
                                 </td>
 
                                 @php $count = 0; @endphp
-                                @forelse($student->documentsForCurrentSeason() as $document)
+                                @forelse($student->documentsByLevel($level) as $document)
                                     @if($document->final_score < 50)
                                         @php $count++; @endphp
                                     @endif
@@ -155,7 +155,7 @@
                                 </td>
 
                                 @php $count = 0; @endphp
-                                @forelse($student->documentsForCurrentSeason() as $document)
+                                @forelse($student->documentsByLevel($level) as $document)
                                     @if($document->final_score < 50)
                                         @php $count++; @endphp
                                     @endif

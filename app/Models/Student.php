@@ -33,6 +33,18 @@ class Student extends Model
 
     }
 
+    public function documentsByLevel($level)
+    {
+        $sys_vars = SystemVariables::find(1);
+        $courses = Course::where("level", $level)->pluck("id")->toArray();
+        return $this->hasMany("App\Models\StudentDocument","student_id", "id")
+            ->whereIn("course_id", $courses)
+            ->where("season", $sys_vars->current_season)
+            ->where("year", $sys_vars->current_year)
+            ->orderBy("course_id")
+            ->get();
+    }
+
     public function documentsForCurrentSeason()
     {
         $sys_vars = SystemVariables::find(1);
