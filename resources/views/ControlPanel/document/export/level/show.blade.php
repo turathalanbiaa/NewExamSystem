@@ -54,6 +54,7 @@
                             <tr>
                                 <td class="th-sm align-middle">
                                     <span>{{$sequence++}}</span>
+                                    <sapn>{{$student->OriginalStudent->ID}}</sapn>
                                 </td>
 
                                 <td class="th-sm align-middle">
