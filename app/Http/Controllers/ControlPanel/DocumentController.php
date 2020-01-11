@@ -106,10 +106,11 @@ class DocumentController extends Controller
             foreach ($documents as $document)
             {
                 $total = $document->first_month_score + $document->second_month_score + $document->assessment_score;
-                if (is_null($document->final_second_score))
-                    $total += $document->final_first_score;
-                else
+                if ($document->final_second_score > $document->final_first_score)
                     $total += $document->final_second_score;
+                else
+                    $total += $document->final_first_score;
+
                 $total = ceil($total);
                 $document->total = $total;
 
