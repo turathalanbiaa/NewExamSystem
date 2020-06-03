@@ -101,7 +101,10 @@ class StudentExamController extends Controller
 
     public function finish(Request $request)
     {
-        $examStudent = ExamStudent::where('exam_id', $request->id)->first();
+        $student = Student::where('remember_token', Cookie::get('remember_me'))->first();
+        $examStudent = ExamStudent::where('exam_id', $request->id)
+            ->where('student_id', $student->id)
+            ->first();
         $examStudent->state = 2;
         $examStudent->save();
         return response()->json($examStudent);
