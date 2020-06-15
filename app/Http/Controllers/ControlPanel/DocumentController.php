@@ -7,6 +7,7 @@ use App\Enums\EventLogType;
 use App\Enums\ExamType;
 use App\Models\Assessment;
 use App\Models\Course;
+use App\Models\EduStudent;
 use App\Models\EventLog;
 use App\Models\Exam;
 use App\Models\ExamStudent;
@@ -217,7 +218,7 @@ class DocumentController extends Controller
 
             $students = Student::all();
             $students = $students->filter(function ($student) use ($value){
-                return ($student->originalStudent->Level == $value);
+                return ($student->originalStudent && $student->originalStudent->Level == $value);
             });
 
             return view("ControlPanel.document.export.level.show")->with([
