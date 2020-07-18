@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\DB;
 
 class DocumentController extends Controller
 {
+    public function __construct()
+    {
+        ini_set('max_execution_time', 300);
+    }
+
     /**
      * Display all operation
      *
@@ -234,7 +239,7 @@ class DocumentController extends Controller
             $course = Course::findOrFail($value);
             $students = Student::all();
             $students = $students->filter(function ($student) use ($course){
-                return ($student->originalStudent->Level == $course->level);
+                return ($student->originalStudent && $student->originalStudent->Level == $course->level);
             });
 
             return view("ControlPanel.document.export.course.show")->with([
@@ -248,7 +253,7 @@ class DocumentController extends Controller
             $exam = Exam::findOrFail($value);
             $students = Student::all();
             $students = $students->filter(function ($student) use ($exam){
-                return ($student->originalStudent->Level == $exam->course->level);
+                return ($student->originalStudent && $student->originalStudent->Level == $exam->course->level);
             });
 
             return view("ControlPanel.document.export.exam.show")->with([
