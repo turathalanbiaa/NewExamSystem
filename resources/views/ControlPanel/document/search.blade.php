@@ -33,7 +33,7 @@
                             <td class="align-baseline">{{$student->originalStudent->Name ?? null}}</td>
                             <td class="align-baseline">{{\App\Enums\Level::get($student->originalStudent->Level ?? null)}}</td>
                             <td class="align-baseline text-center">
-                                <a class="btn btn-outline-dark m-1" href="/control-panel/documents/{{$student->id}}">
+                                <a class="btn btn-outline-dark m-1" href="/control-panel/documents/{{$student->id}}" target="_blank">
                                     <i class="far fa-file-alt ml-1"></i>
                                     <span>عرض الوثائق</span>
                                 </a>
