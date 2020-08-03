@@ -30,7 +30,7 @@
                     @foreach($students as $student)
                         <tr>
                             <td class="align-baseline">{{$student->id}}</td>
-                            <td class="align-baseline">{{$student->originalStudent->Name}}</td>
+                            <td class="align-baseline">{{$student->originalStudent->Name ?? null}}</td>
                             <td class="align-baseline">{{\App\Enums\Level::get($student->originalStudent->Level)}}</td>
                             <td class="align-baseline text-center">
                                 <a class="btn btn-outline-dark m-1" href="/control-panel/documents/{{$student->id}}">
