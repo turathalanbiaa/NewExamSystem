@@ -20,18 +20,9 @@
                                     {{$exam->date}}
                                 </h5>
                                 <p class="card-text text-justify">
-
                                 </p>
 
                                 <div class="card-body-content-fixed">
-                                    {{--                                    <hr>
-
-                                                                        <div class="btn-group w-100">
-                                                                            <a class="btn btn-sm btn-outline-primary font-weight-bold w-50 ml-1 mr-0 waves-effect waves-light"  href="{{URL::to('exam',$exam->id)}}">
-                                                                                <i class="fa fa-play ml-1"></i>
-                                                                                <span>بدء</span>
-                                                                            </a>
-                                                                        </div>--}}
                                 </div>
                             </div>
                         </div>

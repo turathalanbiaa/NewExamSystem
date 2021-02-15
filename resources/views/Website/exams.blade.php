@@ -15,17 +15,16 @@
                         </div>
                         <div class="card-body">
                             <h5>
-                                درجة الامتحان :
-                                {{$exam->real_score}}
+                                درجة الامتحان : 100
                             </h5>
                             <p class="card-text text-justify"></p>
                             <div class="card-body-content-fixed">
                                 <hr>
                                 <div class="btn-group w-100">
-                                    <a class="btn  btn-block btn-sm btn-outline-default font-weight-bold  ml-1 mr-0 waves-effect waves-light"
+                                    <a class="btn btn-block btn-outline-default waves-effect waves-light"
                                        href="{{URL::to('exam',$exam->id)}}">
                                         <i class="fa fa-play ml-1"></i>
-                                        <span>بدء</span>
+                                        <span>بدء الامتحان</span>
                                     </a>
                                 </div>
                             </div>

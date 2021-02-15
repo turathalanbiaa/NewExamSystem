@@ -15,28 +15,28 @@
                         </div>
                         <div class="card-body">
                             <h5>
-                                درجة الامتحان :
-                                {{$exam->real_score}}
+                                درجة الامتحان : 100
                             </h5>
                             <h5>
                                 درجة الطالب :
-                                @if(is_null($exam->pivot->score))
-                                  يرجى انتظار التصحيح
-                                    @else
-                                    {{$exam->pivot->score}}
-                                    @endif
+                                @if($exam->state == \App\Enums\ExamState::OPEN)
+                                    يرجى انتظار التصحيح
+                                @else
+                                    {{$exam->pivot->score ?? 0}}
+                                @endif
                             </h5>
-                            <p class="card-text text-justify"></p>
-                            <div class="card-body-content-fixed">
-                                <hr>
-                                <div class="btn-group w-100">
-                                    <a class="btn btn-block btn-sm btn-outline-default font-weight-bold  ml-1 mr-0 waves-effect waves-light"
-                                       href="{{URL::to('finished-exam',$exam->id)}}">
-                                        <i class="fa fa-eye ml-1"></i>
-                                        <span>معاينة</span>
-                                    </a>
+                            @if($exam->state == \App\Enums\ExamState::END)
+                                <div class="card-body-content-fixed">
+                                    <hr>
+                                    <div class="btn-group w-100">
+                                        <a class="btn btn-block btn-outline-default waves-effect waves-light"
+                                           href="{{URL::to('finished-exam',$exam->id)}}">
+                                            <i class="fa fa-eye ml-1"></i>
+                                            <span>معاينة الاجوبة</span>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>

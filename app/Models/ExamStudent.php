@@ -10,6 +10,10 @@ class ExamStudent extends Model
     protected $primaryKey = "id";
     public $timestamps = false;
 
+    protected $fillable = [
+        "state"
+    ];
+
     public function student()
     {
         return $this->belongsTo("App\Models\Student", "student_id", "id");

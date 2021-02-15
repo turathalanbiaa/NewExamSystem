@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Website;
 
 use App\Enums\AnswerCorrectionState;
+use App\Enums\ExamState;
+use App\Enums\ExamStudentState;
 use App\Models\Answer;
 use App\Models\Exam;
 use App\Models\ExamStudent;
@@ -14,8 +16,7 @@ use Illuminate\Support\Facades\Cookie;
 
 class StudentExamController extends Controller
 {
-    public function exams()
-    {
+    public function exams() {
         try {
             $studentNotFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
             return view("Website/exams", compact('studentNotFinishedExams', $studentNotFinishedExams->notFinishedExams));
@@ -23,8 +24,17 @@ class StudentExamController extends Controller
             return $e->getMessage();
         }
     }
-    public function nextExams()
-    {
+
+    public function finishedExams() {
+        try {
+            $studentFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
+            return view("Website/finishedExams", compact('studentFinishedExams', $studentFinishedExams->finishedExams));
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function nextExams() {
         try {
             $studentNotFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
             return view("Website/nextExams", compact('studentNotFinishedExams', $studentNotFinishedExams->notFinishedExams));
@@ -33,36 +43,51 @@ class StudentExamController extends Controller
         }
     }
 
-    public function finishedExams()
-    {
-        try {
-            $studentFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
-            //return response()->json($student->notFinishedExams);
-            return view("Website/finishedExams", compact('studentFinishedExams', $studentFinishedExams->finishedExams));
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+    public function exam($id) {
+        $exam = Exam::where([
+            "id" => $id,
+            "state" => ExamState::OPEN
+        ])->first();
+
+        if (!$exam)
+            abort(404);
+
+        $student = Student::where('remember_token', Cookie::get('remember_me'))->first();
+
+        $examStudent = ExamStudent::where([
+            "student_id" => $student->id,
+            "exam_id"    => $exam->id
+        ])->first();
+
+        if (!$examStudent || $examStudent->state == ExamStudentState::FINISHED)
+            abort(403, "دخول غير مصرح به");
+
+        return view("Website/exam", compact('exam', $exam));
+    }
+
+    public function finishedExam($id) {
+        $exam = Exam::where([
+            "id" => $id,
+            "state" => ExamState::END
+        ])->first();
+
+        if (!$exam)
+            abort(404);
+
+        $student = Student::where('remember_token', Cookie::get('remember_me'))->first();
+
+        $examStudent = ExamStudent::where([
+            "student_id" => $student->id,
+            "exam_id"    => $exam->id
+        ])->first();
+
+        if (!$examStudent)
+            abort(403, "دخول غير مصرح به");
+
+        return view("Website/finishedExam", compact('exam', $exam));
     }
 
 
-    public function exam($id)
-    {
-        try {
-            $exam = Exam::find($id);
-            return view("Website/exam", compact('exam', $exam));
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
-    }
-    public function finishedExam($id)
-    {
-        try {
-            $exam = Exam::find($id);
-            return view("Website/finishedExam", compact('exam', $exam));
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
-    }
     public function store(Request $request)
     {
         try {
@@ -98,7 +123,6 @@ class StudentExamController extends Controller
             return $e->getMessage();
         }
     }
-
     public function finish(Request $request)
     {
         $student = Student::where('remember_token', Cookie::get('remember_me'))->first();
@@ -108,21 +132,5 @@ class StudentExamController extends Controller
         $examStudent->state = 2;
         $examStudent->save();
         return response()->json($examStudent);
-    }
-
-    public function edit($id)
-    {
-        //
-    }
-
-
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    public function destroy($id)
-    {
-        //
     }
 }

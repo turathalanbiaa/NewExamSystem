@@ -6,6 +6,7 @@ use App\Enums\AccountType;
 use App\Enums\CourseState;
 use App\Enums\EventLogType;
 use App\Enums\ExamState;
+use App\Enums\ExamStudentState;
 use App\Enums\ExamType;
 use App\Enums\QuestionCorrectionState;
 use App\Models\Answer;
@@ -232,6 +233,25 @@ class ExamController extends Controller
                 //Update exam
                 $exam->save();
 
+
+                // finished exam for all student when exam is end
+                if ($exam->state == ExamState::END) {
+                    $exam_students = ExamStudent::where("exam_id", $exam->id)->get();
+                    foreach ($exam_students as $exam_student)
+                        $exam_student->update([
+                            "state" => ExamStudentState::FINISHED
+                        ]);
+                }
+
+                // not finished exam for all student when exam is reopen
+                if (Input::get("state") == "reopen") {
+                    $exam_students = ExamStudent::where("exam_id", $exam->id)->get();
+                    foreach ($exam_students as $exam_student)
+                        $exam_student->update([
+                            "state" => ExamStudentState::NOT_FINISHED
+                        ]);
+                }
+
                 //Store event log
                 $target = $exam->id;
                 $type = EventLogType::EXAM;
@@ -397,14 +417,14 @@ class ExamController extends Controller
             }
 
             //Delete the exam from the student document
-            foreach ($exam->studentsEnrolled as $studentEnrolled)
-                StudentDocument::where('student_id', $studentEnrolled->student_id)
-                    ->where("course_id", $exam->course_id)
-                    ->update(
-                        $exam->type == ExamType::FIRST_MONTH?["first_month_score" => 0]:
-                            $exam->type == ExamType::SECOND_MONTH?["second_month_score" => 0]:
-                                $exam->type == ExamType::FINAL_FIRST_ROLE?["final_first_score" => 0]:["final_second_score" => 0]
-                    );
+            // foreach ($exam->studentsEnrolled as $studentEnrolled)
+            //     StudentDocument::where('student_id', $studentEnrolled->student_id)
+            //         ->where("course_id", $exam->course_id)
+            //         ->update(
+            //             $exam->type == ExamType::FIRST_MONTH?["first_month_score" => 0]:
+            //                 $exam->type == ExamType::SECOND_MONTH?["second_month_score" => 0]:
+            //                     $exam->type == ExamType::FINAL_FIRST_ROLE?["final_first_score" => 0]:["final_second_score" => 0]
+            //         );
 
             //Delete students enrolled for the exam
             $exam->studentsEnrolled()->delete();

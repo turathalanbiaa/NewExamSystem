@@ -11,11 +11,16 @@ class Student extends Model
     public $timestamps = false;
 
     public function notFinishedExams(){
-        return $this->belongsToMany('App\Models\Exam', 'exam_student', 'student_id', 'exam_id')->wherePivot('state',  \App\Enums\ExamStudentState::NOT_FINISHED);
+        return $this->belongsToMany('App\Models\Exam', 'exam_student', 'student_id', 'exam_id')
+            ->orderByDesc("exam_id")
+            ->wherePivot('state',  \App\Enums\ExamStudentState::NOT_FINISHED);
     }
 
     public function finishedExams(){
-        return $this->belongsToMany('App\Models\Exam', 'exam_student', 'student_id', 'exam_id')->wherePivot('state', \App\Enums\ExamStudentState::FINISHED)->withPivot('score');
+        return $this->belongsToMany('App\Models\Exam', 'exam_student', 'student_id', 'exam_id')
+            ->orderByDesc("exam_id")
+            ->wherePivot('state', \App\Enums\ExamStudentState::FINISHED)
+            ->withPivot('score');
     }
 
     public function exams(){

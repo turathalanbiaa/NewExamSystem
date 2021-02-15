@@ -15,16 +15,17 @@ class StudentAuthController extends Controller
 {
     public function studentAuth(Request $request)
     {
-        $crypted_token = Input::get("token");
-
-        list($crypted_token, $enc_iv) = explode("<-::->", $crypted_token);;
-        $cipher_method = 'AES-128-CTR';
-        $enc_key = "TurathExamSystem";
-        $enc_options = 0;
-        $token = openssl_decrypt($crypted_token, $cipher_method, $enc_key, $enc_options, hex2bin($enc_iv));
+//        $crypted_token = Input::get("token");
+//
+//        list($crypted_token, $enc_iv) = explode("<-::->", $crypted_token);;
+//        $cipher_method = 'AES-128-CTR';
+//        $enc_key = "TurathExamSystem";
+//        $enc_options = 0;
+//        $token = openssl_decrypt($crypted_token, $cipher_method, $enc_key, $enc_options, hex2bin($enc_iv));
 
         //Id come from request
-        $requestId = $token;
+//        $requestId = $token;
+        $requestId = 2229;
         $eduStudent=EduStudent::find($requestId);
         $student=Student::where('edu_student_id',$eduStudent->ID)->first();
 
