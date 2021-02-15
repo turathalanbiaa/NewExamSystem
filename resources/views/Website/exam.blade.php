@@ -5,20 +5,45 @@
 @section("content")
     <div class="container">
         <div class="row">
-            <h4 class="alert-heading font-weight-bold mb-4 text-center">{{$exam->title}}</h4>
+            <div class="col-12 py-4">
+                <div class="row text-center">
+                    <div class="col-sm-4">
+                        <h5>
+                            <span>المادة: </span>
+                            {{$exam->course->name}}
+                        </h5>
+                    </div>
+                    <div class="col-sm-4">
+                        <h5>
+                            <span>الامتحان: </span>
+                            {{$exam->title}}
+                        </h5>
+                    </div>
+                    <div class="col-sm-4">
+                        <h5>
+                            <span>التاريخ: </span>
+                            {{$exam->date}}
+                        </h5>
+                    </div>
+                </div>
+            </div>
             @foreach($exam->questions as $question)
                 <div class="col-12 pb-5">
                     <div class="card">
                         <div class="card-body">
-                            <h3 class="card-title"><a>{{$question->title}}</a></h3>
+                            <h3 class="card-title">
+                                {{$question->title}}
+                                <span class="badge badge-pill badge-info float-left">
+                                    <span>الدرجة : </span>
+                                    {{$question->score}}
+                                </span>
+                            </h3>
                             <hr/>
                             {{--true false--}}
                             @if ($question->type== \App\Enums\QuestionType::TRUE_OR_FALSE)
-								@php $i=1; @endphp
                                 @foreach($question->branches as $branch)
                                     <h5 class="card-title">
-										<span>{{ $i++ . "-" }}</span>
-										<a>{{$branch->title}}</a>
+                                        {{$loop->iteration}} - {{$branch->title}}
 									</h5>
                                     <div id="{{$branch->id}}">
                                         @foreach(json_decode($branch->options) as $option)
@@ -26,28 +51,24 @@
                                                 <input type="radio" class="custom-control-input"
                                                        id="{{$branch->id."-".$loop->index}}" name="{{$branch->id}}"
                                                        onchange="saveAnswer({{$branch->id}},'{{$option}}')"
-                                                       @if(!empty($branch->getStudentAnswer))
-                                                       @if ($branch->getStudentAnswer->text==$option) checked @endif
-                                                        @endif >
-                                                <label class="custom-control-label"
-                                                       for="{{$branch->id."-".$loop->index}}">{{$option}}</label>
+                                                       {{($branch->getStudentAnswer && $branch->getStudentAnswer->text==$option)? "checked" : ""}}>
+                                                <label class="custom-control-label" for="{{$branch->id."-".$loop->index}}">
+                                                    {{$option}}
+                                                </label>
                                             </div>
                                         @endforeach
                                     </div>
-                                    <button type="button"
-                                            class="btn btn-sm  btn-outline-danger  waves-effect font-weight-bold"
-                                            onclick="deleteAnswer({{$branch->id}},this)">ترك
+                                    <button type="button" class="btn btn-sm  btn-outline-danger  waves-effect font-weight-bold" onclick="deleteAnswer({{$branch->id}},this)">
+                                        <span>حذف الاجابة</span>
                                     </button>
                                     <hr/>
                                 @endforeach
                             @endif
                             {{--singal choice--}}
                             @if ($question->type==\App\Enums\QuestionType::SINGLE_CHOICE)
-								@php $i=1; @endphp
                                 @foreach($question->branches as $branch)
                                     <h5 class="card-title">
-										<span>{{ $i++ . "-" }}</span>
-										<a>{{$branch->title}}</a>
+                                        {{$loop->iteration}} - {{$branch->title}}
 									</h5>
                                     <div id="{{$branch->id}}">
                                         @foreach(json_decode($branch->options) as $option)
@@ -55,17 +76,15 @@
                                                 <input type="radio" class="custom-control-input"
                                                        id="{{$branch->id."-".$loop->index}}" name="{{$branch->id}}"
                                                        onchange="saveAnswer({{$branch->id}},'{{$option}}')"
-                                                       @if(!empty($branch->getStudentAnswer))
-                                                       @if ($branch->getStudentAnswer->text==$option) checked @endif
-                                                        @endif>
-                                                <label class="custom-control-label"
-                                                       for="{{$branch->id."-".$loop->index}}">{{$option}}</label>
+                                                    {{($branch->getStudentAnswer && $branch->getStudentAnswer->text==$option)? "checked" : ""}}>
+                                                <label class="custom-control-label" for="{{$branch->id."-".$loop->index}}">
+                                                    {{$option}}
+                                                </label>
                                             </div>
                                         @endforeach
                                     </div>
-                                    <button type="button"
-                                            class="btn btn-sm  btn-outline-danger  waves-effect font-weight-bold"
-                                            onclick="deleteAnswer({{$branch->id}},this)">ترك
+                                    <button type="button" class="btn btn-sm  btn-outline-danger  waves-effect font-weight-bold" onclick="deleteAnswer({{$branch->id}},this)">
+                                        <span>حذف الاجابة</span>
                                     </button>
                                     <hr/>
                                 @endforeach
