@@ -89,7 +89,6 @@ class StudentExamController extends Controller
         return view("Website/finishedExam", compact('exam', $exam));
     }
 
-
     public function store(Request $request): JsonResponse {
         $student = Student::where('remember_token', Cookie::get('remember_me'))
             ->first();
