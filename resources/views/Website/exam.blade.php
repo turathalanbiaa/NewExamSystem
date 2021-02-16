@@ -60,7 +60,7 @@
                                             </div>
                                         @endforeach
                                     </div>
-                                    <button type="button" class="btn btn-sm  btn-outline-danger  waves-effect font-weight-bold" onclick="deleteAnswer({{$branch->id}},this)">
+                                    <button type="button" class="btn btn-sm  btn-outline-danger  waves-effect font-weight-bold" onclick="deleteAnswer({{$branch->id}})">
                                         <span>حذف الاجابة</span>
                                     </button>
                                     <hr/>
@@ -85,7 +85,7 @@
                                             </div>
                                         @endforeach
                                     </div>
-                                    <button type="button" class="btn btn-sm  btn-outline-danger  waves-effect font-weight-bold" onclick="deleteAnswer({{$branch->id}},this)">
+                                    <button type="button" class="btn btn-sm  btn-outline-danger  waves-effect font-weight-bold" onclick="deleteAnswer({{$branch->id}})">
                                         <span>حذف الاجابة</span>
                                     </button>
                                     <hr/>
@@ -178,7 +178,6 @@
     <!-- Finish Exam Model-->
 @endsection
 
-
 @section("extra-content")
     <!-- Notify Model-->
     <div class="modal fade top" id="notifyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false">
@@ -197,10 +196,9 @@
     </div>
 @endsection
 
-
 @section('script')
     <script>
-        saveAnswer = function (branch, answer) {
+        function saveAnswer (branch, answer) {
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -225,7 +223,7 @@
             });
         }
 
-        deleteAnswer = function (branch) {
+        function deleteAnswer (branch) {
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
