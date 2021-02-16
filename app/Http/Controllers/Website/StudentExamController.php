@@ -6,9 +6,11 @@ use App\Enums\AnswerCorrectionState;
 use App\Enums\ExamState;
 use App\Enums\ExamStudentState;
 use App\Models\Answer;
+use App\Models\Branch;
 use App\Models\Exam;
 use App\Models\ExamStudent;
 use App\Models\Student;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
@@ -88,41 +90,120 @@ class StudentExamController extends Controller
     }
 
 
-    public function store(Request $request)
-    {
-        try {
-            $student = Student::where('remember_token', Cookie::get('remember_me'))->first();
-            if (Answer::where(['student_id' => $student->id, 'branch_id' => $request->id])->first()) {
-                Answer::where(['student_id' => $student->id, 'branch_id' => $request->id])->update(
-                    ['text' => $request->val]
-                );
-            } else {
-                $answer = new Answer;
-                $answer->student_id = $student->id;
-                $answer->branch_id = $request->id;
-                $answer->text = $request->val;
-                $answer->time = Carbon::now();
-                $answer->score = 0.00000; //Default 0.00000
-                $answer->correction = AnswerCorrectionState::UNCORRECTED; //Default 1
-                $answer->save();
-            }
-            return response()->json('ok');
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+    public function store(Request $request): JsonResponse {
+        $student = Student::where('remember_token', Cookie::get('remember_me'))
+            ->first();
+
+        $exam = Exam::where([
+            "id" => $request->input("exam"),
+            array("state", "!=", ExamState::CLOSE)
+        ])
+            ->first();
+
+        $examStudent = ExamStudent::where([
+            "student_id" => $student->id,
+            "exam_id"    => $exam->id
+        ])
+            ->first();
+
+        if (!$examStudent)
+            return response()->json([
+                "background" => "bg-danger",
+                "icon"       => "fa-bomb",
+                "message"    => "دخول غير مصرح به، يرجى اعادة تحميل الصفحة"
+            ]);
+
+        if ($exam->state == ExamState::END || $examStudent->state == ExamStudentState::FINISHED)
+            return response()->json([
+                "background" => "bg-info",
+                "icon"       => "fa-exclamation",
+                "message"    => "تم انهاء المتحان، يرجى الذهاب الى الامتحانات المنتهية"
+            ]);
+
+        $branch = Branch::where("id", $request->input("branch"))
+            ->whereIn("question_id", $exam->questions->pluck("id")->toArray())
+            ->first();
+
+        if (!$branch)
+            return response()->json([
+                "background" => "bg-warning",
+                "icon"       => "fa-skull-crossbones",
+                "message"    => "تحذير !!!، يرجى اعادة تحميل الصفحة"
+            ]);
+
+        Answer::updateOrCreate([
+            "student_id" => $student->id,
+            "branch_id"  => $branch->id
+        ], [
+            "text"       => $request->input("answer"),
+            "time"       => Carbon::now(),
+            "score"      => 0.0,
+            "correction" => AnswerCorrectionState::UNCORRECTED
+        ]);
+
+        return response()->json([
+            "background" => "bg-success",
+            "icon"       => "fa-check",
+            "message"    => "تم حفظ الاجابة بنجاح"
+        ]);
     }
-    public function delete(Request $request)
-    {
-        try {
-            $student = Student::where('remember_token', Cookie::get('remember_me'))->first();
-            if (Answer::where(['student_id' => $student->id, 'branch_id' => $request->id])->first()) {
-                Answer::where(['student_id' => $student->id, 'branch_id' => $request->id])->delete();
-            }
-            return response()->json('ok');
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+
+    public function delete(Request $request): JsonResponse {
+        $student = Student::where('remember_token', Cookie::get('remember_me'))
+            ->first();
+
+        $exam = Exam::where([
+            "id" => $request->input("exam"),
+            array("state", "!=", ExamState::CLOSE)
+        ])
+            ->first();
+
+        $examStudent = ExamStudent::where([
+            "student_id" => $student->id,
+            "exam_id"    => $exam->id
+        ])
+            ->first();
+
+        if (!$examStudent)
+            return response()->json([
+                "background" => "bg-danger",
+                "icon"       => "fa-bomb",
+                "message"    => "دخول غير مصرح به، يرجى اعادة تحميل الصفحة"
+            ]);
+
+        if ($exam->state == ExamState::END || $examStudent->state == ExamStudentState::FINISHED)
+            return response()->json([
+                "background" => "bg-info",
+                "icon"       => "fa-exclamation",
+                "message"    => "تم انهاء المتحان، يرجى الذهاب الى الامتحانات المنتهية"
+            ]);
+
+        $branch = Branch::where("id", $request->input("branch"))
+            ->whereIn("question_id", $exam->questions->pluck("id")->toArray())
+            ->first();
+
+        if (!$branch)
+            return response()->json([
+                "background" => "bg-warning",
+                "icon"       => "fa-skull-crossbones",
+                "message"    => "تحذير !!!، يرجى اعادة تحميل الصفحة"
+            ]);
+
+        Answer::where([
+            "student_id" => $student->id,
+            "branch_id"  => $branch->id
+        ])->delete();
+
+        return response()->json([
+            "background" => "bg-danger",
+            "icon"       => "fa-check",
+            "message"    => "تم حذف الاجابة بنجاح"
+        ]);
     }
+
+
+
+
     public function finish(Request $request)
     {
         $student = Student::where('remember_token', Cookie::get('remember_me'))->first();

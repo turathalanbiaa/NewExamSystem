@@ -10,6 +10,15 @@ class Answer extends Model
     protected $primaryKey = "id";
     public $timestamps = false;
 
+    protected $fillable = [
+        "student_id",
+        "branch_id",
+        "text",
+        "time",
+        "score",
+        "correction"
+    ];
+
     public function branch()
     {
         return $this->belongsTo("App\Models\Branch", "branch_id", "id");
