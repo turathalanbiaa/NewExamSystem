@@ -64,7 +64,21 @@ class StudentExamController extends Controller
         if (!$examStudent || $examStudent->state == ExamStudentState::FINISHED)
             abort(403, "دخول غير مصرح به");
 
-        return view("Website/exam", compact('exam', $exam));
+        $questions = collect();
+        foreach ($exam->questions as $question) {
+            $questions->push([
+                "id"    => $question->id,
+                "title" => "في " . implode(' ', array_slice(explode(' ', $question->title), 0, 2)),
+                "count" => Answer::where("student_id", $student->id)
+                    ->whereIn("branch_id", $question->branches->pluck("id")->toArray())
+                    ->count()
+            ]);
+        }
+
+        return view("Website/exam")->with([
+            "exam"     => $exam,
+            "questions" => $questions
+        ]);
     }
 
     public function finishedExam($id) {
@@ -107,6 +121,7 @@ class StudentExamController extends Controller
 
         if (!$examStudent)
             return response()->json([
+                "status"     => false,
                 "background" => "bg-danger",
                 "icon"       => "fa-bomb",
                 "message"    => "دخول غير مصرح به، يرجى اعادة تحميل الصفحة"
@@ -114,6 +129,7 @@ class StudentExamController extends Controller
 
         if ($exam->state == ExamState::END || $examStudent->state == ExamStudentState::FINISHED)
             return response()->json([
+                "status"     => false,
                 "background" => "bg-info",
                 "icon"       => "fa-exclamation",
                 "message"    => "تم انهاء المتحان، يرجى الذهاب الى الامتحانات المنتهية"
@@ -125,12 +141,13 @@ class StudentExamController extends Controller
 
         if (!$branch)
             return response()->json([
+                "status"     => false,
                 "background" => "bg-warning",
                 "icon"       => "fa-skull-crossbones",
                 "message"    => "تحذير !!!، يرجى اعادة تحميل الصفحة"
             ]);
 
-        Answer::updateOrCreate([
+        $success = Answer::updateOrCreate([
             "student_id" => $student->id,
             "branch_id"  => $branch->id
         ], [
@@ -140,7 +157,16 @@ class StudentExamController extends Controller
             "correction" => AnswerCorrectionState::UNCORRECTED
         ]);
 
+        if (!$success)
+            return response()->json([
+                "status"     => false,
+                "background" => "bg-danger",
+                "icon"       => "fa-frown",
+                "message"    => "لم يتم حفظ الاجابة يرجى اعادة المحاولة"
+            ]);
+
         return response()->json([
+            "status"     => true,
             "background" => "bg-success",
             "icon"       => "fa-check",
             "message"    => "تم حفظ الاجابة بنجاح"
@@ -165,6 +191,7 @@ class StudentExamController extends Controller
 
         if (!$examStudent)
             return response()->json([
+                "status"     => false,
                 "background" => "bg-danger",
                 "icon"       => "fa-bomb",
                 "message"    => "دخول غير مصرح به، يرجى اعادة تحميل الصفحة"
@@ -172,6 +199,7 @@ class StudentExamController extends Controller
 
         if ($exam->state == ExamState::END || $examStudent->state == ExamStudentState::FINISHED)
             return response()->json([
+                "status"     => false,
                 "background" => "bg-info",
                 "icon"       => "fa-exclamation",
                 "message"    => "تم انهاء المتحان، يرجى الذهاب الى الامتحانات المنتهية"
@@ -183,18 +211,28 @@ class StudentExamController extends Controller
 
         if (!$branch)
             return response()->json([
+                "status"     => false,
                 "background" => "bg-warning",
                 "icon"       => "fa-skull-crossbones",
                 "message"    => "تحذير !!!، يرجى اعادة تحميل الصفحة"
             ]);
 
-        Answer::where([
+        $success = Answer::where([
             "student_id" => $student->id,
             "branch_id"  => $branch->id
         ])->delete();
 
+        if (!$success)
+            return response()->json([
+                "status"     => false,
+                "background" => "bg-danger",
+                "icon"       => "fa-frown",
+                "message"    => "لم يتم حذف الاجابة يرجى اعادة المحاولة"
+            ]);
+
         return response()->json([
-            "background" => "bg-danger",
+            "status"     => true,
+            "background" => "bg-success",
             "icon"       => "fa-check",
             "message"    => "تم حذف الاجابة بنجاح"
         ]);
