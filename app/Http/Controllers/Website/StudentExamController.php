@@ -68,7 +68,7 @@ class StudentExamController extends Controller
         foreach ($exam->questions as $question) {
             $questions->push([
                 "id"    => $question->id,
-                "title" => "في " . implode(' ', array_slice(explode(' ', $question->title), 0, 2)),
+                "title" => implode(' ', array_slice(explode(' ', $question->title), 0, 2)),
                 "count" => Answer::where("student_id", $student->id)
                     ->whereIn("branch_id", $question->branches->pluck("id")->toArray())
                     ->count()
@@ -238,17 +238,37 @@ class StudentExamController extends Controller
         ]);
     }
 
-
-
-
-    public function finish(Request $request)
-    {
+    public function finish(Request $request): JsonResponse {
         $student = Student::where('remember_token', Cookie::get('remember_me'))->first();
-        $examStudent = ExamStudent::where('exam_id', $request->id)
+        $examStudent = ExamStudent::where('exam_id', $request->input("exam"))
             ->where('student_id', $student->id)
             ->first();
-        $examStudent->state = 2;
-        $examStudent->save();
-        return response()->json($examStudent);
+
+        if ($examStudent->state == ExamStudentState::FINISHED)
+            return response()->json([
+                "status"     => false,
+                "background" => "bg-info",
+                "icon"       => "fa-exclamation",
+                "message"    => "تم انهاء الامتحان مسبقااو تم غلق الامتحان"
+            ]);
+
+        $success = $examStudent->update([
+            "state" => ExamStudentState::FINISHED
+        ]);
+
+        if (!$success)
+            return response()->json([
+                "status"     => false,
+                "background" => "bg-danger",
+                "icon"       => "fa-frown",
+                "message"    => "لم يتم انهاء الامتحان ، حاول مره اخرى"
+            ]);
+
+        return response()->json([
+            "status"     => true,
+            "background" => "bg-success",
+            "icon"       => "fa-check",
+            "message"    => "تم انهاء الامتحان بنجاح"
+        ]);
     }
 }

@@ -3,7 +3,7 @@
     <div class="container">
         {{-- Navbar Brand --}}
         <a class="navbar-brand m-0 ml-3" href="javascript:void(0);">
-            نضام الأمتحانات الالكتروني
+            نظام الامتحانات الالكتروني
         </a>
 
         <!-- Toggle button -->
@@ -16,7 +16,7 @@
             <div class="w-100 navbar-nav nav-fill">
                 <div class="nav-item">
                     <a class="nav-link" href="{{URL::to('/')}}">
-                        <span>الأمتحانات الحالية</span>
+                        <span>الامتحانات الحالية</span>
                     </a>
                 </div>
                 <div class="nav-item">

@@ -32,15 +32,15 @@
 
             <div class="col-12 position-sticky pb-4" style="top: 56px; z-index: 1000">
                 <div class="container px-0 z-depth-1">
-                    <section class="grey text-center white-text p-5">
-                        <div class="h3-responsive mb-4 pb-2">
-                            عدد الفروع التي اجبت عليها
+                    <section class="bg-default text-center white-text p-4">
+                        <div class="h4-responsive pb-2">
+                          عدد الافرع التي تمت الاجابة عليها
                         </div>
                         <div class="row">
                             @foreach($questions as $question)
                                 <div class="col-6">
-                                    <div class="h4-responsive">{{$question["title"]}}</div>
-                                    <div class="h4-responsive" id="{{"q-".$question["id"]}}">{{$question["count"]}}</div>
+                                    <div class="h5-responsive">{{$question["title"]}}</div>
+                                    <div class="h5-responsive" id="{{"q-".$question["id"]}}">{{$question["count"]}}</div>
                                 </div>
                             @endforeach
                         </div>
@@ -145,41 +145,14 @@
                 </div>
             @endforeach
         </div>
-        <button type="button" class="btn btn-outline-primary btn-lg btn-block" onclick="finishExam()">
+        <button type="button" class="btn btn-outline-primary btn-lg btn-block" data-toggle="modal" data-target="#finishModal">
             انهاء الامتحان
         </button>
     </div>
-
-    <!-- Finish Exam Model-->
-    <div class="modal fade" id="finishExamModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog modal-notify modal-danger" role="document">
-            <!--Content-->
-            <div class="modal-content">
-                <!--Header-->
-                <div class="modal-header">
-                    <p class="heading lead">تأكيد</p>
-                </div>
-                <!--Body-->
-                <div class="modal-body">
-                    <div class="text-center">
-                        <i class="fas fa-question fa-3x mb-3 animated rotateIn text-danger"></i>
-                        <p>هل انت متأكد .</p>
-                    </div>
-                </div>
-                <!--Footer-->
-                <div class="modal-footer justify-content-center">
-                    <a type="button" class="btn btn-danger" onclick="finishExamConfirmed({{$exam->id}})">تأكيد</a>
-                    <a type="button" class="btn btn-outline-danger waves-effect" data-dismiss="modal">الغاء</a>
-                </div>
-            </div>
-            <!--/.Content-->
-        </div>
-    </div>
-    <!-- Finish Exam Model-->
 @endsection
 
 @section("extra-content")
+    <!-- Notify Modal-->
     <div class="modal fade top" id="notifyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false">
         <div class="modal-dialog modal-notify modal-dialog-centered" role="document">
             <div class="modal-content" id="modal-bg">
@@ -187,7 +160,32 @@
                     <div class="text-white text-center">
                         <i class="fa fa-check fa-3x mb-3" id="modal-icon"></i>
                         <p id="modal-message"></p>
+                        <p id="demo"></p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Finish Exam Modal-->
+    <div class="modal fade" id="finishModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notify modal-dialog-centered modal-primary" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="heading lead">انهاء الامتحان</p>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fa fa-user-graduate fa-3x mb-3"></i>
+                        <p>
+                            <span>هل انت متاكد من انهاء الامتحان </span>
+                            <span class="font-weight-bold text-primary">{{$exam->title}}</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <a type="button" class="btn btn-primary" onclick="finish()">نعم</a>
+                    <a type="button" class="btn btn-outline-primary waves-effect" data-dismiss="modal">لا</a>
                 </div>
             </div>
         </div>
@@ -216,7 +214,7 @@
 
                     setTimeout(function () {
                         $('#notifyModal').modal('hide');
-                    }, 1500);
+                    }, 2000);
 
                     let devBranch = document.getElementById(branch);
                     if (response.status === true && devBranch.getAttribute('data-selected') === '0') {
@@ -250,7 +248,7 @@
 
                     setTimeout(function () {
                         $('#notifyModal').modal('hide');
-                    }, 1500);
+                    }, 2000);
 
                     let devBranch = document.getElementById(branch);
                     if (response.status === true) {
@@ -265,28 +263,48 @@
             });
         }
 
-
-        finishExam = function () {
-            $('#finishExamModel').modal('show');
-        };
-        finishExamConfirmed = function (id) {
-            $.ajaxSetup({
+        function finish() {
+            $('#finishModal').modal('hide');
+            $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-            $.ajax({
+                },
                 url: "{{ url('/finish') }}",
                 method: 'post',
                 data: {
-                    id: id,
+                    exam: {{$exam->id}},
                 },
-                success: function (result) {
-                    console.log(result);
-                    $('#finishExamModel').modal('hide');
-                    window.location.replace('/');
+                success: function (response) {
+                    console.log(response);
+                    $('#modal-bg').removeClass().addClass('modal-content ' + response.background);
+                    $('#modal-icon').removeClass().addClass('fa fa-3x mb-3 ' + response.icon);
+                    $('#modal-message').html(response.message);
+                    $('#notifyModal').modal('show');
+
+                    if (response.status === true) {
+                        let countDown  = new Date();
+                        countDown.setSeconds(countDown.getSeconds() + 5);
+                        countDown = countDown.getTime();
+
+                        setInterval(function() {
+                            let now = new Date().getTime();
+                            let distance = countDown - now;
+                            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                            document.getElementById("demo").innerHTML = "سيتم تحويلك خلال " + seconds + " ثانية";
+
+                            if (distance < 0) {
+                                document.getElementById("demo").innerHTML = "";
+                                $('#notifyModal').modal('hide');
+                                window.location.replace('/');
+                            }
+                        }, 1000);
+                    } else {
+                        setTimeout(function () {
+                            $('#notifyModal').modal('hide');
+                        }, 2000);
+                    }
                 }
             });
-        };
+        }
     </script>
 @endsection
