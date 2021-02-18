@@ -132,15 +132,15 @@
                         <div class="card-body">
                             <div class="list-group list-group-flush">
                                 <div class="list-group-item">
-                                    <span>عدد الفروع الكلي</span>
+                                    <span>عدد الكلي للفروع</span>
                                     <span class="badge badge-pill badge-default float-left" style="font-size: 15px">{{$question->no_of_branch}}</span>
                                 </div>
                                 <div class="list-group-item">
-                                    <span>عدد الفروع المطلوبة</span>
+                                    <span>عدد الفروع المطلوب الاجابة عنها</span>
                                     <span class="badge badge-pill badge-default float-left" style="font-size: 15px">{{$question->no_of_branch_req}}</span>
                                 </div>
                                 <div class="list-group-item">
-                                    <span>عدد الفروع التي اجبت عليها</span>
+                                    <span>عدد الفروع التي اجبت عنها</span>
                                     <span class="badge badge-pill badge-default float-left" style="font-size: 15px">{{$no_of_answer}}</span>
                                 </div>
                                 <div class="list-group-item">
@@ -148,7 +148,7 @@
                                     <span class="badge badge-pill badge-default float-left" style="font-size: 15px">{{$no_of_correct_answer}}</span>
                                 </div>
                                 <div class="list-group-item">
-                                    <span>درجتك في السؤال</span>
+                                    <span>درجتك النهائية في هذا السؤال</span>
                                     <span class="badge badge-pill badge-info float-left" style="font-size: 15px">
                                         @php
                                             $no_of_correct_answer = ($no_of_correct_answer > $question->no_of_branch_req)
