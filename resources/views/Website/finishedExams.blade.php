@@ -22,7 +22,7 @@
                                 @if($exam->state == \App\Enums\ExamState::OPEN)
                                     يرجى انتظار التصحيح
                                 @else
-                                    {{$exam->pivot->score ?? 0}}
+                                    {{ceil($exam->pivot->score) ?? 0}}
                                 @endif
                             </h5>
                             @if($exam->state == \App\Enums\ExamState::END)
