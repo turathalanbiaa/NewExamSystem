@@ -17,14 +17,27 @@
                             <h5>
                                 درجة الامتحان : 100
                             </h5>
-                            <h5>
-                                درجة الطالب :
-                                @if($exam->state == \App\Enums\ExamState::OPEN)
+
+                            @if($exam->state == \App\Enums\ExamState::OPEN)
+                                <h5 class="text-center text-primary">
                                     يرجى انتظار التصحيح
-                                @else
+                                </h5>
+                            @else
+                                <h5>
+                                    <span>درجة الطالب :</span>
                                     {{ceil($exam->pivot->score) ?? 0}}
+                                </h5>
+                            @php $decisionScore = $exam->course->getDecisionScore() @endphp
+                                @if($decisionScore > 0)
+                                    <h5>
+                                        درجة القرار :
+                                        {{$decisionScore}}
+                                    </h5>
                                 @endif
-                            </h5>
+                            @endif
+
+
+
                             @if($exam->state == \App\Enums\ExamState::END)
                                 <div class="card-body-content-fixed">
                                     <hr>
