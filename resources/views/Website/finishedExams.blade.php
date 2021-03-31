@@ -25,18 +25,9 @@
                             @else
                                 <h5>
                                     <span>درجة الطالب :</span>
-                                    {{ceil($exam->pivot->score) ?? 0}}
+                                    {{(ceil($exam->pivot->score) + $decisionScore) ?? 0}}
                                 </h5>
-                            @php $decisionScore = $exam->course->getDecisionScore() @endphp
-                                @if($decisionScore > 0)
-                                    <h5>
-                                        درجة القرار :
-                                        {{$decisionScore}}
-                                    </h5>
-                                @endif
                             @endif
-
-
 
                             @if($exam->state == \App\Enums\ExamState::END)
                                 <div class="card-body-content-fixed">
