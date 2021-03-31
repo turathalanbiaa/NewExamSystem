@@ -23,7 +23,7 @@ class DecisionController extends Controller
         //Levels
         $levels = collect([
             Level::BEGINNER,
-            Level::FIFTH,
+            Level::FIRST,
             Level::SECOND,
             Level::THIRD,
             Level::FOURTH,
