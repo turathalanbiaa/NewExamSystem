@@ -25,9 +25,11 @@
                             @else
                                 <h5>
                                     <span>درجة الطالب :</span>
-                                    {{(ceil($exam->pivot->score) + $decisionScore) ?? 0}}
+                                    {{(ceil($exam->pivot->score) + $exam->course->getDecisionScore()) ?? 0}}
                                 </h5>
                             @endif
+
+
 
                             @if($exam->state == \App\Enums\ExamState::END)
                                 <div class="card-body-content-fixed">
