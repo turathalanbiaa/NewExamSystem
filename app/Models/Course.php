@@ -22,7 +22,7 @@ class Course extends Model
         return $this->belongsTo("App\Models\Lecturer", "lecturer_id", "id");
     }
 
-    public function getDecisionScore() {
+    public function getDecisionScore(): int {
         $sys_vars = SystemVariables::find(1);
         $student = Student::where('remember_token', Cookie::get('remember_me'))->first();
 
@@ -33,6 +33,6 @@ class Course extends Model
             "year"       => $sys_vars->current_year
         ])
             ->first()
-            ->decision_score;
+            ->decision_score ?? 0;
     }
 }
