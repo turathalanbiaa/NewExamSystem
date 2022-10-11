@@ -42,7 +42,7 @@ class DocumentController extends Controller
      */
     public function creation()
     {
-        ini_set('max_execution_time', 300);
+        ini_set('max_execution_time', 3000);
         Auth::check();
         $sys_vars = SystemVariables::find(1);
 
