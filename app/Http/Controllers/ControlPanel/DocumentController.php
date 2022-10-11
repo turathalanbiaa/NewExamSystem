@@ -90,21 +90,21 @@ class DocumentController extends Controller
             }
 
             //Relay students' grades in assessment to their documents
-            $assessments = Assessment::all();
-            foreach ($assessments as $assessment)
-            {
-                $document = StudentDocument::updateOrCreate(
-                    [
-                        "student_id" => $assessment->student_id,
-                        "course_id"  => $assessment->course_id,
-                        'season'     => $sys_vars->current_season,
-                        'year'       => $sys_vars->current_year
-                    ],
-                    [
-                        "assessment_score" => $assessment->score
-                    ]
-                );
-            }
+//            $assessments = Assessment::all();
+//            foreach ($assessments as $assessment)
+//            {
+//                $document = StudentDocument::updateOrCreate(
+//                    [
+//                        "student_id" => $assessment->student_id,
+//                        "course_id"  => $assessment->course_id,
+//                        'season'     => $sys_vars->current_season,
+//                        'year'       => $sys_vars->current_year
+//                    ],
+//                    [
+//                        "assessment_score" => $assessment->score
+//                    ]
+//                );
+//            }
 
             //Find total for the documents
             $documents = StudentDocument::where("season", $sys_vars->current_season)
@@ -131,12 +131,6 @@ class DocumentController extends Controller
 
                 $document->save();
             }
-
-            //Store event log
-            $target = null;
-            $type = EventLogType::DOCUMENT;
-            $event = "ترحيل درجات الطلاب الى وثائقيهم";
-            EventLog::create($target, $type, $event);
         });
 
         if (is_null($exception))
