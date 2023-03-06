@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Throwable;
@@ -29,10 +30,13 @@ class Handler extends ExceptionHandler
         'password_confirmation',
     ];
 
+
     /**
      * Report or log an exception.
      *
-     * @param Exception $e
+     * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
+     *
+     * @param Throwable $e
      * @return void
      * @throws Throwable
      */
@@ -41,15 +45,16 @@ class Handler extends ExceptionHandler
         parent::report($e);
     }
 
+
     /**
      * Render an exception into an HTTP response.
      *
-     * @param Request $request
-     * @param Exception $e
-     * @return Response
+     * @param $request
+     * @param Throwable $e
+     * @return JsonResponse|Response|\Symfony\Component\HttpFoundation\Response
      * @throws Throwable
      */
-    public function render($request, Throwable $e): Response
+    public function render($request, Throwable $e): Response|JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         return parent::render($request, $e);
     }
