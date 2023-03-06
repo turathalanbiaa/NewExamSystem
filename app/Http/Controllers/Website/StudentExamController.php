@@ -19,12 +19,12 @@ use Illuminate\Support\Facades\Cookie;
 class StudentExamController extends Controller
 {
     public function exams() {
-        try {
+//        try {
             $studentNotFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
-            return view("Website/exams", compact('studentNotFinishedExams', $studentNotFinishedExams->notFinishedExams ?? ""));
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+            return view("Website/exams", compact('studentNotFinishedExams', $studentNotFinishedExams->notFinishedExams));
+//        } catch (\Exception $e) {
+//            return $e->getMessage();
+//        }
     }
 
     public function finishedExams() {
