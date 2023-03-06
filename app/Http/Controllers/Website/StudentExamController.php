@@ -15,15 +15,16 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\View;
 
 class StudentExamController extends Controller
 {
     public function exams() {
 //        try {
             $studentNotFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
-            return view("Website/exams")->with([
-                'studentNotFinishedExams' => $studentNotFinishedExams->notFinishedExams
-            ]);
+            return view::make("Website/exams")
+        ->with(compact('studentNotFinishedExams'))
+        ->with(compact($studentNotFinishedExams->notFinishedExams));
 //        } catch (\Exception $e) {
 //            return $e->getMessage();
 //        }
