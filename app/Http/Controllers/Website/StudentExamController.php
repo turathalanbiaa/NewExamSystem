@@ -15,25 +15,22 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\View;
 
 class StudentExamController extends Controller
 {
     public function exams() {
-//        try {
+        try {
             $studentNotFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
-            return view::make("Website/exams")
-        ->with(compact('studentNotFinishedExams'))
-        ->with(compact($studentNotFinishedExams->notFinishedExams));
-//        } catch (\Exception $e) {
-//            return $e->getMessage();
-//        }
+            return view("Website/exams", compact('studentNotFinishedExams', $studentNotFinishedExams->notFinishedExams));
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     public function finishedExams() {
         try {
             $studentFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
-            return view("Website/finishedExams", compact('studentFinishedExams', $studentFinishedExams->finishedExams ?? ""));
+            return view("Website/finishedExams", compact('studentFinishedExams', $studentFinishedExams->finishedExams));
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -42,7 +39,7 @@ class StudentExamController extends Controller
     public function nextExams() {
         try {
             $studentNotFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
-            return view("Website/nextExams", compact('studentNotFinishedExams', $studentNotFinishedExams->notFinishedExams ?? ""));
+            return view("Website/nextExams", compact('studentNotFinishedExams', $studentNotFinishedExams->notFinishedExams));
         } catch (\Exception $e) {
             return $e->getMessage();
         }
