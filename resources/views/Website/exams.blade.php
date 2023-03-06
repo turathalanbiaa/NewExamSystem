@@ -5,7 +5,7 @@
 @section("content")
     <div class="container">
         <div class="row">
-            dd($studentNotFinishedExams);
+            @php dd($studentNotFinishedExams); @endphp
             @forelse($studentNotFinishedExams->notFinishedExams->where('state',App\Enums\ExamState::OPEN) as $exam)
                 <div class="col-lg-4 col-md-6 col-sm-12 mb-5">
                     <div class="card shadow h-100">
