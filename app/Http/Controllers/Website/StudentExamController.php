@@ -21,7 +21,10 @@ class StudentExamController extends Controller
     public function exams() {
 //        try {
             $studentNotFinishedExams = Student::where('remember_token', Cookie::get('remember_me'))->first();
-            return view("Website/exams", compact('studentNotFinishedExams', (array) $studentNotFinishedExams->notFinishedExams));
+            return view("Website/exams")
+                ->with([
+                    "studentNotFinishedExams" => $studentNotFinishedExams->notFinishedExams
+                ]);
 //        } catch (\Exception $e) {
 //            return $e->getMessage();
 //        }
