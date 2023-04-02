@@ -7,11 +7,15 @@ use App\Enums\CourseState;
 use App\Enums\EventLogType;
 use App\Models\Assessment;
 use App\Models\Course;
+use App\Models\EduStudent;
 use App\Models\EventLog;
 use App\Models\Student;
 use App\Http\Controllers\Controller;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
+use Illuminate\View\View;
 
 class AssessmentController extends Controller
 {
@@ -19,7 +23,7 @@ class AssessmentController extends Controller
      * Display a listing of the resource.
      *
      * @param $course
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index($course)
     {
@@ -39,7 +43,7 @@ class AssessmentController extends Controller
      * Show the form for creating a new resource.
      *
      * @param $course
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function create($course)
     {
@@ -47,29 +51,37 @@ class AssessmentController extends Controller
         $course = Course::findOrFail($course);
         CourseController::watchCourse($course);
 
-        //Get students
-        $students = Student::all();
+        $noOfStudentsEnrolled = Student::query()
+            ->whereIn("edu_student_id", EduStudent::query()
+                ->where("Level", $course->level)
+                ->pluck("ID")
+                ->toArray())
+            ->count();
 
-        //Get students are resident for the specific course
-        $studentsIdsResident = Assessment::where("course_id", $course->id)
-            ->pluck("student_id")
-            ->toArray();
+        $noOfResidentStudents =  Student::query()
+            ->whereIn("id", Assessment::query()
+                ->where("course_id", $course->id)
+                ->pluck("student_id")
+                ->toArray())
+            ->count();
 
-        //Get students are not resident for the specific course
-        $students = $students->filter(function ($student) use ($course, $studentsIdsResident) {
-            return (!in_array($student->id, $studentsIdsResident) && $student->originalStudent->Level == $course->level);
-        });
-
-        $noOfStudentsResident = count($studentsIdsResident);
-        $noOfStudentsEnrolled = count($studentsIdsResident) + count($students);
-        $students = $students->take(25);
-
+        $students = Student::query()
+            ->whereIn("edu_student_id", EduStudent::query()
+                ->where("Level", $course->level)
+                ->pluck("ID")
+                ->toArray())
+            ->whereNotIn("id", Assessment::query()
+                ->where("course_id", $course->id)
+                ->pluck("student_id")
+                ->toArray())
+            ->take(10)
+            ->get();
 
         return view("ControlPanel.assessment.create")->with([
             "course"   => $course,
             "students" => $students,
             "noOfStudentsEnrolled" => $noOfStudentsEnrolled,
-            "noOfStudentsResident" => $noOfStudentsResident,
+            "noOfResidentStudents" => $noOfResidentStudents,
         ]);
     }
 
@@ -77,7 +89,7 @@ class AssessmentController extends Controller
      * Store a newly created resource in storage.
      *
      * @param $course
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store($course)
     {
@@ -85,20 +97,23 @@ class AssessmentController extends Controller
         $course = Course::findOrFail($course);
         CourseController::watchCourse($course);
 
-        //Transaction
         $exception = DB::transaction(function () use ($course) {
-            $students = Input::get("students");
-            foreach (json_decode($students) as $student)
-            {
-                //Get student
-                $student = Student::findOrFail($student);
+            $studentsIDs = explode(",", Input::get("students"));
 
-                //Store assessment
-                $score = abs(Input::get($student->id));
-                $assessment = Assessment::updateOrCreate(
-                    ['student_id' => $student->id, 'course_id' => $course->id],
-                    ['score' => ($score<=15)?$score:15]
-                );
+            $students = Student::query()
+                ->whereIn("id", $studentsIDs)
+                ->get();
+
+            foreach ($students as $student) {
+                if ($student->originalStudent->Level != $course->level)
+                    continue;
+
+                $assessment = Assessment::updateOrCreate([
+                    'student_id' => $student->id,
+                    'course_id' => $course->id
+                ], [
+                    'score' => min(abs(Input::get("student-".$student->id)), 25)
+                ]);
 
                 //Store event log
                 $target = $assessment->id;
@@ -123,9 +138,9 @@ class AssessmentController extends Controller
      * Store a newly created resource in storage.
      *
      * @param $course
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public function storeAll($course)
+    public function evaluation($course)
     {
         Auth::check();
         $course = Course::findOrFail($course);
@@ -133,16 +148,22 @@ class AssessmentController extends Controller
 
         if (!is_numeric(Input::get("score")))
             return redirect("/control-panel/assessments/$course->id/create")->with([
-                "StoreAllMessage" => "يرجى ملئ الدرجه"
+                "EvaluationMessage" => "يرجى ملئ الدرجه"
             ]);
 
-        //Get students
-        $students = Student::all();
+        $query = Student::query()
+            ->whereIn("edu_student_id", EduStudent::query()
+                ->where("Level", $course->level)
+                ->pluck("ID")
+                ->toArray());
 
-        //Get students for the specific course
-        $students = $students->filter(function ($student) use ($course) {
-            return ($student->originalStudent->Level == $course->level);
-        });
+        if (Input::get("tab") == "all-remaining-students")
+            $query->whereNotIn("id", Assessment::query()
+                ->where("course_id", $course->id)
+                ->pluck("student_id")
+                ->toArray());
+
+        $students = $query->get();
 
         if (count($students) == 0)
             return redirect("/control-panel/assessments/$course->id/create")->with([
@@ -155,12 +176,10 @@ class AssessmentController extends Controller
             //Store assessment for students
             $score = abs(Input::get("score"));
             foreach ($students as $student)
-            {
                 Assessment::updateOrCreate(
                     ['student_id' => $student->id, 'course_id' => $course->id],
-                    ['score' => ($score<=15)?$score:15]
+                    ['score' => min(abs(Input::get("score")), 25)]
                 );
-            }
 
             //Store event log
             $target = $course->id;
@@ -171,11 +190,11 @@ class AssessmentController extends Controller
 
         if (is_null($exception))
             return redirect("/control-panel/assessments/$course->id/create")->with([
-                "CreateAssessmentMessage" => "تم تقييم جميع الطلاب بدرجه متساوية"
+                "CreateAssessmentMessage" => "تم تقييم جميع الطلاب"
             ]);
         else
             return redirect("/control-panel/assessments/$course->id/create")->with([
-                "CreateAssessmentMessage" => "لم يتم تقييم جميع الطلاب بدرجه متساوية",
+                "CreateAssessmentMessage" => "لم يتم تقييم جميع الطلاب",
                 "TypeMessage" => "Error"
             ]);
     }
@@ -185,7 +204,7 @@ class AssessmentController extends Controller
      *
      * @param $course
      * @param $assessment
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update($course, $assessment)
     {
@@ -198,8 +217,7 @@ class AssessmentController extends Controller
         //Transaction
         $exception = DB::transaction(function () use ($course, $assessment, $student) {
             //Update assessment
-            $score = abs(Input::get("score"));
-            $assessment->score = ($score<=15)?$score:15;
+            $assessment->score = min(abs(Input::get("score")), 25);
             $assessment->save();
 
             //Store event log

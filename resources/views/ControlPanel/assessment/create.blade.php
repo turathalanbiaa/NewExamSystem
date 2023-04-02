@@ -30,25 +30,69 @@
 
             {{-- Assessments Students --}}
             <div class="col-lg-4">
-                <div class="card">
+                {{-- Evaluate all students who have not been evaluated --}}
+                <div class="card mb-4">
                     <div class="card-body border-bottom border-default">
-                        {{-- Session Store All Message --}}
-                        @if (session('StoreAllMessage'))
+                        {{-- Session Evaluation Message --}}
+                        @if (session('EvaluationMessage'))
                             <div class="alert alert-danger text-center">
-                                {{session('StoreAllMessage')}}
+                                {{session('EvaluationMessage')}}
                             </div>
                         @endif
                         {{-- Heading --}}
-                        <h5 class="text-center pb-2 border-bottom border-primary">تقييم جميع الطلاب بدرجة متساوية</h5>
+                        <h5 class="text-center pb-2 border-bottom border-primary">تقييم جميع الطلاب الذين لم يتم تقييمهم</h5>
 
                         {{-- Form --}}
                         <form class="mt-3" method="post" action="/control-panel/assessments/{{$course->id}}">
                             @csrf
                             @method("PUT")
+                            <input type="hidden" name="tab" value="all-remaining-students">
                             <div class="form-inline w-100">
                                 <label for="score" class="w-25 justify-content-start">الدرجة </label>
                                 <input type="number" name="score" id="score" class="form-control w-75" value="">
                             </div>
+
+
+                            {{-- Info --}}
+                            <h6 class="my-3">
+                                <i class="fa fa-star text-danger font-small"></i>
+                                <span>يجب ان لا تتجاوز درجة التقييم (25 درجة).</span>
+                            </h6>
+
+                            <button class="btn btn-outline-default btn-block font-weight-bold" type="submit">ارسال</button>
+                        </form>
+                    </div>
+                </div>
+
+                {{-- Evaluate all students --}}
+                <div class="card">
+                    <div class="card-body border-bottom border-default">
+                        {{-- Session Evaluation Message --}}
+                        @if (session('EvaluationMessage'))
+                            <div class="alert alert-danger text-center">
+                                {{session('EvaluationMessage')}}
+                            </div>
+                        @endif
+                        {{-- Heading --}}
+                        <h5 class="text-center pb-2 border-bottom border-primary">تقييم جميع الطلاب</h5>
+
+                        {{-- Form --}}
+                        <form class="mt-3" method="post" action="/control-panel/assessments/{{$course->id}}">
+                            @csrf
+                            @method("PUT")
+                            <input type="hidden" name="tab" value="all-students">
+                            <div class="form-inline w-100">
+                                <label for="score" class="w-25 justify-content-start">الدرجة </label>
+                                <input type="number" name="score" id="score" class="form-control w-75" value="">
+                            </div>
+
+
+                            {{-- Info --}}
+                            <h6 class="my-3">
+                                <i class="fa fa-star text-danger font-small"></i>
+                                <span>يجب ان لا تتجاوز درجة التقييم (25 درجة).</span>
+                            </h6>
+
                             <button class="btn btn-outline-default btn-block font-weight-bold" type="submit">ارسال</button>
                         </form>
                     </div>
@@ -66,13 +110,13 @@
                         </p>
                         <p>
                             <span>عدد الطلاب الذين تم تقييمهم: </span>
-                            <span>{{$noOfStudentsResident}}</span>
+                            <span>{{$noOfResidentStudents}}</span>
                         </p>
                     </div>
 
                     <form method="post" action="/control-panel/assessments/{{$course->id}}">
                         @csrf
-                        <input type="hidden" name="students" value="{{json_encode($students->pluck("id")->toArray())}}">
+                        <input type="hidden" name="students" value="{{$students->pluck("id")->implode(',')}}">
 
                         {{-- Students --}}
                         <table class="table table-striped table-bordered w-100" cellspacing="0">
@@ -91,7 +135,7 @@
                                 <tr>
                                     <td class="align-baseline">{{$student->originalStudent->Name}}</td>
                                     <td class="align-baseline">
-                                        <input type="number" class="form-control" name="{{$student->id}}" value="0">
+                                        <input type="number" class="form-control" name="{{"student-".$student->id}}" value="0">
                                     </td>
                                 </tr>
                             @endforeach
@@ -101,7 +145,7 @@
                         {{-- Info --}}
                         <h6 class="mb-3">
                             <i class="fa fa-star text-danger font-small"></i>
-                            <span>درجه تقييم الطالب يجب ان لاتتجاوز (15 درجه).</span>
+                            <span>درجه تقييم الطالب يجب ان لاتتجاوز (25 درجه).</span>
                         </h6>
 
                         {{-- Button Submit --}}
@@ -121,7 +165,7 @@
                                         <span>{{$noOfStudentsEnrolled}}</span>
                                         <br>
                                         <span>عدد الطلاب الذين تم تقييمهم: </span>
-                                        <span>{{$noOfStudentsResident}}</span>
+                                        <span>{{$noOfResidentStudents}}</span>
                                     </p>
                                 </div>
                             </div>

@@ -101,7 +101,7 @@
         $(document).ready(function(){
             $("select#type").change(function(){
                 if (($(this).val() == '{{\App\Enums\ExamType::FINAL_FIRST_ROLE}}') || ($(this).val() == '{{\App\Enums\ExamType::FINAL_SECOND_ROLE}}'))
-                    $("input#score").val("60").attr("readonly","readonly");
+                    $("input#score").val("75").attr("readonly","readonly");
                 else if ($(this).val() == '{{\App\Enums\ExamType::SECOND_MONTH}}')
                     $("input#score").val("0").attr("readonly","readonly");
                 else

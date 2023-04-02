@@ -28,8 +28,8 @@ Route::resource('control-panel/courses', 'ControlPanel\CourseController');
 Route::get('control-panel/assessments/{course}', 'ControlPanel\AssessmentController@index');
 Route::get('control-panel/assessments/{course}/create', 'ControlPanel\AssessmentController@create');
 Route::post('control-panel/assessments/{course}', 'ControlPanel\AssessmentController@store');
-Route::put('control-panel/assessments/{course}', 'ControlPanel\AssessmentController@storeAll');
 Route::put('control-panel/assessments/{course}/{assessment}', 'ControlPanel\AssessmentController@update');
+Route::put('control-panel/assessments/{course}', 'ControlPanel\AssessmentController@evaluation');
 
 //Routes for manage exams, questions and branches
 Route::resource('control-panel/exams', 'ControlPanel\ExamController');

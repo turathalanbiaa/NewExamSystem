@@ -16,6 +16,9 @@ use App\Models\Exam;
 use App\Models\ExamStudent;
 use App\Models\Student;
 use App\Models\StudentDocument;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +30,7 @@ class ExamController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Application|Factory|View
      */
     public function index()
     {
@@ -40,7 +43,7 @@ class ExamController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Application|Factory|View
      */
     public function create()
     {
@@ -64,7 +67,7 @@ class ExamController extends Controller
             'course' => ['required', Rule::in(CourseController::getCoursesOpen()->pluck("id")->toArray())],
             'type'   => ['required', 'integer', 'between:1,4', Rule::notIn(self::getExamTypes(Input::get("course")))],
             'title'  => ['required'],
-            'score'  => ['required', 'integer', ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
+            'score'  => ['required', 'integer', ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,75'],
             'date'   => ['required', 'date', 'after_or_equal:today']
         ], [
             'course.required'      => 'يرجى اختيار المادة',
@@ -76,7 +79,7 @@ class ExamController extends Controller
             'title.required'       => 'يرجى ملىء عنوان الامتحان.',
             'score.required'       => 'يرجى ملىء درجة الامتحان.',
             'score.integer'        => 'درجة الامتحان غير مقبولة.',
-            'score.between'        => ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'درجة الامتحان من 25.' : 'درجة الامتحان من 60.',
+            'score.between'        => ((Input::get("type") == ExamType::FIRST_MONTH) || (Input::get("type") == ExamType::SECOND_MONTH)) ? 'درجة الامتحان من 25.' : 'درجة الامتحان من 75.',
             'date.required'        => 'يرجى ملىء تاريخ الامتحان.',
             'date.date'            => 'تاريخ الامتحان غير مقبولة.',
             'date.after_or_equal'  => 'تاريخ الامتحان يجب ان يكون من اليوم فصاعدا.'
@@ -234,7 +237,7 @@ class ExamController extends Controller
                 $exam->save();
 
 
-                // finished exam for all student when exam is end
+                // finished exam for all student when exam is ended
                 if ($exam->state == ExamState::END) {
                     $exam_students = ExamStudent::where("exam_id", $exam->id)->get();
                     foreach ($exam_students as $exam_student)
@@ -281,7 +284,7 @@ class ExamController extends Controller
             //Transaction
             $exception = DB::transaction(function () use ($exam){
                 //Update exam
-                $exam->curve = (Input::get("curve") > 10) ? 10:Input::get("curve");
+                $exam->curve = min(abs(Input::get("curve")), 10);
                 $exam->save();
 
                 //Store event log
@@ -308,13 +311,13 @@ class ExamController extends Controller
             //Validation
             $this->validate($request, [
                 'title' => ['required'],
-                'score' => ['required', 'integer', (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,60'],
+                'score' => ['required', 'integer', (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'between:1,25' : 'between:1,75'],
                 'date'  => ['required', 'date']
             ], [
                 'title.required' => 'يرجى ملىء عنوان الامتحان.',
                 'score.required' => 'يرجى ملىء درجة الامتحان.',
                 'score.integer'  => 'درجة الامتحان غير مقبولة.',
-                'score.between'  => (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'درجة الامتحان من 25.' : 'درجة الامتحان من 60.',
+                'score.between'  => (($exam->type == ExamType::FIRST_MONTH) || ($exam->type == ExamType::SECOND_MONTH)) ? 'درجة الامتحان من 25.' : 'درجة الامتحان من 75.',
                 'date.required'  => 'يرجى ملىء تاريخ الامتحان.',
                 'date.date'      => 'تاريخ الامتحان غير مقبولة.',
             ]);
@@ -416,16 +419,6 @@ class ExamController extends Controller
                 $question->delete();
             }
 
-            //Delete the exam from the student document
-            // foreach ($exam->studentsEnrolled as $studentEnrolled)
-            //     StudentDocument::where('student_id', $studentEnrolled->student_id)
-            //         ->where("course_id", $exam->course_id)
-            //         ->update(
-            //             $exam->type == ExamType::FIRST_MONTH?["first_month_score" => 0]:
-            //                 $exam->type == ExamType::SECOND_MONTH?["second_month_score" => 0]:
-            //                     $exam->type == ExamType::FINAL_FIRST_ROLE?["final_first_score" => 0]:["final_second_score" => 0]
-            //         );
-
             //Delete students enrolled for the exam
             $exam->studentsEnrolled()->delete();
 
@@ -480,7 +473,7 @@ class ExamController extends Controller
      * @param $exam
      * @return bool
      */
-    private static function complete($exam)
+    private static function complete($exam): bool
     {
         //Check score
         $score = $exam->questions()->sum("score");

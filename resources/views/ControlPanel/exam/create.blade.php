@@ -48,7 +48,7 @@
                             <span>توضع درجة امتحان الشهر الثاني تلقائيا وذلك حسب المعادلة التالية،</span><br>
                             <span class="font-weight-bold">درجة امتحان الشهر الثاني = 25 - درجة امتحان الشهر الاول</span>
                         </li>
-                        <li>درجة الامتحان النهائي هي (60) درجة، سواء كان الامتحان النهائي دور اول او دور ثاني.</li>
+                        <li>درجة الامتحان النهائي هي (75) درجة، سواء كان الامتحان النهائي دور اول او دور ثاني.</li>
                     </ul>
                 </div>
             </div>
@@ -136,7 +136,7 @@
         $(document).ready(function(){
             $("select#type").change(function(){
                 if (($(this).val() == '{{\App\Enums\ExamType::FINAL_FIRST_ROLE}}') || ($(this).val() == '{{\App\Enums\ExamType::FINAL_SECOND_ROLE}}'))
-                    $("input#score").val("60").attr("readonly","readonly");
+                    $("input#score").val("75").attr("readonly","readonly");
                 else if ($(this).val() == '{{\App\Enums\ExamType::SECOND_MONTH}}')
                     $("input#score").val("25").attr("readonly","readonly");
                 else
