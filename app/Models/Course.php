@@ -35,4 +35,15 @@ class Course extends Model
             ->first()
             ->decision_score ?? 0;
     }
+
+    public function getAssessmentScore(): int {
+        $student = Student::where('remember_token', Cookie::get('remember_me'))->first();
+
+        return Assessment::where([
+            "student_id" => $student->id,
+            "course_id"  => $this->id
+        ])
+            ->first()
+            ->score ?? 0;
+    }
 }

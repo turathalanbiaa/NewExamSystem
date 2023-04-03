@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\Input;
 
 class CorrectionController extends Controller
 {
+    public function __construct()
+    {
+        set_time_limit(300);
+    }
+
     /**
      * Correction automatically for the question
      *
@@ -251,20 +256,20 @@ class CorrectionController extends Controller
                     $branchesIds = $question->branches()->pluck("id")->toArray();
                     $answers = Answer::where("student_id", $examStudent->student_id)
                         ->whereIn("branch_id", $branchesIds)
-                        ->orderBy("score","DESC")
+                        ->orderBy("score", "DESC")
                         ->take($question->no_of_branch_req)
                         ->get();
                     $sum = $sum + $answers->sum("score");
                 }
 
-                //Convert fake score to real real score
-//                $sum = $sum * $ratio;
-
                 //Add curve to sum
                 $sum = $sum + $exam->curve;
 
+                //Convert fake score to real real score
+                $sum = $sum * $ratio;
+
                 //Update exam student
-                $examStudent->score = ($sum>=100? 100:$sum);
+                $examStudent->score = min($sum, 75);
                 $examStudent->save();
 
                 //Get student

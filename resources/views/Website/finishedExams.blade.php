@@ -14,22 +14,34 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            <h5>
-                                درجة الامتحان : 100
-                            </h5>
-
                             @if($exam->state == \App\Enums\ExamState::OPEN)
-                                <h5 class="text-center text-primary">
-                                    يرجى انتظار التصحيح
-                                </h5>
+                                <div class="h-100 d-flex justify-content-center align-items-center">
+                                    <h5 class="text-center text-primary m-0">
+                                        يرجى انتظار التصحيح
+                                    </h5>
+                                </div>
                             @else
+                                @php $sum = 0; @endphp
                                 <h5>
-                                    <span>درجة الطالب :</span>
-                                    {{(ceil($exam->pivot->score) + $exam->course->getDecisionScore()) ?? 0}}
+                                    <span>درجة الامتحان :</span>
+                                    {{(int) $exam->pivot->score}}
+                                    @php $sum += (int) $exam->pivot->score; @endphp
+                                </h5>
+                                <h5>
+                                    درجة القرار :
+                                    {{$exam->course->getDecisionScore()}}
+                                    @php $sum += $exam->course->getDecisionScore(); @endphp
+                                </h5>
+                                <h5>
+                                    تقييم المباحثات :
+                                    {{$exam->course->getAssessmentScore()}}
+                                    @php $sum += $exam->course->getAssessmentScore(); @endphp
+                                </h5>
+                                <h5>
+                                    الدرجة النهائية :
+                                    {{$sum}}
                                 </h5>
                             @endif
-
-
 
                             @if($exam->state == \App\Enums\ExamState::END)
                                 <div class="card-body-content-fixed">
@@ -49,7 +61,7 @@
             @empty
                 <div class="col-12">
                     <div class="alert alert-success py-5 px-3 text-center" role="alert">
-                        <h2 class="my-3">لا يوجد أمتحانات !</h2>
+                        <h2 class="my-3">لا يوجد امتحانات !</h2>
                     </div>
                 </div>
             @endforelse

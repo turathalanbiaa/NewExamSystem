@@ -169,44 +169,15 @@
             <div class="col-12 order-3 pt-4">
                 <div class="card text-center">
                     <h4 class="card-body m-0">
-                        درجتك النهائية
+                        درجتكم في الامتحان
                         <span class="badge badge-pill badge-default align-text-bottom">{{$total}}/100</span>
+                        <div class="mt-2">
+                            <p class="lead">سيتم اعتبار درجتكم في الامتحان من 75 وحسب المعادلة الاتية</p>
+                            <p class="lead">درجة الامتحان = درجتكم * 0.75</p>
+                        </div>
                     </h4>
                 </div>
             </div>
         </div>
     </div>
 @endsection
-
-
-
-
-
-{{--@foreach($exam->questions as $question)--}}
-{{--    <div class="col-sm-6">--}}
-{{--        <div class="card">--}}
-{{--            <div class="card-header bg-info text-white">{{$question->title}}</div>--}}
-{{--            <div class="card-body">--}}
-{{--                <div class="list-group list-group-flush">--}}
-{{--                    <div class="list-group-item">--}}
-{{--                        <span>عدد الفروع الكلي</span>--}}
-{{--                        <span class="badge badge-pill badge-default float-left" style="font-size: 15px">{{$question->no_of_branch}}</span>--}}
-{{--                    </div>--}}
-{{--                    <div class="list-group-item">--}}
-{{--                        <span>عدد الفروع المطلوبة</span>--}}
-{{--                        <span class="badge badge-pill badge-default float-left" style="font-size: 15px">{{$question->no_of_branch_req}}</span>--}}
-{{--                    </div>--}}
-{{--                    <div class="list-group-item">--}}
-{{--                        <span>عدد الفروع التي اجبت عليها</span>--}}
-{{--                    </div>--}}
-{{--                    <div class="list-group-item">--}}
-{{--                        <span>عدد اجوبتك الصحيحة</span>--}}
-{{--                    </div>--}}
-{{--                    <div class="list-group-item">--}}
-{{--                        <span>درجتك في السؤال</span>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-{{--    </div>--}}
-{{--@endforeach--}}

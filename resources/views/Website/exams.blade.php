@@ -14,13 +14,8 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            <h5>
-                                درجة الامتحان : 100
-                            </h5>
-                            <p class="card-text text-justify"></p>
                             <div class="card-body-content-fixed">
-                                <hr>
-                                <div class="btn-group w-100">
+                                <div class="btn-group w-100 py-3">
                                     <a class="btn btn-block btn-outline-default waves-effect waves-light"
                                        href="{{URL::to('exam',$exam->id)}}">
                                         <i class="fa fa-play ml-1"></i>
