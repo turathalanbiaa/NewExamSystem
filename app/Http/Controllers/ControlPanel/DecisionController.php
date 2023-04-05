@@ -16,7 +16,6 @@ class DecisionController extends Controller
 {
     public function execute()
     {
-
         Auth::check();
         $sys_vars = SystemVariables::find(1);
 
@@ -47,6 +46,9 @@ class DecisionController extends Controller
                     ->where("year", $sys_vars->current_year)
                     ->get()
                     ->groupBy("student_id");
+
+                // localhost
+//                dd($students["3536"]);
 
                 //Total number of students for the level
                 $totalNumberOfStudents = $students->count();

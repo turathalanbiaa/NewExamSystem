@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\ExamType;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cookie;
 
 class Course extends Model
@@ -11,10 +13,15 @@ class Course extends Model
     protected $primaryKey = "id";
     public $timestamps = false;
 
-    public function exams()
+    public function exams(): HasMany
     {
         return $this->hasMany('App\Models\Exam', 'course_id')
             ->orderBy("type");
+    }
+
+    public function assessments(): HasMany
+    {
+        return $this->hasMany('App\Models\Assessment', 'course_id');
     }
 
     public function lecturer()

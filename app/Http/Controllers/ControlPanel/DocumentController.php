@@ -46,99 +46,92 @@ class DocumentController extends Controller
         Auth::check();
         $sys_vars = SystemVariables::find(1);
 
-        //Transaction
-        $exception = DB::transaction(function () use ($sys_vars){
-            //Relay students' grades in exams to their documents
-            $examsStudents = ExamStudent::all();
-            foreach ($examsStudents as $examStudent)
-            {
-                $document = StudentDocument::where('student_id', $examStudent->student->id)
-                    ->where('course_id', $examStudent->exam->course->id)
-                    ->where('season', $sys_vars->current_season)
-                    ->where('year', $sys_vars->current_year)
-                    ->first();
-
-                //Update document
-                if ($document)
-                {
-                    $document->first_month_score = ($examStudent->exam->type == ExamType::FIRST_MONTH)?$examStudent->score:$document->first_month_score;
-                    $document->second_month_score = ($examStudent->exam->type == ExamType::SECOND_MONTH)?$examStudent->score:$document->second_month_score;
-                    $document->final_first_score = ($examStudent->exam->type == ExamType::FINAL_FIRST_ROLE)?$examStudent->score:$document->final_first_score;
-                    $document->final_second_score = ($examStudent->exam->type == ExamType::FINAL_SECOND_ROLE)?$examStudent->score:$document->final_second_score;
-                }
-
-                //Create document
-                if (!$document)
-                {
-                    $document = new StudentDocument();
-                    $document->student_id = $examStudent->student->id;
-                    $document->course_id = $examStudent->exam->course->id;
-                    $document->first_month_score = ($examStudent->exam->type == ExamType::FIRST_MONTH)?$examStudent->score:null;
-                    $document->second_month_score = ($examStudent->exam->type == ExamType::SECOND_MONTH)?$examStudent->score:null;
-                    $document->assessment_score = null;
-                    $document->final_first_score = ($examStudent->exam->type == ExamType::FINAL_FIRST_ROLE)?$examStudent->score:null;
-                    $document->final_second_score = ($examStudent->exam->type == ExamType::FINAL_SECOND_ROLE)?$examStudent->score:null;
-                    $document->total = null;
-                    $document->decision_score = 0;
-                    $document->final_score = null;
-                    $document->season = $sys_vars->current_season;
-                    $document->year = $sys_vars->current_year;
-                }
-
-                //Store document
-                $document->save();
-            }
-
-            //Relay students' grades in assessment to their documents
-//            $assessments = Assessment::all();
-//            foreach ($assessments as $assessment)
-//            {
-//                $document = StudentDocument::updateOrCreate(
-//                    [
-//                        "student_id" => $assessment->student_id,
-//                        "course_id"  => $assessment->course_id,
-//                        'season'     => $sys_vars->current_season,
-//                        'year'       => $sys_vars->current_year
-//                    ],
-//                    [
-//                        "assessment_score" => $assessment->score
-//                    ]
-//                );
-//            }
-
-            //Find total for the documents
-            $documents = StudentDocument::where("season", $sys_vars->current_season)
-                ->where("year", $sys_vars->current_year)
+        try {
+            // Get all students
+            $students = Student::query()
+                ->has("originalStudent")
+                ->with("originalStudent")
                 ->get();
-            foreach ($documents as $document)
-            {
-                $total = $document->first_month_score + $document->second_month_score + $document->assessment_score;
-                $total += max($document->final_first_score, $document->final_second_score);
 
-                $total = ceil($total);
-                $document->total = $total;
+            foreach ($students as $student) {
+                if (!$student->originalStudent->Level)
+                    continue;
 
-                //Find final score
-                $document->final_score = $total;
-                if ($total == 50)
-                {
-                    $document->final_score = $total + 1;
-                    $document->decision_score = 0;
+                // localhost
+//                $student = Student::find(3536);
+
+                // Get all courses, exams, assessment.
+                $courses = Course::query()
+                    ->has("exams")
+                    ->where("level", $student->originalStudent->Level)
+                    ->with(["exams" => function ($query) use ($student) {
+                        $query->with(["studentsEnrolled" => function ($query) use ($student) {
+                            $query->where("student_id", $student->id);
+                        }]);
+                    }])
+                    ->with(['assessments' => function($query) use ($student) {
+                        $query->where("student_id", $student->id);
+                    }])
+                    ->get();
+
+                // Update or create student document
+                foreach ($courses as $course) {
+                    $assessmentScore = $course->assessments->first()->score ?? null;
+                    $finalScoreFirstRole = $this::getExamScore($course, ExamType::FINAL_FIRST_ROLE);
+                    $finalScoreSecondRole = $this::getExamScore($course, ExamType::FINAL_SECOND_ROLE);
+                    $totalScore = ceil($assessmentScore + max($finalScoreFirstRole, $finalScoreSecondRole));
+                    $finalScore = ($totalScore == 50) ? $totalScore+=1 : $totalScore;
+
+                    // localhost
+//                    dump($course->id, $assessmentScore, $finalScoreFirstRole, $finalScoreSecondRole, $totalScore, $finalScore);
+
+                    // create or update document
+                    StudentDocument::query()->updateOrCreate([
+                        "course_id" => $course->id,
+                        "student_id" => $student->id,
+                        "season" => $sys_vars->current_season,
+                        "year" => $sys_vars->current_year,
+                    ], [
+                        "first_month_score" => null,
+                        "second_month_score" => null,
+                        "assessment_score" => $assessmentScore,
+                        "final_first_score" => $finalScoreFirstRole,
+                        "final_second_score" => $finalScoreSecondRole,
+                        "total" => $totalScore,
+                        "decision_score" => 0,
+                        "final_score" => $finalScore,
+                    ]);
                 }
 
-                $document->save();
+                // localhost
+//                dd("Done Student ID: 3536", $courses->toArray());
             }
-        });
-
-        if (is_null($exception))
-            return redirect("/control-panel/documents")->with([
-                "DocumentCreationMessage" => "تم ترحيل درجات الطلاب الى وثائقهم"
-            ]);
-        else
+        } catch (\Exception $exception) {
             return redirect("/control-panel/documents")->with([
                 "DocumentCreationMessage" => "لم يتم ترحيل درجات الطلاب الى وثائقهم",
                 "TypeMessage" => "Error"
             ]);
+        }
+
+        return redirect("/control-panel/documents")->with([
+            "DocumentCreationMessage" => "تم ترحيل درجات الطلاب الى وثائقهم"
+        ]);
+    }
+
+    public static function getExamScore($course, $examType) {
+        $exam = $course->exams
+            ->where("type", $examType)
+            ->first();
+
+        if (!$exam)
+            return null;
+
+        $studentEnrolled = $exam->studentsEnrolled->first();
+
+        if (!$studentEnrolled)
+            return null;
+
+        return $studentEnrolled->score;
     }
 
     /**
@@ -170,7 +163,6 @@ class DocumentController extends Controller
             "student" => $student
         ]);
     }
-
 
     public function exportDocument($type)
     {
