@@ -15,14 +15,9 @@
                             </div>
 
                             <div class="card-body">
-                                <h5>
+                                <div class="h5-responsive text-center text-default">
                                     تاريخ البدء :
                                     {{$exam->date}}
-                                </h5>
-                                <p class="card-text text-justify">
-                                </p>
-
-                                <div class="card-body-content-fixed">
                                 </div>
                             </div>
                         </div>

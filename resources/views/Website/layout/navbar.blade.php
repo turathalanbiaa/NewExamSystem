@@ -30,6 +30,11 @@
                     </a>
                 </div>
                 <div class="nav-item">
+                    <a class="nav-link" href="{{URL::to('/documents')}}">
+                        <span>النتائج</span>
+                    </a>
+                </div>
+                <div class="nav-item">
                     <a class="nav-link" href="{{URL::to('/student-logout')}}">
                         <span>تسجيل خروج</span>
                     </a>

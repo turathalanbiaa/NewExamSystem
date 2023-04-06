@@ -16,31 +16,23 @@
                         <div class="card-body">
                             @if($exam->state == \App\Enums\ExamState::OPEN)
                                 <div class="h-100 d-flex justify-content-center align-items-center">
-                                    <h5 class="text-center text-primary m-0">
-                                        يرجى انتظار التصحيح
-                                    </h5>
+                                    <div class="h5-responsive text-center text-info">
+                                        يرجى انتظار اغلاق الامتحان لمراجعة اجوبتك
+                                    </div>
                                 </div>
                             @else
-                                @php $sum = 0; @endphp
-                                <h5>
-                                    <span>درجة الامتحان :</span>
-                                    {{(int) $exam->pivot->score}}
-                                    @php $sum += (int) $exam->pivot->score; @endphp
-                                </h5>
-                                <h5>
-                                    درجة القرار :
-                                    {{$exam->course->getDecisionScore()}}
-                                    @php $sum += $exam->course->getDecisionScore(); @endphp
-                                </h5>
-                                <h5>
-                                    تقييم المباحثات :
-                                    {{$exam->course->getAssessmentScore()}}
-                                    @php $sum += $exam->course->getAssessmentScore(); @endphp
-                                </h5>
-                                <h5>
-                                    الدرجة النهائية :
-                                    {{$sum}}
-                                </h5>
+                                <div class="h5-responsive text-center">
+                                    @if(is_null($exam->pivot->score))
+                                        <span class="text-info">
+                                         يرجى انتظار التصحيح لمعرفة الدرجة النهائية
+                                    </span>
+                                    @else
+                                        <span class="text-default">
+                                        درجة الامتحان :
+                                        {{$exam->pivot->score}}
+                                    </span>
+                                    @endif
+                                </div>
                             @endif
 
                             @if($exam->state == \App\Enums\ExamState::END)

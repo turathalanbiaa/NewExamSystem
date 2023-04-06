@@ -19,8 +19,11 @@ use App\Models\StudentDocument;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
@@ -57,7 +60,7 @@ class ExamController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
@@ -155,7 +158,7 @@ class ExamController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param  \App\Models\Exam $exam
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request, Exam $exam)
     {
@@ -170,7 +173,7 @@ class ExamController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\Exam  $exam
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Exam $exam)
     {
@@ -186,7 +189,7 @@ class ExamController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param  \App\Models\Exam $exam
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws \Illuminate\Validation\ValidationException
      */
     public function update(Request $request, Exam $exam)
@@ -236,22 +239,22 @@ class ExamController extends Controller
                 //Update exam
                 $exam->save();
 
-
                 // finished exam for all student when exam is ended
                 if ($exam->state == ExamState::END) {
-                    $exam_students = ExamStudent::where("exam_id", $exam->id)->get();
-                    foreach ($exam_students as $exam_student)
-                        $exam_student->update([
+                    ExamStudent::query()
+                        ->where("exam_id", $exam->id)
+                        ->update([
                             "state" => ExamStudentState::FINISHED
                         ]);
                 }
 
-                // not finished exam for all student when exam is reopen
+                // not finished exam for all student when exam is reopened
                 if (Input::get("state") == "reopen") {
-                    $exam_students = ExamStudent::where("exam_id", $exam->id)->get();
-                    foreach ($exam_students as $exam_student)
-                        $exam_student->update([
-                            "state" => ExamStudentState::NOT_FINISHED
+                    $exam_students = ExamStudent::query()
+                        ->where("exam_id", $exam->id)
+                        ->update([
+                            "state" => ExamStudentState::NOT_FINISHED,
+                            "score" => null
                         ]);
                 }
 
@@ -389,8 +392,8 @@ class ExamController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Exam  $exam
-     * @return \Illuminate\Http\Response
+     * @param Exam $exam
+     * @return Application|RedirectResponse|Redirector
      */
     public function destroy(Exam $exam)
     {

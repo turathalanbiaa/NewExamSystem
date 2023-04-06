@@ -17,4 +17,6 @@ Route::post('/store', 'Website\StudentExamController@store');
 Route::post('/delete', 'Website\StudentExamController@delete');
 Route::post('/finish', 'Website\StudentExamController@finish');
 
+Route::get('/documents', 'Website\DocumentController@index');
+
 
