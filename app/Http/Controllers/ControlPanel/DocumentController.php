@@ -74,6 +74,9 @@ class DocumentController extends Controller
                     }])
                     ->get();
 
+                // localhost
+//                dd($courses->toArray());
+
                 // Update or create student document
                 foreach ($courses as $course) {
                     $assessmentScore = $course->assessments->first()->score ?? null;
@@ -83,7 +86,7 @@ class DocumentController extends Controller
                     $finalScore = ($totalScore == 50) ? $totalScore+=1 : $totalScore;
 
                     // localhost
-//                    dump($course->id, $assessmentScore, $finalScoreFirstRole, $finalScoreSecondRole, $totalScore, $finalScore);
+//                    dump($course->id.":A=".$assessmentScore.":FF=".$finalScoreFirstRole.":FS=".$finalScoreSecondRole.":T=".$totalScore.":F=".$finalScore);
 
                     // create or update document
                     StudentDocument::query()->updateOrCreate([
